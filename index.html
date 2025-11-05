@@ -23,13 +23,13 @@
     <!-- GSAP (for loading screen) - Will be imported as module -->
 
 
-    <style>
+        <style>
         /* Base body styles */
         body {
             /* background-color: #030712; */ /* MOVED to fallback div */
             background-color: transparent; /* Make body transparent */
             font-family: 'Inter', sans-serif;
-            color: #d1d5db; /* text-gray-300 */
+            color: #E0E0E0; /* text-gray-300 -> NEW LIGHT GRAY */
         }
         
         /* NEW Fallback background */
@@ -39,7 +39,7 @@
              left: 0;
              width: 100%;
              height: 100%;
-             background-color: #030712; /* Solid black/blue */
+             background-color: #000000; /* Solid black/blue -> NEW BLACK */
              z-index: -2; /* Behind video */
         }
         
@@ -90,7 +90,7 @@
         /* --- REGISTRATION SECTION BACKGROUND (Video) --- */
         #register {
             /* background-image REMOVED */
-            background-color: #030712; /* NEW: Solid background */
+            background-color: #000000; /* NEW: Solid background -> NEW BLACK */
             position: relative;
         }
         #register .container { position: relative; z-index: 1; }
@@ -103,11 +103,11 @@
         /* Glowing button effect */
         .btn-glow {
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);
+            box-shadow: 0 4px 15px rgba(255, 69, 58, 0.2); /* NEW RED */
         }
         .btn-glow:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 25px rgba(225, 29, 72, 0.4);
+            box-shadow: 0 6px 25px rgba(255, 69, 58, 0.4); /* NEW RED */
         }
 
 
@@ -116,7 +116,7 @@
             position: relative;
             overflow: hidden; /* Contain the overlay */
             transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
-            --active-color: #e11d48; /* Default to TTRL Red */
+            --active-color: #FF453A; /* Default to TTRL Red -> NEW RED */
         }
         
         /* The circular overlay */
@@ -158,15 +158,15 @@
         }
 
         /* Text color transitions */
-        .calendar-card .card-date,
+        .calendar-card:hover .card-date,
         .calendar-card .card-gp,
         .calendar-card .card-track {
             transition: color 0.3s ease-out;
         }
         
-        .calendar-card:hover .card-date { color: #f9a8d4; /* Lighter pink */ }
-        .calendar-card:hover .card-gp { color: #ffffff; }
-        .calendar-card:hover .card-track { color: #d1d5db; /* text-gray-300 */ }
+        .calendar-card:hover .card-date { color: #ff9e97; /* Lighter pink -> NEW LIGHTER RED */ }
+        .calendar-card:hover .card-gp { color: #FFFFFF; }
+        .calendar-card:hover .card-track { color: #E0E0E0; /* text-gray-300 -> NEW LIGHT GRAY */ }
         
         /* --- END Card Overlay Effect --- */
 
@@ -197,8 +197,8 @@
         }
 
         /* Standings tabs and reset button */
-        .tab-active { background-color: #e11d48; color: #ffffff; }
-        .tab-inactive { background-color: #374151; color: #d1d5db; }
+        .tab-active { background-color: #FF453A; color: #FFFFFF; } /* NEW RED */
+        .tab-inactive { background-color: #111111; color: #E0E0E0; } /* NEW OFF-BLACK & LIGHT GRAY */
 
         /* Modal styles */
         .modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
@@ -208,7 +208,7 @@
         #standings, #contact {
             position: relative; 
             overflow: hidden; 
-            background-color: #030712; /* NEW: Solid background */
+            background-color: #000000; /* NEW: Solid background -> NEW BLACK */
         }
         #standings > .container, #contact > .container {
             position: relative; /* Ensure content is on top of video */
@@ -766,11 +766,11 @@
         }
 
         /* TTRL Theme Colors for Nav (Order Swapped) */
-        nav li:nth-of-type(1){background-color: #e11d48} /* TTRL Red (Home) */
-        nav li:nth-of-type(2){background-color: #9f1239} /* Darker Red (Calendar) */
-        nav li:nth-of-type(3){background-color: #4b5563} /* Gray (Standings) */
-        nav li:nth-of-type(4){background-color: #111827} /* Darkest Gray (Enrollment) */
-        nav li:nth-of-type(5){background-color: #1f2937} /* Darker Gray (Contact) */
+        nav li:nth-of-type(1){background-color: #FF453A} /* TTRL Red (Home) -> NEW RED */
+        nav li:nth-of-type(2){background-color: #cc2b20} /* Darker Red (Calendar) -> NEW DARKER RED */
+        nav li:nth-of-type(3){background-color: #111111} /* Gray (Standings) -> NEW OFF-BLACK */
+        nav li:nth-of-type(4){background-color: #000000} /* Darkest Gray (Enrollment) -> NEW BLACK */
+        nav li:nth-of-type(5){background-color: #111111} /* Darker Gray (Contact) -> NEW OFF-BLACK */
 
         /* Burger Menu Button (NEW SVG Button) */
         .menu {
@@ -818,7 +818,7 @@
             --array-2: 107px;
         }
         .menu.active svg {
-            stroke: #e11d48; /* Red when active */
+            stroke: #FF453A; /* Red when active -> NEW RED */
         }
         .menu.active path {
             --offset: 57px;
@@ -920,23 +920,22 @@
             font-size: 2.25rem; /* text-4xl */
             line-height: 2.5rem; /* leading-10 */
             font-weight: 700; /* font-bold */
-            color: #fff;
+            color: #FFFFFF;
         }
         #countdown-section .countdown-box span:last-child {
             display: block;
             font-size: 0.75rem; /* text-xs */
             line-height: 1rem; /* leading-4 */
             font-weight: 500; /* font-medium */
-            color: #9CA3AF; /* text-gray-400 */
+            color: #E0E0E0; /* text-gray-400 -> NEW LIGHT GRAY */
             text-transform: uppercase;
         }
         #countdown-section .countdown-box.seconds span:first-child {
-            color: #F43F5E; /* text-rose-500 */
+            color: #FF453A; /* text-rose-500 -> NEW RED */
         }
         @media (min-width: 640px) {
              #countdown-section .countdown-box span:first-child {
-                font-size: 3rem; /* text-5xl */
-                line-height: 1;
+                 line-height: 1;
              }
              #countdown-section .countdown-box span:last-child {
                 font-size: 0.875rem; /* text-sm */
@@ -947,6 +946,34 @@
 
         /* --- REMOVED Curved Scrollbar CSS --- */
         
+        /* --- REMOVED Curved Scrollbar CSS --- */
+        
+        /* --- NEW PALETTE OVERRIDES --- */
+        /* These overrides will catch Tailwind classes used in the HTML */
+        
+        /* Backgrounds */
+        footer#contact {
+            background-color: #111111; /* Off-black for Footer */
+        }
+        .bg-gray-900 { background-color: #111111 !important; }
+        .bg-gray-800, .bg-gray-800\/70 { background-color: rgba(30, 30, 30, 0.7) !important; } /* Dark gray w/ alpha */
+        .bg-gray-950\/80 { background-color: rgba(0, 0, 0, 0.8) !important; } /* Black w/ alpha */
+        
+        /* Borders */
+        .border-gray-700 { border-color: #111111 !important; }
+        .border-gray-800 { border-color: #000000 !important; }
+        
+        /* Text */
+        h1, h2, h3, h4, h5, h6, .text-white { color: #FFFFFF; }
+        .text-gray-300, .text-gray-200 { color: #FFFFFF !important; }
+        .text-gray-400 { color: #E0E0E0 !important; }
+        .text-gray-500 { color: #E0E0E0 !important; opacity: 0.8; }
+
+        /* Accents */
+        .text-rose-600 { color: #FF453A !important; }
+        .bg-rose-600 { background-color: #FF453A !important; }
+        .text-rose-500 { color: #FF453A !important; }
+        /* --- END NEW PALETTE OVERRIDES --- */
     </style>
     
     <!-- REMOVED STYLE TAG FOR SCROLLER KEYFRAMES -->
@@ -1235,7 +1262,7 @@
             </div>
             <!-- Modal Body -->
             <div class="p-0 max-h-[80vh] overflow-y-auto">
-                <img id="modal-map" class="w-full h-64 object-contain bg-black" src="https://placehold.co/768x432/374151/e11d48?text=Track+Map" alt="Track Map">
+                <img id="modal-map" class="w-full h-64 object-contain bg-black" src="https://placehold.co/768x432/374151/FF453A?text=Track+Map" alt="Track Map">
                 <div class="p-6">
                     <p id="modal-date" class="text-sm font-medium text-rose-500 mb-1" style="font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: normal;"></p>
                     <h4 id="modal-gp" class="text-3xl font-bold text-white mb-1">Grand Prix Name</h4>
@@ -1276,7 +1303,7 @@
             { round: 2, gp: "Australian Grand Prix", date: "26/09/25", track: "Albert Park Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Albert-Park-Circuit-768x432.png", insight: "A fast, flowing street circuit with multiple DRS zones. It's a high-speed track that feels like a permanent circuit. Key overtaking spots are Turns 1, 3, and 9.", stats: { laps: 29, length: "5.278 km" } },
             { round: 3, gp: "Emilia Romagna Grand Prix", date: "03/10/25", track: "Autodromo Enzo e Dino Ferrari (Imola)", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Autodromo-Enzo-e-Dino-Ferrari-768x432.png", insight: "An old-school, narrow track with punishing gravel traps. It's fast, unforgiving, and very technical. Overtaking is notoriously difficult, so qualifying and strategy are critical.", stats: { laps: 32, length: "4.909 km" } },
             { round: 4, gp: "Spanish Grand Prix", date: "10/10/25", track: "Circuit de Barcelona-Catalunya", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Circuit-de-Barcelona-768x432.png", insight: "A well-known test track with a great mix of high and low-speed corners. The long, sweeping Turn 3 is a true test of car balance. Tire management is crucial here.", stats: { laps: 33, length: "4.657 km" } },
-            { round: "break", gp: "Season Break", date: "", track: "Time for teams to regroup and upgrade.", mapUrl: "https://placehold.co/768x432/1f2937/e11d48?text=SEASON+BREAK", insight: "A mid-season break for teams to analyze performance, develop upgrades, and for drivers to recharge.", stats: null },
+            { round: "break", gp: "Season Break", date: "", track: "Time for teams to regroup and upgrade.", mapUrl: "https://placehold.co/768x432/1f2937/FF453A?text=SEASON+BREAK", insight: "A mid-season break for teams to analyze performance, develop upgrades, and for drivers to recharge.", stats: null },
             { round: 5, gp: "Great Britain Grand Prix", date: "24/10/25", track: "Silverstone Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Silverstone-Circuit--768x432.png", insight: "An iconic, high-speed circuit featuring legendary corners like Maggotts, Becketts, and Chapel. Requires high downforce and strong aerodynamic efficiency.", stats: { laps: 26, length: "5.891 km" } },
             { round: 6, gp: "Las Vegas Grand Prix", date: "31/10/25", track: "Las Vegas Strip Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Las-Vegas-GP-768x432.png", insight: "A fast street circuit with long straights, especially down the famous Strip. Expect high top speeds, heavy braking, and many overtaking opportunities.", stats: { laps: 25, length: "6.201 km" } },
             { round: 7, gp: "Belgian Grand Prix", date: "07/11/25", track: "Circuit de Spa-Francorchamps", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Circuit-de-Spa-Francorchamps-768x432.png", insight: "A driver favorite, known for its length, elevation changes, and the iconic Eau Rouge/Raidillon sequence. It's a high-speed, low-downforce track.", stats: { laps: 22, length: "7.004 km" } },
@@ -1323,7 +1350,7 @@
             "Aston Martin": "hsl(172, 100%, 22%)", // #006F62
             "Racing Bulls": "hsl(211, 100%, 64%)", // #469BFF
             "Mercedes": "hsl(174, 100%, 41%)", // #00D2BE
-            "Red Bull Racing": "hsl(240, 100%, 48%)", // #0600EF
+            "Red Bull Racing": "hsl(240, 100%, 48%)", // #0600EF -> REVERTED
             // "Reserve": "hsl(0, 0%, 50%)", // #808080 // Removed
             "default": "hsl(347, 83%, 54%)" // #e11d48
         };
@@ -1518,7 +1545,7 @@
             
             // Define colors for calendar cards
             const testingColor = "#0082FA"; // Williams Blue
-            const raceColor = "#e11d48"; // TTRL Red
+            const raceColor = "#FF453A"; // TTRL Red -> NEW RED
             
             leagueCalendar.forEach(race => {
                 if (race.round === "break") { 
@@ -2021,7 +2048,7 @@
                 modalEls.modalMap.src = race.mapUrl;
                 modalEls.modalMap.alt = `${race.track} Map`;
                 modalEls.modalMap.onerror = () => {
-                    modalEls.modalMap.src = `https::/placehold.co/768x432/374151/e11d48?text=Map+Error`;
+                    modalEls.modalMap.src = `https::/placehold.co/768x432/374151/FF453A?text=Map+Error`;
                     modalEls.modalMap.alt = 'Track map loading error';
                 };
                 modalEls.modalDate.textContent = race.date;
