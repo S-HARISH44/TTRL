@@ -1126,7 +1126,7 @@
                              <!-- Driver cards will be injected here -->
                         </div>
                          <!-- Added max-w-4xl mx-auto to this paragraph -->
-                        <p class="text-center text-sm text-gray-200 mt-4 max-w-4xl mx-auto">Points after the Great Britain GP</p>
+                        <p class="text-center text-sm text-gray-200 mt-4 max-w-4xl mx-auto">Points after the Las Vegas GP</p>
                     </div>
 
 
@@ -1135,7 +1135,7 @@
                      <!-- Use inline style to hide by default, ensuring it's hidden before Tailwind loads -->
                     <div id="constructors-list-container" style="display: none;" class="max-w-4xl mx-auto">
                          <!-- Carousel will be injected here -->
-                         <p class="text-center text-sm text-gray-200 mt-4" style="grid-column: 1 / -1;">Points after the Great Britain GP. Click and drag cards to explore.</p>
+                         <p class="text-center text-sm text-gray-200 mt-4" style="grid-column: 1 / -1;">Points after the Las Vegas GP. Click and drag cards to explore.</p>
                     </div>
                 </div>
             </div>
@@ -1288,25 +1288,25 @@
         // Original data, DO NOT MODIFY
         const driverData = [
             // No 'pos' needed, it will be auto-assigned
-            { driver: "Simman", team: "Ferrari", points: 109 },
-            { driver: "Wi7ard", team: "Williams", points: 96 },
-            { driver: "TheGodfather", team: "Alpine", points: 40 },
-            { driver: "Overlord", team: "McLaren", points: 34 },
-            { driver: "Kentucky", team: "Haas", points: 26 },
-            { driver: "Oxygen", team: "Kick Sauber", points: 18 },
-            { driver: "ApexEntropy", team: "Alpine", points: 33 },
+            { driver: "Simman", team: "Ferrari", points: 124 },
+            { driver: "Wi7ard", team: "Williams", points: 105 },
+            { driver: "TheGodfather", team: "Alpine", points: 58 },
+            { driver: "Harish", team: "Haas", points: 50 },
+            { driver: "ApexEntropy", team: "Alpine", points: 45 },
+            { driver: "Overload", team: "McLaren", points: 34 },
             { driver: "Vibin", team: "Aston Martin", points: 33 },
-            { driver: "Mahesh", team: "Williams", points: 17 },
-            { driver: "Clone", team: "Racing Bulls", points: 8 },
-            { driver: "Bopedope", team: "McLaren", points: 6 },
+            { driver: "Kentucky", team: "Haas", points: 27 },
+            { driver: "Mahesh", team: "Williams", points: 27 },
+            { driver: "Oxygen", team: "Kick Sauber", points: 18 },
+            { driver: "Memb", team: "Mercedes", points: 18 },
             { driver: "Apurrv", team: "Aston Martin", points: 17 },
-            { driver: "Majunu", team: "Ferrari", points: 4 },
+            { driver: "Bopedope", team: "McLaren", points: 12 },
+            { driver: "Clone", team: "Racing Bulls", points: 8 },
             { driver: "Denji", team: "Red Bull Racing", points: 4 },
-            { driver: "Harish", team: "Haas", points: 25 },
-            { driver: "Memb", team: "Mercedes", points: 16 },
-            { driver: "Doc YT", team: "Racing Bulls", points: 1 },
             { driver: "Maayaone", team: "Mercedes", points: 0 },
             { driver: "Bala", team: "Kick Sauber", points: 0 },
+            { driver: "Dino", team: "Ferrari", points: 0 },
+            { driver: "Spartan Gamer", team: "Racing Bulls", points: 0 },
             { driver: "HarryBeckham", team: "Red Bull Racing", points: 0 }
             // Removed Reserve Drivers
         ];
@@ -1407,6 +1407,14 @@
                 // Store driver name and points for the card
                 teamData.drivers.push({ name: driver.driver, points: driver.points });
             });
+
+            // --- NEW: Manual point adjustment for Racing Bulls ---
+            if (constructorMap.has("Racing Bulls")) {
+                const rbData = constructorMap.get("Racing Bulls");
+                // Add 1 point from the previous driver
+                rbData.points += 1; 
+            }
+            // --- END NEW ---
 
             // Convert map to array
             currentConstructorStandings = Array.from(constructorMap.values());
