@@ -46,7 +46,6 @@
         .fixed-ui {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
             padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center;
-            /* mix-blend-mode: difference; REMOVED to fix logo color */ 
             pointer-events: none;
         }
         .logo { height: 3rem; width: auto; pointer-events: auto; filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5)); }
@@ -82,7 +81,8 @@
         }
 
         .slide-content {
-            position: relative; z-index: 2; max-width: 1400px; width: 100%; padding: 0 4vw;
+            position: relative; z-index: 3; /* Above Three.js canvas */
+            max-width: 1400px; width: 100%; padding: 0 4vw;
             display: flex; flex-direction: column; justify-content: center; height: 100%;
         }
 
@@ -154,7 +154,7 @@
         }
 
         /* Driver Table View */
-        .table-scroll { height: 100%; overflow-y: auto; padding-right: 1rem; scrollbar-width: thin; scrollbar-color: var(--accent-red) rgba(255,255,255,0.1); }
+        .table-scroll { height: 100%; overflow-y: auto; padding-right: 1rem; scrollbar-width: thin; scrollbar-color: var(--accent-red) rgba(255,255,255,0.1); overscroll-behavior: contain; }
         .standings-table { width: 100%; border-collapse: separate; border-spacing: 0 0.5rem; font-family: 'JetBrains Mono', monospace; }
         .standings-table th {
             text-align: left; color: var(--accent-cyan); padding: 1rem;
@@ -174,6 +174,8 @@
             display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem; height: 100%; overflow-y: auto; padding-right: 1rem;
             scrollbar-width: thin; scrollbar-color: var(--accent-red) rgba(255,255,255,0.1);
+            overscroll-behavior: contain;
+            padding-top: 1.5rem; /* FIX: Add top padding to prevent clipping on scroll */
         }
         .constructor-card {
             background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.2) 100%);
@@ -377,10 +379,10 @@
     </div>
 
     <!-- REQUIRED LIBRARIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Observer.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.topology.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
 
     <script>
         gsap.registerPlugin(Observer);
@@ -537,8 +539,8 @@
         gsap.set('#slide-0 .char', { opacity: 1 });
         gsap.set('#slide-0 .slide-tag, #slide-0 .slide-desc, #slide-0 .btn-container, #slide-0 .hero-countdown', { opacity: 1, y: 0 });
 
-        // INIT VANTA
-        VANTA.TOPOLOGY({
+        // INIT VANTA (Switch to NET for stability as TOPOLOGY depends on P5 which causes issues here)
+        VANTA.NET({
             el: "#vanta-bg",
             mouseControls: true,
             touchControls: true,
@@ -548,7 +550,10 @@
             scale: 1.00,
             scaleMobile: 1.00,
             color: 0x00f0ff,
-            backgroundColor: 0x030616
+            backgroundColor: 0x030616,
+            points: 10.00,
+            maxDistance: 25.00,
+            spacing: 20.00
         });
 
         function gotoSlide(index, direction) {
@@ -582,11 +587,59 @@
             tl.to(nextSlide.querySelectorAll('.slide-tag, .slide-desc, .btn-container, .cal-grid, .standings-wrapper, .contact-grid, .standings-tabs, .hero-countdown'), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.6);
         }
 
+        // Main Page Observer
         Observer.create({
-            target: window, type: "wheel,touch,pointer", wheelSpeed: -1, tolerance: 10, preventDefault: true,
-            onDown: () => !isAnimating && gotoSlide(currentIndex - 1, -1),
-            onUp: () => !isAnimating && gotoSlide(currentIndex + 1, 1)
+            target: window,
+            type: "wheel,touch,pointer",
+            wheelSpeed: -1,
+            tolerance: 10,
+            preventDefault: true,
+            onDown: (self) => {
+                 // Ignore if interaction started inside a scrollable container
+                if (self.event.target.closest('.table-scroll') || self.event.target.closest('.garage-grid')) return;
+                if (!isAnimating) gotoSlide(currentIndex - 1, -1);
+            },
+            onUp: (self) => {
+                 // Ignore if interaction started inside a scrollable container
+                if (self.event.target.closest('.table-scroll') || self.event.target.closest('.garage-grid')) return;
+                if (!isAnimating) gotoSlide(currentIndex + 1, 1);
+            }
         });
+        
+        // Scroll Trap for inner containers with boundary detection
+        function trapScroll(element) {
+             Observer.create({
+                target: element,
+                type: "wheel,touch,pointer",
+                wheelSpeed: -1,
+                tolerance: 10,
+                preventDefault: true, // Always prevent default to stop main page scroll
+                onDown: (self) => {
+                    // Scrolling UP (dragging down)
+                    if (element.scrollTop > 0) {
+                        // Allow internal scroll
+                         element.scrollTop -= Math.abs(self.deltaY); 
+                    } else {
+                        // Boundary reached, trigger page transition
+                        if (!isAnimating) gotoSlide(currentIndex - 1, -1);
+                    }
+                },
+                onUp: (self) => {
+                    // Scrolling DOWN (dragging up)
+                    // Use a small buffer (e.g., 2px) to handle potential rounding errors in scrollHeight
+                    if (element.scrollTop + element.clientHeight < element.scrollHeight - 2) {
+                         // Allow internal scroll
+                         element.scrollTop += Math.abs(self.deltaY);
+                    } else {
+                         // Boundary reached, trigger page transition
+                         if (!isAnimating) gotoSlide(currentIndex + 1, 1);
+                    }
+                }
+            });
+        }
+        trapScroll(document.querySelector('.table-scroll'));
+        trapScroll(document.querySelector('.garage-grid'));
+
 
         dots.forEach((dot, i) => { dot.addEventListener('click', () => { if (i !== currentIndex && !isAnimating) gotoSlide(i, i > currentIndex ? 1 : -1); }); });
         document.getElementById('start-engine-btn').addEventListener('click', () => { if (!isAnimating) gotoSlide(1, 1); });
