@@ -13,22 +13,30 @@
 
     <style>
         :root {
-            --bg-main: #030616;
+            --bg-main: #000000; /* UPDATED to pure black */
             --accent-red: #ff1f4b;
             --accent-cyan: #00f0ff;
             --text-primary: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background-color: var(--bg-main);
+        
+        /* FIX: Lock viewport to prevent scrollbars and bars */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-main); /* Base color */
             font-family: 'Inter', sans-serif;
             color: var(--text-primary);
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
+            overflow: hidden; /* Lock native scroll */
+            overscroll-behavior: none; /* Prevent rubber-banding */
+            scrollbar-width: none; /* Firefox */
+            /* position: fixed; */ /* REVERTED: No longer needed with crossfade */
         }
+        body::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+
 
         /* --- CINEMATIC OVERLAYS --- */
         .cinematic-grain {
@@ -60,13 +68,19 @@
         .dot.active { background: var(--accent-red); transform: scale(1.5); }
 
         /* --- SLIDE STRUCTURE --- */
-        .slides-wrapper { position: fixed; inset: 0; width: 100%; height: 100%; }
+        .slides-wrapper { 
+            position: fixed; 
+            inset: 0; /* REVERTED: Back to 0 */
+            width: 100%; 
+            height: 100%;
+        }
         .slide {
             position: absolute; inset: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             visibility: hidden; overflow: hidden;
+            opacity: 0; /* NEW: Slides start invisible */
         }
-        .slide.active { visibility: visible; z-index: 10; }
+        .slide.active { visibility: visible; z-index: 10; opacity: 1; }
 
         .slide-bg {
             position: absolute; inset: 0; z-index: 1;
@@ -75,6 +89,9 @@
             transform: scale(1.1); will-change: transform;
         }
         /* Ensure Vanta canvas fits perfectly */
+        #vanta-bg {
+            filter: brightness(1) grayscale(0); /* Vanta doesn't need double filtering */
+        }
         #vanta-bg canvas {
             width: 100% !important;
             height: 100% !important;
@@ -158,7 +175,7 @@
         .standings-table { width: 100%; border-collapse: separate; border-spacing: 0 0.5rem; font-family: 'JetBrains Mono', monospace; }
         .standings-table th {
             text-align: left; color: var(--accent-cyan); padding: 1rem;
-            position: sticky; top: 0; background: rgba(3,6,22,0.9); backdrop-filter: blur(10px); z-index: 10;
+            position: sticky; top: 0; background: rgba(0,0,0,0.9); /* Updated for black bg */ backdrop-filter: blur(10px); z-index: 10;
             font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 0.1em;
         }
         .standings-table td { padding: 1rem; background: rgba(255,255,255,0.03); border: 1px solid transparent; transition: all 0.3s ease; }
@@ -388,8 +405,8 @@
         gsap.registerPlugin(Observer);
 
         // --- ASSETS ---
-        const teamLogoMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/ferrari.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/williams.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/alpine.png", "HAAS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/haas.png", "MCLAREN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mclaren.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/kick_sauber.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/martin.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/vcarb.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mercedes.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/redbull.png" };
-        const teamCarMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025ferraricarright.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025williamscarright.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025alpinecarright.png", "HAAS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025haasf1teamcarright.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025astonmartincarright.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025kicksaubercarright.png", "MCLAREN": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mclarencarright.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025redbullracingcarright.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025racingbullscarright.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mercedescarright.png" };
+        const teamLogoMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/ferrari.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/williams.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/alpine.png", "HAAS": "https_//raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/haas.png", "MCLAREN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mclaren.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/kick_sauber.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/martin.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/vcarb.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mercedes.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/redbull.png" };
+        const teamCarMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025ferraricarright.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025williamscarright.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025alpinecarright.png", "HAAS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025haasf1teamcarright.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025astonmartincarright.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025kicksaubercarright.png", "MCLAREN": "httpsGallery/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mclarencarright.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025redbullracingcarright.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025racingbullscarright.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mercedescarright.png" };
 
         // --- DATA ---
         // Updated years to 2025 for realistic syncing based on today's date (Nov 9, 2025)
@@ -405,7 +422,29 @@
             { round: 9, gp: "BRAZIL", date: "21/11/2025" },
             { round: 10, gp: "ABU DHABI", date: "28/11/2025" }
         ];
-        const driverData = [ { driver: "SIMMAN", team: "FERRARI", points: 124 }, { driver: "WI7ARD", team: "WILLIAMS", points: 105 }, { driver: "THEGODFATHER", team: "ALPINE", points: 58 }, { driver: "HARISH", team: "HAAS", points: 50 }, { driver: "APEXENTROPY", team: "ALPINE", points: 45 }, { driver: "OVERLOAD", team: "MCLAREN", points: 34 }, { driver: "VIBIN", team: "ASTON MARTIN", points: 33 }, { driver: "KENTUCKY", team: "HAAS", points: 27 }, { driver: "MAHESH", team: "WILLIAMS", points: 27 }, { driver: "OXYGEN", team: "KICK SAUBER", points: 18 }, { driver: "MEMB", team: "MERCEDES", points: 18 }, { driver: "APURRV", team: "ASTON MARTIN", points: 17 }, { driver: "BOPEDOPE", team: "MCLAREN", points: 12 }, { driver: "CLONE", team: "RACING BULLS", points: 8 }, { driver: "DENJI", team: "RED BULL RACING", points: 4 }, { driver: "MAAYAONE", team: "MERCEDES", points: 0 }, { driver: "BALA", team: "KICK SAUBER", points: 0 }, { driver: "DINO", team: "FERRARI", points: 0 }, { driver: "SPARTAN GAMER", team: "RACING BULLS", points: 0 }, { driver: "HARRYBECKHAM", team: "RED BULL RACING", points: 0 } ];
+        // Points *after* Belgium GP
+        const driverData = [ 
+            { driver: "SIMMAN", team: "FERRARI", points: 136 }, 
+            { driver: "WI7ARD", team: "WILLIAMS", points: 124 }, 
+            { driver: "THEGODFATHER", team: "ALPINE", points: 68 }, 
+            { driver: "HARISH", team: "HAAS", points: 58 }, 
+            { driver: "VIBIN", team: "ASTON MARTIN", points: 48 },
+            { driver: "APEXENTROPY", team: "ALPINE", points: 45 }, 
+            { driver: "OVERLOAD", team: "MCLAREN", points: 34 }, 
+            { driver: "KENTUCKY", team: "HAAS", points: 33 }, 
+            { driver: "MAHESH", team: "WILLIAMS", points: 27 }, 
+            { driver: "APURRV", team: "ASTON MARTIN", points: 21 },
+            { driver: "OXYGEN", team: "KICK SAUBER", points: 18 }, 
+            { driver: "MEMB", team: "MERCEDES", points: 18 }, 
+            { driver: "BOPEDOPE", team: "MCLAREN", points: 12 }, 
+            { driver: "CLONE", team: "RACING BULLS", points: 8 }, 
+            { driver: "DENJI", team: "RED BULL RACING", points: 4 }, 
+            { driver: "MAAYAONE", team: "MERCEDES", points: 0 }, 
+            { driver: "BALA", team: "KICK SAUBER", points: 0 }, 
+            { driver: "DINO", team: "FERRARI", points: 0 }, 
+            { driver: "SPARTAN GAMER", team: "RACING BULLS", points: 0 }, 
+            { driver: "HARRYBECKHAM", team: "RED BULL RACING", points: 0 } 
+        ];
 
         function getConstructorData() {
             const teamMap = {};
@@ -423,7 +462,7 @@
 
         // SYNCED CALENDAR POPULATION
         function populateCalendar() {
-            const now = new Date();
+            const now = new Date(); // Using browser's current date
             const RACE_TIME = { hours: 17, minutes: 0 }; // Assume 17:00 UTC race time
 
             document.getElementById('calendar-grid').innerHTML = leagueCalendar.map(r => {
@@ -466,7 +505,7 @@
 
         // REAL-TIME SYNCED COUNTDOWN
         function initSyncedCountdown() {
-            const now = new Date();
+            const now = new Date(); // Using browser's current date
             const RACE_TIME = { hours: 17, minutes: 0 };
             let nextRace = null;
 
@@ -492,7 +531,8 @@
                 daysEl.textContent = "00";
                 return;
             }
-
+            
+            // Set next race label based on calendar
             nextTagEl.textContent = `NEXT RACE // ${nextRace.gp}`;
 
             function updateTimer() {
@@ -550,7 +590,7 @@
             scale: 1.00,
             scaleMobile: 1.00,
             color: 0x00f0ff,
-            backgroundColor: 0x030616,
+            backgroundColor: 0x000000, // UPDATED to pure black
             points: 10.00,
             maxDistance: 25.00,
             spacing: 20.00
@@ -566,23 +606,27 @@
             dots[currentIndex].classList.remove('active');
             dots[nextIndex].classList.add('active');
 
-            gsap.set(nextSlide, { zIndex: 20, visibility: 'visible', yPercent: direction * 100 });
-            gsap.set(nextSlide.querySelectorAll('.char'), { y: direction * 50, opacity: 0 });
-            gsap.set(nextSlide.querySelectorAll('.slide-tag, .slide-desc, .btn-container, .cal-grid, .standings-wrapper, .contact-grid, .standings-tabs, .hero-countdown'), { y: direction * 30, opacity: 0 });
+            // NEW: CROSSFADE LOGIC
+            gsap.set(nextSlide, { zIndex: 20, visibility: 'visible', opacity: 0 });
+            gsap.set(nextSlide.querySelectorAll('.char'), { y: 0, opacity: 0 }); // y: 0, no direction
+            gsap.set(nextSlide.querySelectorAll('.slide-tag, .slide-desc, .btn-container, .cal-grid, .standings-wrapper, .contact-grid, .standings-tabs, .hero-countdown'), { y: 0, opacity: 0 }); // y: 0, no direction
             
             const tl = gsap.timeline({
-                defaults: { ease: "power4.inOut", duration: 1.2 },
+                defaults: { ease: "power2.inOut", duration: 1.0 }, // Faster, cleaner fade
                 onComplete: () => {
-                    gsap.set(currentSlide, { visibility: 'hidden', zIndex: 1 });
+                    gsap.set(currentSlide, { visibility: 'hidden', zIndex: 1, opacity: 0 }); // Reset old slide
                     currentIndex = nextIndex;
                     isAnimating = false;
                 }
             });
 
-            tl.to(currentSlide, { yPercent: direction * -100 }, 0);
-            tl.to(nextSlide, { yPercent: 0 }, 0);
-            gsap.fromTo(nextSlide.querySelector('.slide-bg'), { yPercent: direction * -20, scale: 1.2 }, { yPercent: 0, scale: 1.0, duration: 1.4, ease: "power2.out" }, 0);
+            tl.to(currentSlide, { opacity: 0 }, 0);
+            tl.to(nextSlide, { opacity: 1 }, 0.2); // Overlap for smoother transition
             
+            // Background still animates for depth
+            gsap.fromTo(nextSlide.querySelector('.slide-bg'), { scale: 1.2 }, { scale: 1.1, duration: 1.4, ease: "power2.out" }, 0);
+            
+            // Content still staggers in
             tl.to(nextSlide.querySelectorAll('.char'), { y: 0, opacity: 1, stagger: { each: 0.025, from: "start" }, duration: 0.8, ease: "back.out(1.5)" }, 0.4);
             tl.to(nextSlide.querySelectorAll('.slide-tag, .slide-desc, .btn-container, .cal-grid, .standings-wrapper, .contact-grid, .standings-tabs, .hero-countdown'), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.6);
         }
