@@ -283,6 +283,8 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem; height: 100%; overflow-y: auto; padding: 1rem;
             scrollbar-width: none; perspective: 1000px;
+            /* REMOVED GLOBAL PERSPECTIVE TO FIX ALIGNMENT/PARALLAX ISSUE */
+            perspective: none; 
         }
         .garage-grid::-webkit-scrollbar { display: none; }
 
@@ -321,7 +323,173 @@
             margin: 1rem 0; position: relative; z-index: 1; transform: translateZ(50px);
             height: 130px; /* Ensures consistent height */
         }
-        .cc-car-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); }
+        /* FIXED: Updated image styling to align perfectly center */
+        .cc-car-img { 
+            width: auto; 
+            max-width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); 
+        }
+
+        /* --- ACCORDION STYLE DOTD (HOVER BASED) --- */
+        .dotd-accordion-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            overflow: hidden;
+        }
+        
+        /* Responsive: switch to row on larger screens */
+        @media (min-width: 768px) {
+            .dotd-accordion-container {
+                flex-direction: row;
+            }
+        }
+
+        .dotd-panel {
+            flex: 1;
+            display: flex;
+            position: relative;
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer;
+            min-height: 60px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .dotd-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%);
+            z-index: 1;
+            transition: background 0.5s;
+        }
+        
+        /* HOVER STATE REPLACES .active STATE */
+        .dotd-panel:hover {
+            flex: 4; 
+            cursor: default;
+            border-color: var(--team-color);
+        }
+        
+        .dotd-panel:hover::before {
+             background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+        }
+
+        /* Vertical Text Label (Inactive State) */
+        .dotd-label {
+            position: absolute;
+            z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            transition: all 0.3s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
+        /* Desktop: Rotate text for vertical strips */
+        @media (min-width: 768px) {
+            .dotd-label {
+                transform: translate(-50%, -50%) rotate(-90deg);
+                font-size: 1.5rem;
+            }
+            /* Hide label on hover */
+            .dotd-panel:hover .dotd-label {
+                opacity: 0;
+                transform: translate(-50%, -200%) rotate(-90deg);
+            }
+        }
+        
+        /* Mobile: Normal text */
+        @media (max-width: 767px) {
+            /* Hide label on hover */
+            .dotd-panel:hover .dotd-label {
+                opacity: 0;
+                transform: translate(-200%, -50%);
+            }
+        }
+
+        /* Content Area (Visible only when Hovered) */
+        .dotd-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem;
+            z-index: 3;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s 0.1s ease-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        }
+
+        .dotd-panel:hover .dotd-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dotd-gp-name {
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .dotd-driver-name {
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .dotd-team-name {
+            color: var(--team-color);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .dotd-badge-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: #FFD700;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 4;
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+        }
+        
+        .dotd-panel:hover .dotd-badge-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
 
         /* --- CONTROLS --- */
         .standings-tabs { display: flex; gap: 1rem; margin-bottom: 1rem; }
@@ -706,6 +874,7 @@
                 <div class="standings-tabs">
                     <button class="tab-btn active hover-target" data-tab="drivers">DRIVERS</button>
                     <button class="tab-btn hover-target" data-tab="constructors">TEAMS</button>
+                    <button class="tab-btn hover-target" data-tab="dotd">AWARDS</button>
                 </div>
                 <div class="standings-wrapper">
                     <div class="standings-view active-view" id="view-drivers">
@@ -718,6 +887,9 @@
                     </div>
                     <div class="standings-view" id="view-constructors">
                         <div class="garage-grid" id="garage-grid"></div>
+                    </div>
+                    <div class="standings-view" id="view-dotd">
+                        <div class="dotd-accordion-container" id="dotd-container"></div>
                     </div>
                 </div>
             </div>
@@ -853,23 +1025,50 @@
              `;
         }
 
-        function getLeagueContext() {
+        function getLeagueContext(currentQuery = "") {
             // Converts JS objects into a readable text format for the AI
             const drivers = driverData.map(d => `${d.driver} (${d.team}): ${d.points}pts`).join(', ');
             // Updated to use the decoupled constructor data
             const teams = getConstructorData().map(c => `${c.team}: ${c.points}pts`).join(', ');
             const schedule = leagueCalendar.map(r => `Rd ${r.round} ${r.gp} (${r.date})`).filter(r => r.round !== 'break').join(', ');
             
+            // NEW: Add DOTD Data to the context
+            const dotdHistory = dotdData.map(d => `${d.gp}: ${d.driver} (${d.team})`).join(', ');
+
             // Look for potential setup query to inject setup data
-            const lastQuery = userInput.value.toLowerCase();
+            const lastQuery = currentQuery.toLowerCase();
             let setupHint = '';
-            if (lastQuery.includes('setup') || lastQuery.includes('aero') || lastQuery.includes('diff') || lastQuery.includes('suspension')) {
-                // Try to infer track name from query
-                for (const race of leagueCalendar) {
-                    if (lastQuery.includes(race.gp.toLowerCase().split(' ')[0])) {
-                        setupHint = getSetupDataForAI(race.gp);
+            
+            // Broad check for setup-related keywords
+            if (lastQuery.includes('setup') || lastQuery.includes('aero') || lastQuery.includes('diff') || lastQuery.includes('suspension') || lastQuery.includes('wing') || lastQuery.includes('brakes') || lastQuery.includes('tyre') || lastQuery.includes('tire')) {
+                
+                // Iterate through available setups to find a match
+                const availableTracks = Object.keys(f125SetupData);
+                
+                for (const gpName of availableTracks) {
+                    // Create flexible matching terms
+                    const firstWord = gpName.split(' ')[0].toLowerCase(); // e.g., "bahrain", "australian"
+                    
+                    // Match logic: 
+                    // 1. Direct match of first word (e.g. "Bahrain")
+                    // 2. Common aliases (Australia/Australian, Brazil/Sao Paulo, Imola/Emilia, Silverstone/Great Britain)
+                    const isMatch = lastQuery.includes(firstWord) || 
+                                   (firstWord === 'australian' && lastQuery.includes('australia')) ||
+                                   (firstWord === 'emilia' && lastQuery.includes('imola')) ||
+                                   (firstWord === 'great' && (lastQuery.includes('britain') || lastQuery.includes('silverstone') || lastQuery.includes('uk'))) ||
+                                   (firstWord === 'são' && (lastQuery.includes('brazil') || lastQuery.includes('sao') || lastQuery.includes('interlagos')));
+
+                    if (isMatch) {
+                        setupHint = getSetupDataForAI(gpName);
                         break;
                     }
+                }
+                
+                // Fallback: If user asks for setup but no track is identified, give the AI the list of available tracks so it can ask.
+                if (!setupHint) {
+                    setupHint = `SYSTEM NOTE: User asked for setup but no specific track was detected in the query. 
+                    Available Setups: ${availableTracks.map(t => t.split(' ')[0]).join(', ')}. 
+                    Please ask the user which track they need.`;
                 }
             }
 
@@ -878,7 +1077,12 @@
             CURRENT STANDINGS (After São Paulo GP):
             Drivers: ${drivers}
             Constructors: ${teams}
+            
+            DRIVER OF THE DAY AWARDS:
+            ${dotdHistory}
+
             CALENDAR: ${schedule}
+            
             ${setupHint}
             `;
         }
@@ -900,12 +1104,14 @@
             const context = getLeagueContext(queryForContext);
             const systemPrompt = `You are 'Chief', a Race Engineer for the Turbo Tribe Racing League (TTRL). 
             
-            Here is the current TTRL League Data. Use the detailed F1 25 Setup Prediction data if the user asks for a car setup:
+            Here is the COMPLETE TTRL League Data database. Use this to answer any questions about standings, awards, schedule, or car setups:
             ${context}
             
             INSTRUCTIONS:
             - Answer user questions based on the Data above.
             - If asked who is winning, check the points.
+            - If asked about Driver of the Day, check the Awards section.
+            - If asked for a setup, provide the specific values from the data.
             - Be concise, tactical, and use F1 jargon (Box box, Delta, Apex, Sector, Deg).
             - Keep responses under 50 words.
             - Do not use markdown formatting like **bold** or *italics*.`;
@@ -1054,6 +1260,75 @@
             { round: 9, gp: "São Paulo Grand Prix", date: "21/11/25", track: "Autódromo José Carlos Pace (Interlagos)", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Auto%CC%81dromo-Jose%CC%81-Carlos-Pace--768x432.png", insight: "A classic anti-clockwise track with significant elevation changes. The long uphill run to Turn 1 is a major DRS zone. The 'Senna S' is an iconic opening sequence.", stats: null },
             { round: 10, gp: "Abu Dhabi Grand Prix", date: "28/11/25", track: "Yas Marina Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Yas-Marina-Circuit--768x432.png", insight: "A modern circuit with a mix of high-speed straights and a technical final sector. Overtaking was improved with recent layout changes.", stats: null }
         ];
+
+        // --- DOTD DATA ---
+        // Updated with correct image URLs from the user
+        const dotdData = [
+            { 
+                gp: "Bahrain Grand Prix", 
+                driver: "Sanju Vibhi", 
+                team: "ASTON MARTIN", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju.png",
+                desc: "A stellar performance in the desert night."
+            },
+            { 
+                gp: "Australian Grand Prix", 
+                driver: "Apex Entropy", 
+                team: "KICK SAUBER", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex%201.png",
+                desc: "Dominance down under at Albert Park."
+            },
+            { 
+                gp: "Emilia Romagna GP", 
+                driver: "Mahesh", 
+                team: "WILLIAMS", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Mahesh.png",
+                desc: "Masterclass at Imola's historic circuit."
+            },
+            { 
+                gp: "Spanish Grand Prix", 
+                driver: "Apex Entropy", 
+                team: "ALPINE", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex.png",
+                desc: "Conquering Catalunya with precision."
+            },
+            { 
+                gp: "Great Britain GP", 
+                driver: "Sanju Vibhi", 
+                team: "ASTON MARTIN", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju%201.png",
+                desc: "Home glory at the home of motorsport."
+            },
+            { 
+                gp: "Las Vegas Grand Prix", 
+                driver: "Harish", 
+                team: "HAAS", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Harish.png",
+                desc: "High stakes win on the Vegas Strip."
+            },
+            { 
+                gp: "Belgian Grand Prix", 
+                driver: "Sandeep Mareedu", 
+                team: "RACING BULLS", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sandeep.png",
+                desc: "Incredible drive as a reserve for Racing Bulls."
+            },
+            { 
+                gp: "Austrian Grand Prix", 
+                driver: "Wi7ard", 
+                team: "WILLIAMS", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Wizard.png",
+                desc: "Simply magical performance at the Red Bull Ring."
+            },
+            { 
+                gp: "São Paulo Grand Prix", 
+                driver: "TheGodfather", 
+                team: "ALPINE", 
+                image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Godfather.png",
+                desc: "An offer Interlagos couldn't refuse."
+            }
+        ];
+
 
         // --- UPDATED POINTS - Data is accurate up to (and including) the São Paulo Grand Prix ---
         const driverData = [ 
@@ -1336,18 +1611,22 @@
                 }
                 
                 // Only show Strategy button for actual race rounds
-                const buttonHtml = (r.round !== 'break') ? 
-                    `<button class="btn-ai-intel hover-target" onclick="fetchTrackIntel('${r.gp}')">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY
-                    </button>` : 
-                    `<span style="margin-top: 0.8rem; display: block; color: #555; font-size: 0.75rem;">TEAM REGROUP</span>`;
+                let footerContent = '';
+                if (r.round === 'break') {
+                    footerContent = `<span style="margin-top: 0.8rem; display: block; color: #555; font-size: 0.75rem;">TEAM REGROUP</span>`;
+                } else {
+                     footerContent = `
+                        <button class="btn-ai-intel hover-target" onclick="fetchTrackIntel('${r.gp}')">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY
+                        </button>`;
+                }
 
                 return `
                 <div class="cal-item ${statusClass} hover-target">
                     <span class="round">${statusText}</span>
                     <span class="gp">${r.gp.split(' ')[0].toUpperCase()}</span>
                     <span class="date">${r.date.slice(0, 5)}</span>
-                    ${buttonHtml}
+                    ${footerContent}
                 </div>`;
             }).join('');
         }
@@ -1383,6 +1662,35 @@
             
             // Re-init tilt after DOM population
             setTimeout(initTilt, 100);
+        }
+
+        // --- NEW FUNCTION: RENDER ACCORDION DOTD ---
+        function renderDOTDAccordion() {
+            const container = document.getElementById('dotd-container');
+            
+            // Generate HTML
+            const html = dotdData.map((data, index) => {
+                const tColor = teamColors[data.team] || '#fff';
+                // Active class for the last item initially (most recent race)
+                // const isActive = index === dotdData.length - 1 ? 'active' : ''; // Removed as per new hover logic
+                
+                return `
+                <div class="dotd-panel" 
+                     style="background-image: url('${data.image}'); --team-color: ${tColor}">
+                    
+                    <div class="dotd-label">${data.driver.split(' ')[0]}</div>
+                    <div class="dotd-badge-icon"><i class="fa-solid fa-award"></i></div>
+                    
+                    <div class="dotd-content">
+                        <div class="dotd-gp-name">${data.gp}</div>
+                        <div class="dotd-driver-name">${data.driver}</div>
+                        <div class="dotd-team-name" style="color:${tColor}">${data.team}</div>
+                        <div class="mono-font" style="font-size:0.8rem; color:#ccc; margin-top:0.5rem;">${data.desc}</div>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            container.innerHTML = html;
         }
 
         // FIX 2: Corrected Countdown Clock Logic
@@ -1460,6 +1768,7 @@
         populateCalendar();
         populateDrivers();
         populateGarage();
+        renderDOTDAccordion(); // Initialize the new accordion
         initSyncedCountdown();
         initCursor();
         
@@ -1475,12 +1784,22 @@
         });
 
         function revealSlideContent(slide) {
-            // Title Glitch (handled by CSS)
-            // Staggered Content
-            gsap.fromTo(slide.querySelectorAll('.slide-tag, .slide-desc, .btn-container, .hero-countdown'), 
-                { y: 30, opacity: 0 }, 
+            // Staggered Text Entry (Vertical Slide Up)
+            const elements = slide.querySelectorAll('.slide-tag, .slide-title, .slide-desc, .btn-container, .countdown-grid, .cal-grid, .contact-grid, .standings-tabs, .standings-wrapper');
+            
+            gsap.fromTo(elements, 
+                { y: 50, opacity: 0 }, 
                 { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" }
             );
+
+            // If the slide has split text (characters), stagger them too
+            const chars = slide.querySelectorAll('.char');
+            if(chars.length > 0) {
+                gsap.fromTo(chars, 
+                    { y: 20, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.5, stagger: 0.02, ease: "back.out(1.7)" }
+                );
+            }
 
             // Specific Staggers for complex elements
             if(slide.id === 'slide-1') {
@@ -1505,10 +1824,12 @@
             // Update active link immediately
             updateActiveLink(nextIndex);
 
+            // Prepare next slide
             gsap.set(nextSlide, { zIndex: 20, visibility: 'visible', opacity: 0 });
             
+            // ENHANCED TRANSITION: "Fly-Through"
             const tl = gsap.timeline({
-                defaults: { ease: "power2.inOut", duration: 1.0 },
+                defaults: { ease: "power2.inOut", duration: 1.2 },
                 onComplete: () => {
                     gsap.set(currentSlide, { visibility: 'hidden', zIndex: 1, opacity: 0 });
                     currentIndex = nextIndex;
@@ -1516,13 +1837,17 @@
                 }
             });
 
-            tl.to(currentSlide, { opacity: 0, scale: 0.95 }, 0);
-            tl.to(nextSlide, { opacity: 1, scale: 1 }, 0.2);
+            // 1. Current slide "Recedes" (Zooms Out + Fades)
+            tl.to(currentSlide, { scale: 0.9, opacity: 0, filter: 'brightness(0.5)' }, 0);
+
+            // 2. Next slide "Approaches" (Zooms In from 1.1 to 1 + Fades In)
+            tl.fromTo(nextSlide, 
+                { scale: 1.1, opacity: 0, filter: 'brightness(1.5)' }, 
+                { scale: 1, opacity: 1, filter: 'brightness(1)' }, 
+                "-=0.8" // Overlap significantly for fluid feel
+            );
             
-            // BG Parallax
-            gsap.fromTo(nextSlide.querySelector('.slide-bg'), { scale: 1.2 }, { scale: 1.1, duration: 1.4 }, 0);
-            
-            // Trigger Content Reveal slightly later
+            // Trigger Content Reveal slightly later for staggered effect
             setTimeout(() => revealSlideContent(nextSlide), 400);
         }
 
@@ -1538,13 +1863,25 @@
                 
                 const dView = document.getElementById('view-drivers');
                 const cView = document.getElementById('view-constructors');
+                const dotdView = document.getElementById('view-dotd');
                 
+                // Hide all views first
+                [dView, cView, dotdView].forEach(v => v.classList.remove('active-view'));
+
                 if (targetTab === 'constructors') { 
-                    dView.classList.remove('active-view'); cView.classList.add('active-view');
+                    cView.classList.add('active-view');
                     // Stagger animate cards
                     gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all", onComplete: initTilt});
+                } else if (targetTab === 'dotd') {
+                    dotdView.classList.add('active-view');
+                    // Stagger panel animation via class-based or CSS triggers for simplicity, 
+                    // but we can add a GSAP entry animation for the whole container
+                    gsap.fromTo('.dotd-panel', 
+                        { width: "10%", opacity: 0 }, 
+                        { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" }
+                    );
                 } else { 
-                    cView.classList.remove('active-view'); dView.classList.add('active-view');
+                    dView.classList.add('active-view');
                     // Stagger animate rows
                     gsap.fromTo('tr', {x: -20, opacity: 0}, {x: 0, opacity: 1, stagger: 0.05, duration: 0.4});
                 }
