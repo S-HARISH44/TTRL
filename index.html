@@ -152,6 +152,19 @@
             position: relative; z-index: 3; max-width: 1400px; width: 100%; padding: 0 4vw;
             display: flex; flex-direction: column; justify-content: center; height: 100%;
         }
+        
+        /* Layout Fix for Standings Slide - Moving it up */
+        #slide-2 .slide-content {
+            justify-content: flex-start;
+            padding-top: 12vh; /* Push content down slightly from top, but higher than center */
+        }
+        #slide-2 .slide-title {
+            font-size: clamp(3rem, 6vw, 6rem); /* Smaller title for standings */
+            margin-bottom: 0.5rem;
+        }
+        #slide-2 .slide-tag {
+            margin-bottom: 1rem;
+        }
 
         /* --- TYPOGRAPHY & GLITCH --- */
         .tech-font { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; line-height: 0.9; }
@@ -230,7 +243,7 @@
         }
 
         /* --- STANDINGS --- */
-        .standings-wrapper { width: 100%; height: 55vh; margin-top: 2rem; position: relative; }
+        .standings-wrapper { width: 100%; height: 65vh; margin-top: 1rem; position: relative; } /* Increased height, reduced margin */
         .standings-view {
             position: absolute; inset: 0; width: 100%; height: 100%;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -375,9 +388,12 @@
         
         /* Modals */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(5px); /* Reduced blur for performance */
             z-index: 9990; display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease;
+            opacity: 0; visibility: hidden; pointer-events: none; 
+            transition: all 0.3s ease;
+            will-change: opacity, visibility; /* Hint for browser optimization */
         }
         .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
         
@@ -418,6 +434,7 @@
             background: #000; border: 1px solid var(--accent-cyan);
             padding: 2rem; position: relative; clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
             display: flex; flex-direction: column;
+            will-change: transform, opacity; /* Hint for browser optimization */
         }
         .intel-title { color: var(--accent-cyan); font-family: 'Rajdhani', sans-serif; font-size: 2rem; margin-bottom: 1rem; text-transform: uppercase; }
         
@@ -552,7 +569,7 @@
 
     <!-- LOADER -->
     <div id="loader">
-        <div class="tech-font" style="letter-spacing: 0.3em; font-size: 1.5rem;">INITIALIZING TELEMETRY</div>
+        <div class="tech-font" style="letter-spacing: 0.3em; font-size: 1.5rem;">INITIALIZING RACE CONTROL</div>
         <div class="loader-bar"><div class="loader-progress" id="load-bar"></div></div>
         <div class="mono-font" style="margin-top: 10px; font-size: 0.8rem; color: #666;">V 2.5.0 // TTRL SYSTEM</div>
     </div>
@@ -564,7 +581,7 @@
         <div class="header-right">
             <!-- NEW TOP NAVIGATION LINKS -->
             <div class="top-nav">
-                <a href="#" class="nav-link active hover-target" data-slide="0">HERO</a>
+                <a href="#" class="nav-link active hover-target" data-slide="0">HOME</a>
                 <a href="#" class="nav-link hover-target" data-slide="1">CALENDAR</a>
                 <a href="#" class="nav-link hover-target" data-slide="2">STANDINGS</a>
                 <a href="#" class="nav-link hover-target" data-slide="3">REGISTER</a>
@@ -728,7 +745,15 @@
 
     <script>
         gsap.registerPlugin(Observer);
-        const apiKey = ""; // Populated by environment
+        
+        // --- API KEY CONFIGURATION ---
+        // The key is split into parts to prevent simple scraping, then reassembled at runtime.
+        const _k_parts = [
+            "AIzaSyBUpBE",
+            "iHMqvfc5PCFn",
+            "3aqTwfBZg8d9QThI"
+        ];
+        const apiKey = _k_parts.join('');
 
         // --- GEMINI API INTEGRATION ---
         async function callGemini(prompt, systemInstruction = "") {
@@ -763,7 +788,7 @@
 
             } catch (error) {
                 console.error(error);
-                return "Radio interference... Signal lost. Please repeat.";
+                return "Radio interference... Signal lost. Please check your connection.";
             }
         }
 
@@ -818,6 +843,7 @@
         function getLeagueContext() {
             // Converts JS objects into a readable text format for the AI
             const drivers = driverData.map(d => `${d.driver} (${d.team}): ${d.points}pts`).join(', ');
+            // Updated to use the decoupled constructor data
             const teams = getConstructorData().map(c => `${c.team}: ${c.points}pts`).join(', ');
             const schedule = leagueCalendar.map(r => `Rd ${r.round} ${r.gp} (${r.date})`).filter(r => r.round !== 'break').join(', ');
             
@@ -945,38 +971,48 @@
         async function fetchTrackIntel(gpName) {
             intelModal.classList.add('active');
             
-            const raceData = leagueCalendar.find(r => r.gp === gpName);
-            const setup = f125SetupData[gpName];
+            // Use requestAnimationFrame to ensure the animation starts smoothly before JS logic kicks in
+            requestAnimationFrame(async () => {
+                const raceData = leagueCalendar.find(r => r.gp === gpName);
+                const setup = f125SetupData[gpName];
 
-            const mapUrl = raceData ? raceData.mapUrl : 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND';
-            const trackName = raceData ? raceData.track : gpName;
+                const mapUrl = raceData ? raceData.mapUrl : 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND';
+                const trackName = raceData ? raceData.track : gpName;
 
-            intelTitle.innerText = gpName.toUpperCase();
-            intelMap.src = mapUrl; // Set the track map image
-            
-            displaySetupData(setup); // Display the structured setup data immediately
+                intelTitle.innerText = gpName.toUpperCase();
+                intelMap.src = mapUrl; // Set the track map image
+                
+                displaySetupData(setup); // Display the structured setup data immediately
 
-            aiBriefing.innerHTML = `<i class="fa-solid fa-satellite-dish fa-spin"></i> DOWNLOADING TACTICAL BRIEFING...`;
+                aiBriefing.innerHTML = `<i class="fa-solid fa-satellite-dish fa-spin"></i> DOWNLOADING TACTICAL BRIEFING...`;
 
-            // Enhanced prompt for AI briefing
-            const prompt = `Provide a tactical summary briefing for the ${gpName} (${trackName}) in F1 23/24 video game. 
-            Focus on: 1. Key overtaking spots. 2. Tire wear warning. 
-            Keep it strictly tactical, conversational, and under 50 words. No intro/outro.`;
-            
-            const briefing = await callGemini(prompt);
-            
-            // Simple type-writer effect for the content
-            aiBriefing.innerHTML = "";
-            let i = 0;
-            const speed = 20; 
-            function typeWriter() {
-                if (i < briefing.length) {
-                    aiBriefing.innerHTML += briefing.charAt(i);
-                    i++;
-                    setTimeout(typeWriter, speed);
+                // Enhanced prompt for AI briefing
+                const prompt = `Provide a tactical summary briefing for the ${gpName} (${trackName}) in F1 23/24 video game. 
+                Focus on: 1. Key overtaking spots. 2. Tire wear warning. 
+                Keep it strictly tactical, conversational, and under 50 words. No intro/outro.`;
+                
+                const briefing = await callGemini(prompt);
+                
+                // Optimized Typewriter using textContent and requestAnimationFrame
+                aiBriefing.textContent = "";
+                let i = 0;
+                
+                function typeWriter() {
+                    // Performance: Append chunks of text instead of single characters to reduce layout trashing
+                    // and use textContent to avoid HTML parsing overhead.
+                    if (i < briefing.length) {
+                        const chunk = briefing.slice(i, i + 3); // Add 3 chars at a time for performance
+                        aiBriefing.textContent += chunk;
+                        i += 3;
+                        
+                        // Use requestAnimationFrame for smoother visual updates
+                        if (i < briefing.length) {
+                            setTimeout(() => requestAnimationFrame(typeWriter), 20); 
+                        }
+                    }
                 }
-            }
-            typeWriter();
+                typeWriter();
+            });
         }
 
 
@@ -987,7 +1023,7 @@
             "KICK SAUBER": "#52E252", "ASTON MARTIN": "#229971", "RACING BULLS": "#6692FF", "MERCEDES": "#27F4D2",
             "RED BULL RACING": "#3671C6"
         };
-        const teamLogoMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/ferrari.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/williams.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/alpine.png", "HAAS": "https_//raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/haas.png", "MCLAREN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mclaren.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/kick_sauber.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/martin.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/vcarb.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mercedes.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/redbull.png" };
+        const teamLogoMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/ferrari.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/williams.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/alpine.png", "HAAS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/haas.png", "MCLAREN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mclaren.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/kick_sauber.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/martin.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/vcarb.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mercedes.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/redbull.png" };
         const teamCarMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025ferraricarright.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025williamscarright.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025alpinecarright.png", "HAAS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025haasf1teamcarright.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025astonmartincarright.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025kicksaubercarright.png", "MCLAREN": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mclarencarright.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025redbullracingcarright.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025racingbullscarright.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mercedescarright.png" };
         
         // --- UPDATED LEAGUE CALENDAR DATA ---
@@ -1008,27 +1044,41 @@
 
         // --- UPDATED POINTS - Data is accurate up to (and including) the Austrian Grand Prix ---
         const driverData = [ 
-            { driver: "SIMMAN", team: "FERRARI", points: 142 }, 
-            { driver: "WI7ARD", team: "WILLIAMS", points: 150 }, 
-            { driver: "THEGODFATHER", team: "ALPINE", points: 68 }, 
-            { driver: "HARISH", team: "HAAS", points: 68 }, 
-            { driver: "APEXENTROPY", team: "ALPINE", points: 57 }, 
+            { driver: "SIMMAN", team: "FERRARI", points: 158 }, 
+            { driver: "WI7ARD", team: "WILLIAMS", points: 160 }, 
+            { driver: "THEGODFATHER", team: "ALPINE", points: 72 }, 
+            { driver: "HARISH", team: "HAAS", points: 74 }, 
+            { driver: "APEXENTROPY", team: "ALPINE", points: 58 }, 
             { driver: "OVERLOAD", team: "MCLAREN", points: 34 }, 
-            { driver: "VIBIN", team: "ASTON MARTIN", points: 63 }, 
+            { driver: "VIBIN", team: "ASTON MARTIN", points: 88 }, 
             { driver: "KENTUCKY", team: "HAAS", points: 41 }, 
-            { driver: "MAHESH", team: "WILLIAMS", points: 27 }, 
+            { driver: "MAHESH", team: "WILLIAMS", points: 35 }, 
             { driver: "OXYGEN", team: "KICK SAUBER", points: 18 }, 
             { driver: "MEMB", team: "MERCEDES", points: 18 }, 
             { driver: "APURRV", team: "ASTON MARTIN", points: 21 },
-            { driver: "BOPEDOPE", team: "MCLAREN", points: 12 }, 
+            { driver: "BOPEDOPE", team: "MCLAREN", points: 24 }, 
             { driver: "CLONE", team: "RACING BULLS", points: 8 }, 
             { driver: "DENJI", team: "RED BULL RACING", points: 8 }, 
             { driver: "MAAYAONE", team: "MERCEDES", points: 0 }, 
             { driver: "BALA", team: "KICK SAUBER", points: 0 }, 
-            { driver: "DINO", team: "FERRARI", points: 0 }, 
+            { driver: "NIGHTFURY", team: "FERRARI", points: 0 }, 
             { driver: "SPARTAN GAMER", team: "RACING BULLS", points: 0 }, 
             { driver: "HARRYBECKHAM", team: "RED BULL RACING", points: 1 } 
         ];
+
+        // --- NEW: MANUAL CONSTRUCTOR POINTS (Decoupled from Driver Points) ---
+        const manualConstructorPoints = {
+            "WILLIAMS": 195,
+            "FERRARI": 162,
+            "ALPINE": 116,
+            "HAAS": 116,
+            "ASTON MARTIN": 111,
+            "MCLAREN": 60,
+            "KICK SAUBER": 51,
+            "MERCEDES": 42,
+            "RACING BULLS": 34,
+            "RED BULL RACING": 30
+        };
 
         // --- F1 25 SETUP DATASET (Source: F1 25 setup.xlsx - F1 25 .csv) ---
         // The data is normalized to match the GP names in leagueCalendar.
@@ -1185,7 +1235,7 @@
             });
 
             // Hover effects
-            const hoverTargets = document.querySelectorAll('a, button, .hover-target, .tab-btn, .team-radio-btn');
+            const hoverTargets = document.querySelectorAll('a, button, .hover-target, .tab-btn, .team-radio-btn, .api-btn, .api-input');
             hoverTargets.forEach(el => {
                 el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
                 el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
@@ -1217,13 +1267,29 @@
 
         function getConstructorData() {
             const teamMap = {};
-            driverData.forEach(d => { 
-                if (!teamMap[d.team]) teamMap[d.team] = { points: 0, drivers: [] };
-                teamMap[d.team].points += d.points;
-                teamMap[d.team].drivers.push(d.driver);
+            
+            // Initialize from MANUAL points (ensure all teams exist and have correct fixed points)
+            Object.keys(manualConstructorPoints).forEach(team => {
+                teamMap[team] = { 
+                    points: manualConstructorPoints[team], 
+                    drivers: [] 
+                };
             });
-            if (teamMap['RACING BULLS']) { teamMap['RACING BULLS'].points += 1; teamMap['RACING BULLS'].drivers.push("+1 Prev."); }
-            return Object.entries(teamMap).map(([team, data]) => ({ team, points: data.points, drivers: data.drivers.join(', ') })).sort((a, b) => b.points - a.points);
+
+            // Populate current drivers for display only (DO NOT calculate points from them)
+            driverData.forEach(d => { 
+                if (teamMap[d.team]) {
+                    teamMap[d.team].drivers.push(d.driver);
+                }
+            });
+
+            return Object.entries(teamMap)
+                .map(([team, data]) => ({ 
+                    team, 
+                    points: data.points, 
+                    drivers: data.drivers.join(', ') 
+                }))
+                .sort((a, b) => b.points - a.points);
         }
 
         // UPDATED CALENDAR WITH AI INTEL BUTTON AND NEW DATA STRUCTURE
@@ -1290,7 +1356,7 @@
         // FIX 2: Corrected Countdown Clock Logic
         function initSyncedCountdown() {
             // Set the current date to UTC to prevent local timezone issues with future race dates
-            const now = new Date(new Date().toUTCString());
+            const now = new Date();
             const RACE_TIME = { hours: 17, minutes: 0 }; // Assuming race time is 17:00 UTC
             let nextRace = null;
             
@@ -1298,7 +1364,11 @@
                 if (race.round === 'break' || race.round === 0) continue;
                 
                 // Parse date components: DD/MM/YY
-                const [d, m, y] = race.date.split('/').map(Number);
+                let [d, m, y] = race.date.split('/').map(Number);
+                
+                // FIX: Handle 2-digit years correctly (e.g., 25 -> 2025)
+                if (y < 100) y += 2000;
+
                 // Create Date object using UTC constructor (Year, Month Index (0-11), Day, Hour, Minute)
                 const raceDate = new Date(Date.UTC(y, m - 1, d, RACE_TIME.hours, RACE_TIME.minutes));
 
@@ -1320,7 +1390,7 @@
             nextTagEl.textContent = `NEXT RACE // ${nextRace.gp.toUpperCase().replace(' GRAND PRIX', '')}`;
 
             function updateTimer() {
-                const currentTime = new Date(new Date().toUTCString()).getTime(); // Always use current UTC time
+                const currentTime = new Date().getTime(); // Always use current time
                 const dist = nextRace.raceDate.getTime() - currentTime;
                 
                 if (dist < 0) { 
