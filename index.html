@@ -36,6 +36,7 @@
         #cursor, #cursor-follower {
             position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
             transform: translate(-50%, -50%); border-radius: 50%;
+            will-change: transform, left, top;
         }
         #cursor {
             width: 8px; height: 8px; background: var(--accent-cyan);
@@ -72,7 +73,8 @@
         .cinematic-grain {
             position: fixed; inset: 0; pointer-events: none; z-index: 998;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.04; mix-blend-mode: screen;
+            opacity: 0.04; /* Restored Visual Quality */
+            mix-blend-mode: screen;
         }
 
         /* --- UI COMPONENTS --- */
@@ -136,6 +138,7 @@
             position: absolute; inset: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
             visibility: hidden; overflow: hidden; opacity: 0;
+            will-change: opacity, transform;
         }
         .slide.active { visibility: visible; z-index: 10; opacity: 1; }
 
@@ -143,7 +146,8 @@
             position: absolute; inset: 0; z-index: 1;
             background-size: cover; background-position: center;
             filter: brightness(0.3) grayscale(0.2);
-            transform: scale(1.1); will-change: transform;
+            transform: scale(1.1); 
+            will-change: transform;
         }
         #vanta-bg { filter: brightness(1) grayscale(0); }
         #vanta-bg canvas { width: 100% !important; height: 100% !important; }
@@ -153,13 +157,13 @@
             display: flex; flex-direction: column; justify-content: center; height: 100%;
         }
         
-        /* Layout Fix for Standings Slide - Moving it up */
+        /* Layout Fix for Standings Slide */
         #slide-2 .slide-content {
             justify-content: flex-start;
-            padding-top: 12vh; /* Push content down slightly from top, but higher than center */
+            padding-top: 12vh;
         }
         #slide-2 .slide-title {
-            font-size: clamp(3rem, 6vw, 6rem); /* Smaller title for standings */
+            font-size: clamp(3rem, 6vw, 6rem);
             margin-bottom: 0.5rem;
         }
         #slide-2 .slide-tag {
@@ -229,7 +233,7 @@
             border-top: 2px solid var(--accent-red);
             padding: 1rem 1.5rem; text-align: center; min-width: 100px;
             clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px); /* Restored High Quality Blur */
             transition: transform 0.3s ease;
         }
         .countdown-item:hover { transform: translateY(-5px); border-color: var(--accent-red); background: rgba(255, 31, 75, 0.1); }
@@ -243,11 +247,12 @@
         }
 
         /* --- STANDINGS --- */
-        .standings-wrapper { width: 100%; height: 65vh; margin-top: 1rem; position: relative; } /* Increased height, reduced margin */
+        .standings-wrapper { width: 100%; height: 65vh; margin-top: 1rem; position: relative; }
         .standings-view {
             position: absolute; inset: 0; width: 100%; height: 100%;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0; visibility: hidden; transform: translateY(20px); pointer-events: none;
+            will-change: opacity, transform;
         }
         .standings-view.active-view { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
 
@@ -273,7 +278,9 @@
 
         /* --- 3D GARAGE CARDS --- */
         .garage-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            display: grid; 
+            /* FIXED: Use auto-fit to stretch cards equally, and reduced min-width to 300px for better fit */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem; height: 100%; overflow-y: auto; padding: 1rem;
             scrollbar-width: none; perspective: 1000px;
         }
@@ -285,6 +292,7 @@
             padding: 1.5rem; display: flex; flex-direction: column; position: relative;
             transform-style: preserve-3d; transition: transform 0.1s linear, box-shadow 0.3s ease;
             cursor: none; /* Uses custom cursor */
+            will-change: transform;
         }
         /* Dynamic Team Glow */
         .constructor-card::after {
@@ -307,11 +315,13 @@
             color: var(--team-color, var(--accent-cyan)); font-family: 'JetBrains Mono', monospace; font-weight: 700;
             background: rgba(0,0,0,0.5); padding: 0.2rem 0.5rem; border-radius: 4px;
         }
+        /* FIXED: Added fixed height to image container for uniform card size */
         .cc-img-container {
             flex-grow: 1; display: flex; align-items: center; justify-content: center;
             margin: 1rem 0; position: relative; z-index: 1; transform: translateZ(50px);
+            height: 130px; /* Ensures consistent height */
         }
-        .cc-car-img { width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); }
+        .cc-car-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); }
 
         /* --- CONTROLS --- */
         .standings-tabs { display: flex; gap: 1rem; margin-bottom: 1rem; }
@@ -339,12 +349,15 @@
         .btn-tech:hover::before { left: 100%; }
 
         /* --- CALENDAR --- */
+        /* OPTIMIZATION: Replaced specific transitions instead of 'all' */
         .cal-grid { display: flex; flex-wrap: wrap; gap: 1rem; max-width: 1200px; margin-top: 2rem; }
         .cal-item {
             border: 1px solid var(--glass-border); padding: 1.5rem; text-align: center;
-            transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: center;
+            transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            display: flex; flex-direction: column; justify-content: center;
             background: var(--glass-bg); opacity: 0.5; flex: 1 1 140px; min-width: 140px;
             position: relative; overflow: hidden;
+            will-change: transform, opacity; /* Hint for browser */
         }
         .cal-item::before {
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
@@ -389,7 +402,7 @@
         /* Modals */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            backdrop-filter: blur(5px); /* Reduced blur for performance */
+            backdrop-filter: blur(10px); /* Restored High Quality Blur */
             z-index: 9990; display: flex; justify-content: center; align-items: center;
             opacity: 0; visibility: hidden; pointer-events: none; 
             transition: all 0.3s ease;
@@ -862,7 +875,7 @@
 
 
             return `
-            CURRENT STANDINGS (After Austrian GP):
+            CURRENT STANDINGS (After São Paulo GP):
             Drivers: ${drivers}
             Constructors: ${teams}
             CALENDAR: ${schedule}
@@ -1042,7 +1055,7 @@
             { round: 10, gp: "Abu Dhabi Grand Prix", date: "28/11/25", track: "Yas Marina Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Yas-Marina-Circuit--768x432.png", insight: "A modern circuit with a mix of high-speed straights and a technical final sector. Overtaking was improved with recent layout changes.", stats: null }
         ];
 
-        // --- UPDATED POINTS - Data is accurate up to (and including) the Austrian Grand Prix ---
+        // --- UPDATED POINTS - Data is accurate up to (and including) the São Paulo Grand Prix ---
         const driverData = [ 
             { driver: "SIMMAN", team: "FERRARI", points: 158 }, 
             { driver: "WI7ARD", team: "WILLIAMS", points: 160 }, 
@@ -1235,15 +1248,18 @@
             });
 
             // Hover effects
-            const hoverTargets = document.querySelectorAll('a, button, .hover-target, .tab-btn, .team-radio-btn, .api-btn, .api-input');
+            const hoverTargets = document.querySelectorAll('a, button, .hover-target, .tab-btn, .team-radio-btn');
             hoverTargets.forEach(el => {
                 el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
                 el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
             });
         }
 
-        // 3. 3D Tilt Effect for Cards
+        // 3. 3D Tilt Effect for Cards (Optimized)
         function initTilt() {
+            // OPTIMIZATION: Disable on touch devices to save resources
+            if (window.matchMedia("(pointer: coarse)").matches) return;
+
             document.querySelectorAll('.constructor-card').forEach(card => {
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
@@ -1346,7 +1362,23 @@
         function populateGarage() {
             document.getElementById('garage-grid').innerHTML = getConstructorData().map((c,i) => {
                 const tColor = teamColors[c.team] || '#fff';
-                return `<div class="constructor-card hover-target" data-rank="${String(i+1).padStart(2,'0')}" style="--team-color: ${tColor}"><div class="cc-bg-rank">${String(i+1).padStart(2,'0')}</div><div class="cc-header"><span class="cc-name">${c.team}</span><span class="cc-points" data-drivers="${c.drivers}">${c.points} PTS</span></div><div class="cc-img-container"><img src="${teamCarMap[c.team] || 'https://placehold.co/300x100?text=Car'}" class="cc-car-img" alt="${c.team} Car"></div></div>`;
+                
+                // FIX: Specific adjustment for Ferrari image to align it with others
+                let customImgStyle = '';
+                if (c.team === 'FERRARI') {
+                    customImgStyle = 'transform: translateY(-8px) scale(1.15);'; // Lift up and slightly enlarge to match visual weight
+                }
+
+                return `<div class="constructor-card hover-target" data-rank="${String(i+1).padStart(2,'0')}" style="--team-color: ${tColor}">
+                    <div class="cc-bg-rank">${String(i+1).padStart(2,'0')}</div>
+                    <div class="cc-header">
+                        <span class="cc-name">${c.team}</span>
+                        <span class="cc-points" data-drivers="${c.drivers}">${c.points} PTS</span>
+                    </div>
+                    <div class="cc-img-container">
+                        <img src="${teamCarMap[c.team] || 'https://placehold.co/300x100?text=Car'}" class="cc-car-img" alt="${c.team} Car" style="${customImgStyle}">
+                    </div>
+                </div>`;
             }).join('');
             
             // Re-init tilt after DOM population
@@ -1431,11 +1463,15 @@
         initSyncedCountdown();
         initCursor();
         
+        // OPTIMIZATION: Reduced Vanta.js intensity for better performance
         VANTA.NET({
             el: "#vanta-bg",
             mouseControls: true, touchControls: true, gyroControls: false,
             minHeight: 200.00, minWidth: 200.00, scale: 1.00, scaleMobile: 1.00,
-            color: 0x00f0ff, backgroundColor: 0x050505, points: 10.00, maxDistance: 25.00, spacing: 20.00
+            color: 0x00f0ff, backgroundColor: 0x050505, 
+            points: 8.00, /* Reduced from 10 to 8 */
+            maxDistance: 22.00, /* Reduced from 25 to 22 */
+            spacing: 35.00 /* Increased from 20 to 35 (fewer points) */
         });
 
         function revealSlideContent(slide) {
@@ -1448,7 +1484,7 @@
 
             // Specific Staggers for complex elements
             if(slide.id === 'slide-1') {
-                gsap.fromTo(slide.querySelectorAll('.cal-item'), {y: 50, opacity: 0}, {y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "back.out(1.2)"});
+                gsap.fromTo(slide.querySelectorAll('.cal-item'), {y: 50, opacity: 0}, {y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out"}); /* OPTIMIZED: Simpler ease */
             }
             if(slide.id === 'slide-2') {
                  // Standings table animate in
