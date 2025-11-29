@@ -84,7 +84,6 @@
             pointer-events: none;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
         }
-        /* UPDATED: Made logo bigger (4.5rem) and interactive */
         .logo { 
             height: 4.5rem; 
             width: auto; 
@@ -193,7 +192,6 @@
             font-size: clamp(4rem, 12vw, 11rem); font-weight: 800; margin-bottom: 1rem;
             color: #fff; position: relative; z-index: 2; mix-blend-mode: hard-light;
         }
-        /* UPDATED: Increased opacity from 0.3 to 0.85 for better visibility */
         .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.85); color: transparent; }
 
         /* Glitch Effect Keyframes */
@@ -201,18 +199,15 @@
         .glitch-effect::before, .glitch-effect::after {
             content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: transparent; opacity: 0.8;
-            /* UPDATED: Make glitch layers transparent with stroke (border) only */
             color: transparent;
         }
         .glitch-effect::before {
-            /* Cyan Border Glitch */
             -webkit-text-stroke: 2px var(--accent-cyan);
             z-index: -1; 
             clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
             transform: translate(-2px, -2px); opacity: 0;
         }
         .glitch-effect::after {
-            /* Red Border Glitch */
             -webkit-text-stroke: 2px var(--accent-red);
             z-index: -2; 
             clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
@@ -250,7 +245,7 @@
             border-top: 2px solid var(--accent-red);
             padding: 1rem 1.5rem; text-align: center; min-width: 100px;
             clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
-            backdrop-filter: blur(10px); /* Restored High Quality Blur */
+            backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
         }
         .countdown-item:hover { transform: translateY(-5px); border-color: var(--accent-red); background: rgba(255, 31, 75, 0.1); }
@@ -267,7 +262,6 @@
         }
 
         /* --- STANDINGS --- */
-        /* UPDATED: Increased height to use more screen space */
         .standings-wrapper { width: 100%; height: 72vh; margin-top: 0.5rem; position: relative; }
         .standings-view {
             position: absolute; inset: 0; width: 100%; height: 100%;
@@ -288,7 +282,6 @@
         }
         .standings-table td { padding: 1rem; background: var(--glass-bg); border-top: 1px solid transparent; border-bottom: 1px solid transparent; transition: all 0.2s ease; }
         
-        /* Dynamic Team Border on Left */
         .standings-table td:first-child { border-radius: 4px 0 0 4px; border-left: 3px solid var(--team-color, transparent); }
         .standings-table td:last-child { border-radius: 0 4px 4px 0; border-right: 1px solid transparent; }
         
@@ -300,16 +293,13 @@
         /* --- 3D GARAGE CARDS --- */
         .garage-grid {
             display: grid; 
-            /* Mobile/Tablet: Responsive wrapping */
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 1.5rem; 
             height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem;
             scrollbar-width: none; 
-            /* Ensure rows are equal height */
             grid-auto-rows: 1fr;
         }
         
-        /* Desktop: Force exactly 5 columns (2 rows for 10 teams) */
         @media (min-width: 1200px) {
             .garage-grid {
                 grid-template-columns: repeat(5, 1fr);
@@ -326,11 +316,9 @@
             transform-style: preserve-3d; transition: transform 0.1s linear, box-shadow 0.3s ease;
             cursor: none;
             will-change: transform;
-            /* Ensure card fills the grid cell height */
             height: 100%;
             justify-content: space-between;
         }
-        /* Dynamic Team Glow */
         .constructor-card::after {
             content: ''; position: absolute; inset: 0; border-radius: 12px;
             box-shadow: 0 0 20px var(--team-color, var(--accent-cyan));
@@ -352,7 +340,6 @@
             background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px;
         }
         
-        /* FIXED: Tighter, perfectly centered image container */
         .cc-img-container {
             flex-grow: 1; 
             display: flex; 
@@ -362,10 +349,9 @@
             position: relative; 
             z-index: 1; 
             transform: translateZ(50px);
-            height: 90px; /* Fixed height for uniformity */
+            height: 90px; 
             width: 100%;
         }
-        /* FIXED: Images scale to fit without stretching */
         .cc-car-img { 
             width: auto;
             height: auto;
@@ -375,7 +361,7 @@
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
         }
 
-        /* --- ACCORDION STYLE DOTD (HOVER BASED) --- */
+        /* --- ACCORDION STYLE DOTD --- */
         .dotd-accordion-container {
             width: 100%;
             height: 100%;
@@ -385,7 +371,6 @@
             overflow: hidden;
         }
         
-        /* Responsive: switch to row on larger screens */
         @media (min-width: 768px) {
             .dotd-accordion-container {
                 flex-direction: row;
@@ -415,7 +400,6 @@
             transition: background 0.5s;
         }
         
-        /* HOVER STATE REPLACES .active STATE */
         .dotd-panel:hover {
             flex: 4; 
             cursor: default;
@@ -426,7 +410,6 @@
              background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
         }
 
-        /* Vertical Text Label (Inactive State) */
         .dotd-label {
             position: absolute;
             z-index: 2;
@@ -444,29 +427,24 @@
             pointer-events: none;
         }
 
-        /* Desktop: Rotate text for vertical strips */
         @media (min-width: 768px) {
             .dotd-label {
                 transform: translate(-50%, -50%) rotate(-90deg);
                 font-size: 1.5rem;
             }
-            /* Hide label on hover */
             .dotd-panel:hover .dotd-label {
                 opacity: 0;
                 transform: translate(-50%, -200%) rotate(-90deg);
             }
         }
         
-        /* Mobile: Normal text */
         @media (max-width: 767px) {
-            /* Hide label on hover */
             .dotd-panel:hover .dotd-label {
                 opacity: 0;
                 transform: translate(-200%, -50%);
             }
         }
 
-        /* Content Area (Visible only when Hovered) */
         .dotd-content {
             position: absolute;
             bottom: 0;
@@ -560,7 +538,6 @@
         .btn-tech:hover::before { left: 100%; }
 
         /* --- CALENDAR --- */
-        /* OPTIMIZATION: Replaced specific transitions instead of 'all' */
         .cal-grid { display: flex; flex-wrap: wrap; gap: 1rem; max-width: 1200px; margin-top: 2rem; }
         .cal-item {
             border: 1px solid var(--glass-border); padding: 1.5rem; text-align: center;
@@ -568,7 +545,7 @@
             display: flex; flex-direction: column; justify-content: center;
             background: var(--glass-bg); opacity: 0.5; flex: 1 1 140px; min-width: 140px;
             position: relative; overflow: hidden;
-            will-change: transform, opacity; /* Hint for browser */
+            will-change: transform, opacity;
         }
         .cal-item::before {
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
@@ -614,11 +591,11 @@
         /* Modals */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            backdrop-filter: blur(10px); /* Restored High Quality Blur */
+            backdrop-filter: blur(10px);
             z-index: 9990; display: flex; justify-content: center; align-items: center;
             opacity: 0; visibility: hidden; pointer-events: none; 
             transition: all 0.3s ease;
-            will-change: opacity, visibility; /* Hint for browser optimization */
+            will-change: opacity, visibility;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
         
@@ -628,7 +605,7 @@
             background: #000; border: 1px solid var(--accent-cyan);
             padding: 2rem; position: relative; clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
             display: flex; flex-direction: column;
-            will-change: transform, opacity; /* Hint for browser optimization */
+            will-change: transform, opacity;
         }
         .intel-title { color: var(--accent-cyan); font-family: 'Rajdhani', sans-serif; font-size: 2rem; margin-bottom: 1rem; text-transform: uppercase; }
         
@@ -718,40 +695,6 @@
             font-weight: 500;
             width: 50%;
         }
-
-
-        @media (max-width: 768px) {
-            .countdown-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-            .countdown-item { min-width: auto; padding: 0.8rem; }
-            .slide-title { font-size: 4.5rem; }
-            .garage-grid { grid-template-columns: 1fr; }
-            .table-scroll { overflow-x: auto; }
-            .intel-modal { padding: 1rem; }
-            
-            /* Mobile Grid Stack */
-            .intel-content-layout {
-                grid-template-columns: 1fr; /* Stack vertically */
-                max-height: 80vh;
-                overflow-y: auto; /* Main modal content scrolls */
-            }
-            .intel-left-column, .intel-right-column {
-                overflow-y: visible; /* Let the main modal scroll */
-                padding-right: 0;
-            }
-            .intel-map-container {
-                height: 200px; /* Fixed height for mobile view */
-                padding-bottom: 0;
-            }
-            .intel-map-container img {
-                position: static;
-                height: 100%;
-            }
-            
-            /* Mobile menu button adjustment */
-            .fixed-ui { padding: 1rem 1.5rem; }
-            .header-right { gap: 1rem; }
-            .top-nav { display: none; /* Hide full menu on mobile */ }
-        }
     </style>
 </head>
 <body>
@@ -788,13 +731,6 @@
         </div>
     </div>
 
-    <!-- SIDE MENU OVERLAY (Removed functionality) -->
-    <div class="modal-overlay" id="side-menu">
-        <div class="side-menu-content">
-            <!-- Content here is redundant but kept for structural completeness -->
-        </div>
-    </div>
-
     <!-- INTEL MODAL -->
     <div class="modal-overlay" id="intel-modal-overlay">
         <div class="intel-modal">
@@ -825,8 +761,6 @@
         </div>
     </div>
     
-    <!-- REMOVED: Nav Dots -->
-
     <div class="slides-wrapper">
         <!-- SLIDE 0: HERO -->
         <section class="slide active" id="slide-0">
@@ -948,62 +882,45 @@
         gsap.registerPlugin(Observer);
         
         // --- API KEY CONFIGURATION ---
-        // --- GOOGLE SHEETS ARCHIVE LOGIC ---
-        async function fetchSeason1Archives() {
-            const container = document.getElementById('archive-table-wrapper');
-            // This URL fetches the specific GID (sheet tab) as CSV format
-            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6QiPCDENe5q3JXy1n2l4z6lcNw1VXSRia8RPC2O9-x9fAg4oliwAgGTgMhBwLf9fPkNlyAQdGQB4x/pub?gid=1142364758&single=true&output=csv";
+        const _k_parts = [
+            "AIzaSyBUpBE",
+            "iHMqvfc5PCFn",
+            "3aqTwfBZg8d9QThI"
+        ];
+        const apiKey = _k_parts.join('');
 
+        // --- GEMINI API INTEGRATION ---
+        async function callGemini(prompt, systemInstruction = "") {
             try {
-                const response = await fetch(sheetUrl);
-                const data = await response.text();
-
-                // Parse CSV: Split by new line for rows
-                const rows = data.split('\n').map(row => row.split(','));
-
-                if (rows.length === 0) {
-                    container.innerHTML = '<p>No data found.</p>';
-                    return;
-                }
-
-                // Build the Table
-                let tableHtml = `<table class="standings-table">`;
+                const maxRetries = 3;
+                let delay = 1000;
                 
-                // Header Row (First row of CSV)
-                tableHtml += `<thead><tr>`;
-                rows[0].forEach(header => {
-                    // Remove quotes if present and trim
-                    const cleanHeader = header.replace(/^"|"$/g, '').trim();
-                    tableHtml += `<th>${cleanHeader}</th>`;
-                });
-                tableHtml += `</tr></thead><tbody>`;
-
-                // Data Rows (Remaining rows)
-                for (let i = 1; i < rows.length; i++) {
-                    const cols = rows[i];
-                    // Skip empty rows
-                    if (cols.length <= 1 && !cols[0]) continue;
-
-                    tableHtml += `<tr>`;
-                    cols.forEach((col, index) => {
-                        const cleanCol = col.replace(/^"|"$/g, '').trim();
-                        
-                        // Style the first column specially (like Position or Name)
-                        if(index === 0) {
-                            tableHtml += `<td style="color: var(--accent-cyan); font-weight:700;">${cleanCol}</td>`;
-                        } else {
-                            tableHtml += `<td>${cleanCol}</td>`;
-                        }
+                for (let i = 0; i < maxRetries; i++) {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            systemInstruction: { parts: [{ text: systemInstruction }] }
+                        })
                     });
-                    tableHtml += `</tr>`;
-                }
 
-                tableHtml += `</tbody></table>`;
-                container.innerHTML = tableHtml;
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                    
+                    if (i < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; 
+                    }
+                }
+                
+                throw new Error('API Call Failed after retries');
 
             } catch (error) {
-                console.error('Error loading archives:', error);
-                container.innerHTML = `<div style="color: var(--accent-red); padding: 1rem;">FAILED TO LOAD DATA. <br> <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vR6QiPCDENe5q3JXy1n2l4z6lcNw1VXSRia8RPC2O9-x9fAg4oliwAgGTgMhBwLf9fPkNlyAQdGQB4x/pubhtml?gid=1142364758&single=true" target="_blank" style="color:#fff; text-decoration:underline; margin-top:10px; display:inline-block;">Open in Google Sheets</a></div>`;
+                console.error(error);
+                return "Radio interference... Signal lost. Please check your connection.";
             }
         }
 
@@ -1023,6 +940,7 @@
                 gotoSlide(index);
             });
         });
+
 
         function getSetupDataForAI(gpName) {
              const setup = f125SetupData[gpName];
@@ -1044,7 +962,6 @@
         // --- TRACK INTEL LOGIC ---
         const intelModal = document.getElementById('intel-modal-overlay');
         const intelTitle = document.getElementById('intel-title');
-        // const intelContent = document.getElementById('intel-content'); // Removed
         const intelMap = document.getElementById('intel-map');
         const setupDisplay = document.getElementById('setup-display');
         const aiBriefing = document.getElementById('ai-briefing');
@@ -1059,7 +976,6 @@
                 return;
             }
 
-            // Suspension format: "41-3-7-16-21-40 (Springs F/R, ARB F/R, Ride Height F/R)"
             const suspPartsRegex = /(\d+)-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)/;
             const match = setup.suspension.match(suspPartsRegex);
             
@@ -1120,8 +1036,6 @@
                 let i = 0;
                 
                 function typeWriter() {
-                    // Performance: Append chunks of text instead of single characters to reduce layout trashing
-                    // and use textContent to avoid HTML parsing overhead.
                     if (i < briefing.length) {
                         const chunk = briefing.slice(i, i + 3); // Add 3 chars at a time for performance
                         aiBriefing.textContent += chunk;
@@ -1139,7 +1053,6 @@
 
 
         // --- ASSETS & DATA ---
-        // Added Team Colors Map for Dynamic Branding
         const teamColors = {
             "FERRARI": "#E80020", "WILLIAMS": "#64C4FF", "ALPINE": "#0093CC", "HAAS": "#B6BABD", "MCLAREN": "#FF8000",
             "KICK SAUBER": "#52E252", "ASTON MARTIN": "#229971", "RACING BULLS": "#6692FF", "MERCEDES": "#27F4D2",
@@ -1165,7 +1078,6 @@
         ];
 
         // --- DOTD DATA ---
-        // Updated with correct image URLs from the user
         const dotdData = [
             { 
                 gp: "Bahrain Grand Prix", 
@@ -1401,6 +1313,93 @@
                 }, 500);
             }});
         });
+        
+        // --- GOOGLE SHEETS ARCHIVE LOGIC ---
+        async function fetchSeason1Archives() {
+            const container = document.getElementById('archive-table-wrapper');
+            // This URL fetches the specific GID (sheet tab) as CSV format
+            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6QiPCDENe5q3JXy1n2l4z6lcNw1VXSRia8RPC2O9-x9fAg4oliwAgGTgMhBwLf9fPkNlyAQdGQB4x/pub?gid=1142364758&single=true&output=csv";
+
+            try {
+                const response = await fetch(sheetUrl);
+                const data = await response.text();
+
+                // Parse CSV: Split by new line for rows
+                const rows = data.split('\n').map(row => row.split(','));
+
+                if (rows.length === 0) {
+                    container.innerHTML = '<p>No data found.</p>';
+                    return;
+                }
+
+                // Build the Table
+                let tableHtml = `<table class="standings-table" style="width: 100%;">`;
+                
+                // Header Row (First row of CSV)
+                tableHtml += `<thead><tr>`;
+                rows[0].forEach(header => {
+                    // Remove quotes if present and trim
+                    const cleanHeader = header.replace(/^"|"$/g, '').trim();
+                    tableHtml += `<th>${cleanHeader}</th>`;
+                });
+                tableHtml += `</tr></thead><tbody>`;
+
+                // Data Rows (Remaining rows)
+                for (let i = 1; i < rows.length; i++) {
+                    const cols = rows[i];
+                    // Skip empty rows
+                    if (cols.length <= 1 && !cols[0]) continue;
+
+                     // Detect Team Color
+                    let teamColor = 'transparent'; // Default
+                    let foundTeamKey = null;
+
+                    // First pass: find the team to set the row color
+                    for (const col of cols) {
+                        const val = col.replace(/^"|"$/g, '').trim().toUpperCase();
+                        
+                         for (const key in teamColors) {
+                             if (val === key || val.includes(key)) {
+                                 teamColor = teamColors[key];
+                                 foundTeamKey = key;
+                                 break;
+                             }
+                         }
+                         if(teamColor !== 'transparent') break;
+                    }
+
+                    tableHtml += `<tr style="--team-color: ${teamColor}">`;
+                    cols.forEach((col, index) => {
+                        const cleanCol = col.replace(/^"|"$/g, '').trim();
+                        
+                        let cellContent = cleanCol;
+
+                        // If this specific column looks like a team name (matches the found key), add logo
+                        if (foundTeamKey && (cleanCol.toUpperCase() === foundTeamKey || cleanCol.toUpperCase().includes(foundTeamKey))) {
+                             const logoUrl = teamLogoMap[foundTeamKey];
+                             if(logoUrl) {
+                                 cellContent = `<div style="display:flex; align-items:center; gap:10px;"><img src="${logoUrl}" style="height:20px; width:auto;"> ${cleanCol}</div>`;
+                             }
+                        }
+                        
+                        // Style the first column specially (like Position or Name)
+                        if(index === 0) {
+                            tableHtml += `<td style="color: var(--accent-cyan); font-weight:700;">${cellContent}</td>`;
+                        } else {
+                            tableHtml += `<td>${cellContent}</td>`;
+                        }
+                    });
+                    tableHtml += `</tr>`;
+                }
+
+                tableHtml += `</tbody></table>`;
+                container.innerHTML = tableHtml;
+
+            } catch (error) {
+                console.error('Error loading archives:', error);
+                container.innerHTML = `<div style="color: var(--accent-red); padding: 1rem;">FAILED TO LOAD DATA. <br> <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vR6QiPCDENe5q3JXy1n2l4z6lcNw1VXSRia8RPC2O9-x9fAg4oliwAgGTgMhBwLf9fPkNlyAQdGQB4x/pubhtml?gid=1142364758&single=true" target="_blank" style="color:#fff; text-decoration:underline; margin-top:10px; display:inline-block;">Open in Google Sheets</a></div>`;
+            }
+        }
 
         // 2. Custom Cursor Logic
         function initCursor() {
@@ -1458,114 +1457,6 @@
                     gsap.to(card, { transform: `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`, duration: 0.5 });
                 });
             });
-        }
-
-        function getConstructorData() {
-            const teamMap = {};
-            
-            // Initialize from MANUAL points (ensure all teams exist and have correct fixed points)
-            Object.keys(manualConstructorPoints).forEach(team => {
-                teamMap[team] = { 
-                    points: manualConstructorPoints[team], 
-                    drivers: [] 
-                };
-            });
-
-            // Populate current drivers for display only (DO NOT calculate points from them)
-            driverData.forEach(d => { 
-                if (teamMap[d.team]) {
-                    teamMap[d.team].drivers.push(d.driver);
-                }
-            });
-
-            return Object.entries(teamMap)
-                .map(([team, data]) => ({ 
-                    team, 
-                    points: data.points, 
-                    drivers: data.drivers.join(', ') 
-                }))
-                .sort((a, b) => b.points - a.points);
-        }
-
-        // UPDATED CALENDAR WITH AI INTEL BUTTON AND NEW DATA STRUCTURE
-        function populateCalendar() {
-            const now = new Date();
-            const RACE_TIME = { hours: 17, minutes: 0 };
-            document.getElementById('calendar-grid').innerHTML = leagueCalendar.filter(r => r.round !== 0).map(r => { // Filter out Pre-Season Testing for main display
-                const roundText = r.round === 'break' ? 'BREAK' : 'RD ' + String(r.round).padStart(2, '0');
-                const [d, m, y] = r.date.split('/').map(Number);
-                const raceDate = new Date(Date.UTC(y, m - 1, d, RACE_TIME.hours, RACE_TIME.minutes));
-                
-                let statusClass = '';
-                let statusText = roundText;
-
-                if (r.round === 'break') {
-                    statusClass = '';
-                } else if (raceDate < now) { 
-                     statusClass = ''; 
-                } else {
-                    statusClass = 'future-race';
-                    const isNext = !leagueCalendar.some(prev => {
-                        if (prev.round === 'break' || prev.round === 0) return false;
-                        const [pd, pm, py] = prev.date.split('/').map(Number);
-                        const prevDate = new Date(Date.UTC(py, pm - 1, pd, RACE_TIME.hours, RACE_TIME.minutes));
-                        return prevDate > now && prevDate < raceDate;
-                    });
-                    if (isNext) { statusClass = 'next-race'; statusText = 'NEXT UP'; }
-                }
-                
-                // Only show Strategy button for actual race rounds
-                let footerContent = '';
-                if (r.round === 'break') {
-                    footerContent = `<span style="margin-top: 0.8rem; display: block; color: #555; font-size: 0.75rem;">TEAM REGROUP</span>`;
-                } else {
-                     footerContent = `
-                        <button class="btn-ai-intel hover-target" onclick="fetchTrackIntel('${r.gp}')">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY
-                        </button>`;
-                }
-
-                return `
-                <div class="cal-item ${statusClass} hover-target">
-                    <span class="round">${statusText}</span>
-                    <span class="gp">${r.gp.split(' ')[0].toUpperCase()}</span>
-                    <span class="date">${r.date.slice(0, 5)}</span>
-                    ${footerContent}
-                </div>`;
-            }).join('');
-        }
-        
-        function populateDrivers() {
-             document.getElementById('drivers-body').innerHTML = [...driverData].sort((a,b)=>b.points-a.points).map((d,i) => {
-                 const tColor = teamColors[d.team] || '#fff';
-                 return `<tr style="--team-color: ${tColor}"><td style="color:${i<3?['#FFD700','#C0C0C0','#CD7F32'][i]:'inherit'}">${String(i+1).padStart(2,'0')}</td><td style="font-weight:700;color:#fff">${d.driver}</td><td class="team-cell"><img src="${teamLogoMap[d.team] || ''}" class="team-logo-mini" alt="${d.team}"> ${d.team}</td><td style="color:var(--accent-cyan);font-weight:700">${d.points}</td></tr>`;
-             }).join('');
-        }
-
-        function populateGarage() {
-            document.getElementById('garage-grid').innerHTML = getConstructorData().map((c,i) => {
-                const tColor = teamColors[c.team] || '#fff';
-                
-                // FIX: Specific adjustment for Ferrari image to align it with others
-                let customImgStyle = '';
-                if (c.team === 'FERRARI') {
-                    customImgStyle = 'transform: translateY(-8px) scale(1.15);'; // Lift up and slightly enlarge to match visual weight
-                }
-
-                return `<div class="constructor-card hover-target" data-rank="${String(i+1).padStart(2,'0')}" style="--team-color: ${tColor}">
-                    <div class="cc-bg-rank">${String(i+1).padStart(2,'0')}</div>
-                    <div class="cc-header">
-                        <span class="cc-name">${c.team}</span>
-                        <span class="cc-points" data-drivers="${c.drivers}">${c.points} PTS</span>
-                    </div>
-                    <div class="cc-img-container">
-                        <img src="${teamCarMap[c.team] || 'https://placehold.co/300x100?text=Car'}" class="cc-car-img" alt="${c.team} Car" style="${customImgStyle}">
-                    </div>
-                </div>`;
-            }).join('');
-            
-            // Re-init tilt after DOM population
-            setTimeout(initTilt, 100);
         }
 
         // --- NEW FUNCTION: RENDER ACCORDION DOTD ---
@@ -1712,6 +1603,9 @@
 
         // --- Event Listeners ---
         document.getElementById('start-engine-btn').addEventListener('click', () => gotoSlide(1));
+
+        // NEW: Logo click takes user to Home
+        document.getElementById('app-logo').addEventListener('click', () => gotoSlide(0));
 
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
