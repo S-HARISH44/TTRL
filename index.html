@@ -84,7 +84,15 @@
             pointer-events: none;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
         }
-        .logo { height: 3rem; width: auto; pointer-events: auto; }
+        /* UPDATED: Made logo bigger (4.5rem) and interactive */
+        .logo { 
+            height: 4.5rem; 
+            width: auto; 
+            pointer-events: auto; 
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .logo:hover { transform: scale(1.05); }
         
         .header-right {
             display: flex;
@@ -157,10 +165,10 @@
             display: flex; flex-direction: column; justify-content: center; height: 100%;
         }
         
-        /* Layout Fix for Standings Slide - UPDATED: Reduced padding-top to move list higher */
+        /* Layout Fix for Standings Slide */
         #slide-2 .slide-content {
             justify-content: flex-start;
-            padding-top: 8vh; /* Was 12vh */
+            padding-top: 8vh; 
         }
         #slide-2 .slide-title {
             font-size: clamp(3rem, 6vw, 6rem);
@@ -185,20 +193,29 @@
             font-size: clamp(4rem, 12vw, 11rem); font-weight: 800; margin-bottom: 1rem;
             color: #fff; position: relative; z-index: 2; mix-blend-mode: hard-light;
         }
-        .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.3); color: transparent; }
+        /* UPDATED: Increased opacity from 0.3 to 0.85 for better visibility */
+        .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.85); color: transparent; }
 
         /* Glitch Effect Keyframes */
         .glitch-effect { position: relative; display: inline-block; }
         .glitch-effect::before, .glitch-effect::after {
             content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: transparent; opacity: 0.8;
+            /* UPDATED: Make glitch layers transparent with stroke (border) only */
+            color: transparent;
         }
         .glitch-effect::before {
-            color: var(--accent-cyan); z-index: -1; clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+            /* Cyan Border Glitch */
+            -webkit-text-stroke: 2px var(--accent-cyan);
+            z-index: -1; 
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
             transform: translate(-2px, -2px); opacity: 0;
         }
         .glitch-effect::after {
-            color: var(--accent-red); z-index: -2; clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+            /* Red Border Glitch */
+            -webkit-text-stroke: 2px var(--accent-red);
+            z-index: -2; 
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
             transform: translate(2px, 2px); opacity: 0;
         }
         .slide.active .glitch-effect::before { animation: glitch-anim-1 2.5s infinite linear alternate-reverse; opacity: 1; }
@@ -238,8 +255,11 @@
         }
         .countdown-item:hover { transform: translateY(-5px); border-color: var(--accent-red); background: rgba(255, 31, 75, 0.1); }
         .countdown-val {
-            display: block; font-family: 'Rajdhani', sans-serif; font-size: clamp(2.5rem, 4vw, 4rem);
+            display: block; 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: clamp(2.5rem, 4vw, 4rem);
             font-weight: 700; color: #fff; line-height: 1;
+            font-variant-numeric: tabular-nums;
         }
         .countdown-label {
             display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
@@ -280,30 +300,35 @@
         /* --- 3D GARAGE CARDS --- */
         .garage-grid {
             display: grid; 
-            /* FIXED: Use auto-fit to stretch cards equally, and reduced min-width to 300px for better fit */
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem; /* Reduced gap */
-            height: 100%; overflow-y: auto; padding: 1rem;
-            scrollbar-width: none; perspective: 1000px;
-            /* REMOVED GLOBAL PERSPECTIVE TO FIX ALIGNMENT/PARALLAX ISSUE */
-            perspective: none; 
+            /* Mobile/Tablet: Responsive wrapping */
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem; 
+            height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem;
+            scrollbar-width: none; 
+            /* Ensure rows are equal height */
+            grid-auto-rows: 1fr;
         }
-        /* Force 5 columns (2 rows) on larger screens */
-        @media (min-width: 1400px) {
+        
+        /* Desktop: Force exactly 5 columns (2 rows for 10 teams) */
+        @media (min-width: 1200px) {
             .garage-grid {
                 grid-template-columns: repeat(5, 1fr);
             }
         }
+        
         .garage-grid::-webkit-scrollbar { display: none; }
 
         .constructor-card {
             background: linear-gradient(145deg, rgba(30,30,30,0.6) 0%, rgba(10,10,10,0.8) 100%);
             border: 1px solid var(--glass-border); border-radius: 12px;
-            padding: 1rem; /* Reduced padding */
+            padding: 1.2rem;
             display: flex; flex-direction: column; position: relative;
             transform-style: preserve-3d; transition: transform 0.1s linear, box-shadow 0.3s ease;
-            cursor: none; /* Uses custom cursor */
+            cursor: none;
             will-change: transform;
+            /* Ensure card fills the grid cell height */
+            height: 100%;
+            justify-content: space-between;
         }
         /* Dynamic Team Glow */
         .constructor-card::after {
@@ -315,31 +340,39 @@
         .constructor-card:hover::after { opacity: 0.2; }
 
         .cc-bg-rank {
-            position: absolute; top: -1rem; right: 1rem; font-size: 6rem; /* Smaller rank number */
+            position: absolute; top: -0.5rem; right: 0.5rem; font-size: 5rem;
             font-family: 'Rajdhani', sans-serif; font-weight: 800;
-            color: rgba(255,255,255,0.02); z-index: 0; pointer-events: none;
+            color: rgba(255,255,255,0.03); z-index: 0; pointer-events: none;
             transform: translateZ(20px);
         }
         .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; position: relative; z-index: 2; transform: translateZ(30px); }
-        .cc-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.2rem; }
+        .cc-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.1rem; white-space: nowrap; }
         .cc-points {
-            color: var(--team-color, var(--accent-cyan)); font-family: 'JetBrains Mono', monospace; font-weight: 700;
-            background: rgba(0,0,0,0.5); padding: 0.2rem 0.5rem; border-radius: 4px;
+            color: var(--team-color, var(--accent-cyan)); font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.9rem;
+            background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px;
         }
-        /* FIXED: Added fixed height to image container for uniform card size */
+        
+        /* FIXED: Tighter, perfectly centered image container */
         .cc-img-container {
-            flex-grow: 1; display: flex; align-items: center; justify-content: center;
-            margin: 0.5rem 0; /* Reduced margin */
-            position: relative; z-index: 1; transform: translateZ(50px);
-            height: 100px; /* Fixed height */
+            flex-grow: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            margin: 0; 
+            position: relative; 
+            z-index: 1; 
+            transform: translateZ(50px);
+            height: 90px; /* Fixed height for uniformity */
             width: 100%;
         }
-        /* FIXED: Updated image styling to align perfectly center */
+        /* FIXED: Images scale to fit without stretching */
         .cc-car-img { 
-            width: 100%; 
-            height: 100%; 
+            width: auto;
+            height: auto;
+            max-width: 100%; 
+            max-height: 100%; 
             object-fit: contain; 
-            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
         }
 
         /* --- ACCORDION STYLE DOTD (HOVER BASED) --- */
@@ -568,14 +601,15 @@
         }
         .contact-item:hover { background: #fff; color: #000; transform: translateY(-5px); }
 
-        /* --- AI FEATURES STYLES --- */
-        .team-radio-btn {
-            position: fixed; bottom: 2rem; right: 2rem; width: 60px; height: 60px;
-            background: var(--accent-red); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            z-index: 990; cursor: pointer; pointer-events: auto; box-shadow: 0 0 20px rgba(255, 31, 75, 0.4);
-            transition: all 0.3s ease; border: 2px solid #fff;
+        /* --- ARCHIVE STYLES --- */
+        .archive-container {
+            width: 100%;
+            height: 60vh;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            position: relative;
+            overflow: hidden;
         }
-        .team-radio-btn:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(255, 31, 75, 0.8); }
         
         /* Modals */
         .modal-overlay {
@@ -587,37 +621,6 @@
             will-change: opacity, visibility; /* Hint for browser optimization */
         }
         .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
-        
-        /* Chat Interface */
-        .chat-interface {
-            width: 90%; max-width: 500px; height: 70vh; background: #000;
-            border: 1px solid var(--accent-red); display: flex; flex-direction: column;
-            box-shadow: 0 0 50px rgba(255, 31, 75, 0.2); position: relative;
-        }
-        .chat-header {
-            padding: 1rem; background: var(--accent-red); color: #fff; display: flex; justify-content: space-between; align-items: center;
-            font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase;
-        }
-        .chat-messages {
-            flex-grow: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;
-            font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
-        }
-        .chat-input-area {
-            padding: 1rem; border-top: 1px solid #333; display: flex; gap: 0.5rem; background: #111;
-        }
-        .chat-input {
-            flex-grow: 1; background: #000; border: 1px solid #333; color: #fff; padding: 0.8rem;
-            font-family: 'Inter', sans-serif; outline: none; pointer-events: auto;
-        }
-        .chat-input:focus { border-color: var(--accent-red); }
-        .chat-send-btn {
-            background: var(--accent-red); color: #fff; border: none; padding: 0 1.5rem;
-            font-family: 'Rajdhani', sans-serif; font-weight: 700; cursor: pointer; pointer-events: auto;
-        }
-
-        .message { padding: 0.8rem; max-width: 80%; border-radius: 4px; line-height: 1.4; }
-        .message.user { align-self: flex-end; background: #333; color: #fff; border-right: 2px solid #fff; }
-        .message.ai { align-self: flex-start; background: rgba(255, 31, 75, 0.1); color: var(--accent-cyan); border-left: 2px solid var(--accent-red); }
         
         /* Intel Modal */
         .intel-modal {
@@ -723,7 +726,6 @@
             .slide-title { font-size: 4.5rem; }
             .garage-grid { grid-template-columns: 1fr; }
             .table-scroll { overflow-x: auto; }
-            .team-radio-btn { width: 50px; height: 50px; bottom: 1.5rem; right: 1.5rem; }
             .intel-modal { padding: 1rem; }
             
             /* Mobile Grid Stack */
@@ -768,18 +770,20 @@
     <div class="cinematic-grain"></div>
 
     <div class="fixed-ui">
-        <img src="https://raw.githubusercontent.com/HARISHWINNER/TTRL/ade50d630c482acbb96676fc69c2849a58494f7f/RESOURCES/image.png" alt="TTRL" class="logo hover-target">
+        <!-- UPDATED: Added ID for click functionality -->
+        <img id="app-logo" src="https://raw.githubusercontent.com/HARISHWINNER/TTRL/ade50d630c482acbb96676fc69c2849a58494f7f/RESOURCES/image.png" alt="TTRL" class="logo hover-target">
         <div class="header-right">
             <!-- NEW TOP NAVIGATION LINKS -->
             <div class="top-nav">
                 <a href="#" class="nav-link active hover-target" data-slide="0">HOME</a>
                 <a href="#" class="nav-link hover-target" data-slide="1">CALENDAR</a>
                 <a href="#" class="nav-link hover-target" data-slide="2">STANDINGS</a>
-                <a href="#" class="nav-link hover-target" data-slide="3">REGISTER</a>
-                <a href="#" class="nav-link hover-target" data-slide="4">PADDOCK</a>
+                <a href="#" class="nav-link hover-target" data-slide="3">ARCHIVES</a>
+                <a href="#" class="nav-link hover-target" data-slide="4">REGISTER</a>
+                <a href="#" class="nav-link hover-target" data-slide="5">PADDOCK</a>
             </div>
             <div class="mono-font text-sm uppercase tracking-widest">
-                <span style="color: var(--accent-cyan)">Season 1</span> <span style="animation: blink 1s infinite">// Live</span>
+                <span style="color: var(--accent-cyan)">Season 1</span> // Completed
             </div>
         </div>
     </div>
@@ -788,28 +792,6 @@
     <div class="modal-overlay" id="side-menu">
         <div class="side-menu-content">
             <!-- Content here is redundant but kept for structural completeness -->
-        </div>
-    </div>
-
-    <!-- TEAM RADIO BUTTON -->
-    <div class="team-radio-btn hover-target" id="team-radio-toggle" title="Talk to Race Engineer">
-        <i class="fa-solid fa-headset fa-xl" style="color: white;"></i>
-    </div>
-
-    <!-- TEAM RADIO MODAL -->
-    <div class="modal-overlay" id="radio-modal">
-        <div class="chat-interface">
-            <div class="chat-header">
-                <span><i class="fa-solid fa-tower-broadcast"></i> PIT WALL // CHIEF</span>
-                <span class="close-modal hover-target" onclick="toggleRadio()">&times;</span>
-            </div>
-            <div class="chat-messages" id="chat-messages">
-                <div class="message ai">Radio Check. I'm Chief, your Race Engineer. I can help with setups, strategy, or track info. Over.</div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" class="chat-input hover-target" id="user-input" placeholder="Ask about setup, strategy..." onkeypress="if(event.key==='Enter') sendMessage()">
-                <button class="chat-send-btn hover-target" onclick="sendMessage()">TX</button>
-            </div>
         </div>
     </div>
 
@@ -851,7 +833,10 @@
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/001-EA-Sports-F1-2023-Video-Game-Review.jpg')"></div>
             <div class="slide-content" style="align-items: center; text-align: center;">
                 <div class="slide-tag" id="hero-next-tag">NEXT RACE // LOADING...</div>
-                <h1 class="slide-title tech-font glitch-effect" data-text="TURBO TRIBE">TURBO<br><span class="text-outline">TRIBE</span></h1>
+                <h1 class="slide-title tech-font">
+                    <span class="glitch-effect" data-text="TURBO">TURBO</span><br>
+                    <span class="text-outline glitch-effect" data-text="TRIBE">TRIBE</span>
+                </h1>
                 
                 <div class="countdown-grid hover-target" id="hero-countdown">
                     <div class="countdown-item"><span class="countdown-val" id="cd-days">00</span><span class="countdown-label">DAYS</span></div>
@@ -905,23 +890,44 @@
             </div>
         </section>
 
-        <!-- SLIDE 3: REGISTER -->
-        <section class="slide" id="slide-3">
+         <!-- SLIDE 3: ARCHIVES (NEW) -->
+         <section class="slide" id="slide-3">
+            <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/001-EA-Sports-F1-2023-Video-Game-Review.jpg'); filter: brightness(0.2);"></div>
+            <div class="slide-content">
+                <div class="slide-tag">04 // HISTORY</div>
+                <h2 class="slide-title tech-font glitch-effect" data-text="ARCHIVES">SEASON 1<br><span class="text-outline">ARCHIVES</span></h2>
+                
+                <!-- UPDATED: Native Table Container instead of Iframe -->
+                <div class="archive-container" style="background: transparent; border: none;">
+                   <div class="table-scroll" id="archive-table-wrapper">
+                        <div style="text-align: center; padding: 2rem; color: var(--accent-cyan);">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i> RETRIEVING SEASON 1 DATA...
+                        </div>
+                   </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: REGISTER -->
+        <section class="slide" id="slide-4">
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/1-w-GettyImages-2048270135.webp')"></div>
             <div class="slide-content">
-                <div class="slide-tag">04 // ENLIST</div>
+                <div class="slide-tag">05 // ENLIST</div>
                 <h2 class="slide-title tech-font glitch-effect" data-text="JOIN THE GRID">JOIN<br><span class="text-outline">THE GRID</span></h2>
                 <p class="slide-desc">Seats are limited for Season 2. Secure your place in the most competitive league on the platform.</p>
                 <div class="btn-container"><a href="https://docs.google.com/forms/d/e/1FAIpQLSc1xE8SkAOIKoHaryLjNgTNXJfmBCSv73vdgxaAA0_uxnmUTw/viewform" target="_blank" class="btn-tech hover-target">REGISTER NOW</a></div>
             </div>
         </section>
 
-         <!-- SLIDE 4: CONTACT -->
-        <section class="slide" id="slide-4">
+         <!-- SLIDE 5: CONTACT -->
+        <section class="slide" id="slide-5">
             <div class="slide-bg" id="vanta-bg"></div>
             <div class="slide-content">
-                <div class="slide-tag">05 // PADDOCK</div>
-                <h2 class="slide-title tech-font glitch-effect" data-text="CONNECT">CONNECT<br><span class="text-outline">WITH US</span></h2>
+                <div class="slide-tag">06 // PADDOCK</div>
+                <h2 class="slide-title tech-font">
+                    <span class="glitch-effect" data-text="CONNECT">CONNECT</span><br>
+                    <span class="text-outline glitch-effect" data-text="WITH US">WITH US</span>
+                </h2>
                 <p class="slide-desc">Join our Discord server for live race updates.</p>
                 <div class="contact-grid mono-font">
                     <a href="https://discord.gg/EuyPTXqbg6" target="_blank" class="contact-item hover-target"><i class="fa-brands fa-discord"></i> <span>DISCORD</span></a>
@@ -942,48 +948,62 @@
         gsap.registerPlugin(Observer);
         
         // --- API KEY CONFIGURATION ---
-        // The key is split into parts to prevent simple scraping, then reassembled at runtime.
-        const _k_parts = [
-            "AIzaSyBUpBE",
-            "iHMqvfc5PCFn",
-            "3aqTwfBZg8d9QThI"
-        ];
-        const apiKey = _k_parts.join('');
+        // --- GOOGLE SHEETS ARCHIVE LOGIC ---
+        async function fetchSeason1Archives() {
+            const container = document.getElementById('archive-table-wrapper');
+            // This URL fetches the specific GID (sheet tab) as CSV format
+            const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6QiPCDENe5q3JXy1n2l4z6lcNw1VXSRia8RPC2O9-x9fAg4oliwAgGTgMhBwLf9fPkNlyAQdGQB4x/pub?gid=1142364758&single=true&output=csv";
 
-        // --- GEMINI API INTEGRATION ---
-        async function callGemini(prompt, systemInstruction = "") {
             try {
-                // Implementing basic exponential backoff
-                const maxRetries = 3;
-                let delay = 1000;
-                
-                for (let i = 0; i < maxRetries; i++) {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            systemInstruction: { parts: [{ text: systemInstruction }] }
-                        })
-                    });
+                const response = await fetch(sheetUrl);
+                const data = await response.text();
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        return data.candidates[0].content.parts[0].text;
-                    }
-                    
-                    // If not OK, wait and retry
-                    if (i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2; // Double the delay
-                    }
+                // Parse CSV: Split by new line for rows
+                const rows = data.split('\n').map(row => row.split(','));
+
+                if (rows.length === 0) {
+                    container.innerHTML = '<p>No data found.</p>';
+                    return;
                 }
+
+                // Build the Table
+                let tableHtml = `<table class="standings-table">`;
                 
-                throw new Error('API Call Failed after retries');
+                // Header Row (First row of CSV)
+                tableHtml += `<thead><tr>`;
+                rows[0].forEach(header => {
+                    // Remove quotes if present and trim
+                    const cleanHeader = header.replace(/^"|"$/g, '').trim();
+                    tableHtml += `<th>${cleanHeader}</th>`;
+                });
+                tableHtml += `</tr></thead><tbody>`;
+
+                // Data Rows (Remaining rows)
+                for (let i = 1; i < rows.length; i++) {
+                    const cols = rows[i];
+                    // Skip empty rows
+                    if (cols.length <= 1 && !cols[0]) continue;
+
+                    tableHtml += `<tr>`;
+                    cols.forEach((col, index) => {
+                        const cleanCol = col.replace(/^"|"$/g, '').trim();
+                        
+                        // Style the first column specially (like Position or Name)
+                        if(index === 0) {
+                            tableHtml += `<td style="color: var(--accent-cyan); font-weight:700;">${cleanCol}</td>`;
+                        } else {
+                            tableHtml += `<td>${cleanCol}</td>`;
+                        }
+                    });
+                    tableHtml += `</tr>`;
+                }
+
+                tableHtml += `</tbody></table>`;
+                container.innerHTML = tableHtml;
 
             } catch (error) {
-                console.error(error);
-                return "Radio interference... Signal lost. Please check your connection.";
+                console.error('Error loading archives:', error);
+                container.innerHTML = `<div style="color: var(--accent-red); padding: 1rem;">FAILED TO LOAD DATA. <br> <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vR6QiPCDENe5q3JXy1n2l4z6lcNw1VXSRia8RPC2O9-x9fAg4oliwAgGTgMhBwLf9fPkNlyAQdGQB4x/pubhtml?gid=1142364758&single=true" target="_blank" style="color:#fff; text-decoration:underline; margin-top:10px; display:inline-block;">Open in Google Sheets</a></div>`;
             }
         }
 
@@ -1004,20 +1024,6 @@
             });
         });
 
-
-        // --- TEAM RADIO LOGIC ---
-        const radioBtn = document.getElementById('team-radio-toggle');
-        const radioModal = document.getElementById('radio-modal');
-        const chatMessages = document.getElementById('chat-messages');
-        const userInput = document.getElementById('user-input');
-
-        radioBtn.addEventListener('click', toggleRadio);
-
-        function toggleRadio() {
-            radioModal.classList.toggle('active');
-            if (radioModal.classList.contains('active')) userInput.focus();
-        }
-
         function getSetupDataForAI(gpName) {
              const setup = f125SetupData[gpName];
              if (!setup) return "No specific setup data available for this track.";
@@ -1033,119 +1039,6 @@
              Notes: ${setup.notes}
              ----------------------------------------
              `;
-        }
-
-        function getLeagueContext(currentQuery = "") {
-            // Converts JS objects into a readable text format for the AI
-            const drivers = driverData.map(d => `${d.driver} (${d.team}): ${d.points}pts`).join(', ');
-            // Updated to use the decoupled constructor data
-            const teams = getConstructorData().map(c => `${c.team}: ${c.points}pts`).join(', ');
-            const schedule = leagueCalendar.map(r => `Rd ${r.round} ${r.gp} (${r.date})`).filter(r => r.round !== 'break').join(', ');
-            
-            // NEW: Add DOTD Data to the context
-            const dotdHistory = dotdData.map(d => `${d.gp}: ${d.driver} (${d.team})`).join(', ');
-
-            // Look for potential setup query to inject setup data
-            const lastQuery = currentQuery.toLowerCase();
-            let setupHint = '';
-            
-            // Broad check for setup-related keywords
-            if (lastQuery.includes('setup') || lastQuery.includes('aero') || lastQuery.includes('diff') || lastQuery.includes('suspension') || lastQuery.includes('wing') || lastQuery.includes('brakes') || lastQuery.includes('tyre') || lastQuery.includes('tire')) {
-                
-                // Iterate through available setups to find a match
-                const availableTracks = Object.keys(f125SetupData);
-                
-                for (const gpName of availableTracks) {
-                    // Create flexible matching terms
-                    const firstWord = gpName.split(' ')[0].toLowerCase(); // e.g., "bahrain", "australian"
-                    
-                    // Match logic: 
-                    // 1. Direct match of first word (e.g. "Bahrain")
-                    // 2. Common aliases (Australia/Australian, Brazil/Sao Paulo, Imola/Emilia, Silverstone/Great Britain)
-                    const isMatch = lastQuery.includes(firstWord) || 
-                                   (firstWord === 'australian' && lastQuery.includes('australia')) ||
-                                   (firstWord === 'emilia' && lastQuery.includes('imola')) ||
-                                   (firstWord === 'great' && (lastQuery.includes('britain') || lastQuery.includes('silverstone') || lastQuery.includes('uk'))) ||
-                                   (firstWord === 'são' && (lastQuery.includes('brazil') || lastQuery.includes('sao') || lastQuery.includes('interlagos')));
-
-                    if (isMatch) {
-                        setupHint = getSetupDataForAI(gpName);
-                        break;
-                    }
-                }
-                
-                // Fallback: If user asks for setup but no track is identified, give the AI the list of available tracks so it can ask.
-                if (!setupHint) {
-                    setupHint = `SYSTEM NOTE: User asked for setup but no specific track was detected in the query. 
-                    Available Setups: ${availableTracks.map(t => t.split(' ')[0]).join(', ')}. 
-                    Please ask the user which track they need.`;
-                }
-            }
-
-
-            return `
-            CURRENT STANDINGS (After São Paulo GP):
-            Drivers: ${drivers}
-            Constructors: ${teams}
-            
-            DRIVER OF THE DAY AWARDS:
-            ${dotdHistory}
-
-            CALENDAR: ${schedule}
-            
-            ${setupHint}
-            `;
-        }
-
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            // Add User Message
-            appendMessage(text, 'user');
-            // Store query temporarily before clearing for context lookup
-            const queryForContext = userInput.value;
-            userInput.value = '';
-
-            // Loading Indicator
-            const loadingId = appendMessage('Copy...', 'ai', true);
-
-            // Call Gemini WITH LEAGUE CONTEXT
-            const context = getLeagueContext(queryForContext);
-            const systemPrompt = `You are 'Chief', a Race Engineer for the Turbo Tribe Racing League (TTRL). 
-            
-            Here is the COMPLETE TTRL League Data database. Use this to answer any questions about standings, awards, schedule, or car setups:
-            ${context}
-            
-            INSTRUCTIONS:
-            - Answer user questions based on the Data above.
-            - If asked who is winning, check the points.
-            - If asked about Driver of the Day, check the Awards section.
-            - If asked for a setup, provide the specific values from the data.
-            - Be concise, tactical, and use F1 jargon (Box box, Delta, Apex, Sector, Deg).
-            - Keep responses under 50 words.
-            - Do not use markdown formatting like **bold** or *italics*.`;
-            
-            // FIX: Ensure systemPrompt is passed correctly (already fixed in previous step)
-            const reply = await callGemini(text, systemPrompt); 
-
-            // Remove loading and add AI response
-            document.getElementById(loadingId).remove();
-            appendMessage(reply, 'ai');
-        }
-
-        function appendMessage(text, sender, isLoading = false) {
-            const div = document.createElement('div');
-            div.className = `message ${sender}`;
-            if (isLoading) {
-                div.id = 'loading-' + Date.now();
-                div.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${text}`;
-            } else {
-                div.innerText = text;
-            }
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            return div.id;
         }
 
         // --- TRACK INTEL LOGIC ---
@@ -1353,7 +1246,7 @@
             { driver: "MAHESH", team: "WILLIAMS", points: 35 }, 
             { driver: "OXYGEN", team: "KICK SAUBER", points: 18 }, 
             { driver: "MEMB", team: "MERCEDES", points: 18 }, 
-            { driver: "APURRV", team: "ASTON MARTIN", points: 21 },
+            { driver: "APURRV", team: "ASTON MARTIN", points: 21 }, 
             { driver: "BOPEDOPE", team: "MCLAREN", points: 24 }, 
             { driver: "CLONE", team: "RACING BULLS", points: 8 }, 
             { driver: "DENJI", team: "RED BULL RACING", points: 8 }, 
@@ -1504,6 +1397,7 @@
                 // Reveal Hero Elements
                 setTimeout(() => {
                     revealSlideContent(document.querySelector('#slide-0'));
+                    fetchSeason1Archives(); // Fetch the sheet data
                 }, 500);
             }});
         });
@@ -1533,7 +1427,7 @@
             });
 
             // Hover effects
-            const hoverTargets = document.querySelectorAll('a, button, .hover-target, .tab-btn, .team-radio-btn, .api-btn, .api-input');
+            const hoverTargets = document.querySelectorAll('a, button, .hover-target, .tab-btn, .team-radio-btn');
             hoverTargets.forEach(el => {
                 el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
                 el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
@@ -1705,60 +1599,15 @@
 
         // FIX 2: Corrected Countdown Clock Logic
         function initSyncedCountdown() {
-            // Set the current date to UTC to prevent local timezone issues with future race dates
-            const now = new Date();
-            const RACE_TIME = { hours: 17, minutes: 0 }; // Assuming race time is 17:00 UTC
-            let nextRace = null;
-            
-            for (const race of leagueCalendar) {
-                if (race.round === 'break' || race.round === 0) continue;
-                
-                // Parse date components: DD/MM/YY
-                let [d, m, y] = race.date.split('/').map(Number);
-                
-                // FIX: Handle 2-digit years correctly (e.g., 25 -> 2025)
-                if (y < 100) y += 2000;
-
-                // Create Date object using UTC constructor (Year, Month Index (0-11), Day, Hour, Minute)
-                const raceDate = new Date(Date.UTC(y, m - 1, d, RACE_TIME.hours, RACE_TIME.minutes));
-
-                if (raceDate.getTime() > now.getTime()) { 
-                    nextRace = { ...race, raceDate }; 
-                    break;
-                }
-            }
-            
             const nextTagEl = document.getElementById('hero-next-tag');
             const els = { d: document.getElementById('cd-days'), h: document.getElementById('cd-hours'), m: document.getElementById('cd-minutes'), s: document.getElementById('cd-seconds') };
 
-            if (!nextRace) { 
-                nextTagEl.textContent = "SEASON COMPLETED"; 
-                Object.values(els).forEach(e => e.textContent = "GO"); 
-                return; 
-            }
+            // SEASON ENDED STATE
+            // Overriding dynamic logic to show season completion and pending results status
+            nextTagEl.innerHTML = `SEASON 1 // OFFICIALLY ENDED <br><span style="font-size:0.6em; color:var(--accent-red); letter-spacing:1px; display:block; margin-top:5px;">ABU DHABI RESULTS: PENDING STEWARDS VALIDATION</span>`;
             
-            nextTagEl.textContent = `NEXT RACE // ${nextRace.gp.toUpperCase().replace(' GRAND PRIX', '')}`;
-
-            function updateTimer() {
-                const currentTime = new Date().getTime(); // Always use current time
-                const dist = nextRace.raceDate.getTime() - currentTime;
-                
-                if (dist < 0) { 
-                    Object.values(els).forEach(e => e.textContent = "GO"); 
-                    return; 
-                }
-                
-                const dayMs = 864e5; // 1000 * 60 * 60 * 24
-                const hourMs = 36e5; // 1000 * 60 * 60
-                const minuteMs = 6e4; // 1000 * 60
-
-                els.d.textContent = String(Math.floor(dist / dayMs)).padStart(2, '0');
-                els.h.textContent = String(Math.floor((dist % dayMs) / hourMs)).padStart(2, '0');
-                els.m.textContent = String(Math.floor((dist % hourMs) / minuteMs)).padStart(2, '0');
-                els.s.textContent = String(Math.floor((dist % minuteMs) / 1000)).padStart(2, '0');
-            }
-            updateTimer(); 
-            setInterval(updateTimer, 1000);
+            // Set countdown to zero
+            Object.values(els).forEach(e => e.textContent = "00");
         }
 
         // --- ANIMATION ENGINE ---
