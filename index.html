@@ -1415,7 +1415,7 @@
         
         // --- NEW: CSV ARCHIVE PARSER ---
         // Your specific Raw GitHub URL
-        const CSV_URL = 'https://raw.githubusercontent.com/S-HARISH44/TTRL/8ebc1fd7494f4509fc9f9f93cceb0ef79d3de8ac/RESOURCES/Result/TTRL%20point%20table%20-%20Race%20Results.csv';
+        const CSV_URL = 'https://raw.githubusercontent.com/S-HARISH44/TTRL/7408b20236f47ee697f06bce5e7d1f7a993a86a6/RESOURCES/Result/TTRL%20point%20table%20-%20Race%20Results.csv';
         let archivesLoaded = false;
 
         async function loadArchives() {
@@ -1427,8 +1427,8 @@
                 if (!response.ok) throw new Error("Network response was not ok");
                 const csvText = await response.text();
                 
-                // Parse CSV
-                // Simple Parser: Handles new lines and commas. Assumes no quoted commas for simplicity based on typical game data.
+                // Parse CSV - Enhanced for Quotes
+                // Handle new lines, then split commas respecting quotes
                 const rows = csvText.split('\n').map(row => row.trim()).filter(row => row.length > 0);
                 
                 if (rows.length === 0) {
@@ -1436,7 +1436,13 @@
                      return;
                 }
 
-                const headers = rows[0].split(',');
+                // Regex to split by comma ONLY if not inside quotes
+                const splitCSV = (row) => {
+                    const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+                    return row.split(regex).map(cell => cell.replace(/^"|"$/g, '').trim());
+                };
+
+                const headers = splitCSV(rows[0]);
                 
                 let tableHtml = `<table class="standings-table"><thead><tr>`;
                 
@@ -1452,7 +1458,7 @@
                 
                 // Build Rows
                 for (let i = 1; i < rows.length; i++) {
-                    const cells = rows[i].split(',');
+                    const cells = splitCSV(rows[i]);
                     // Attempt to find team color from the second column (assuming it's Team Name)
                     const teamName = cells[1] ? cells[1].trim().toUpperCase() : '';
                     // Partial match for team colors (e.g. "RED BULL" in "RED BULL RACING")
@@ -1468,9 +1474,11 @@
                         if(index === 0) cls = 'sticky-col';
                         else if (index === 1) cls = 'sticky-col-2';
                         
-                        // Highlight points or wins? 
-                        // Just standard formatting for now
-                        tableHtml += `<td class="${cls}">${cell}</td>`;
+                        // Center align numbers (points), Left align text (names)
+                        const isNum = !isNaN(cell) && cell !== '';
+                        const alignStyle = isNum ? 'text-align:center;' : 'text-align:left;';
+                        
+                        tableHtml += `<td class="${cls}" style="${alignStyle}">${cell}</td>`;
                     });
                     tableHtml += `</tr>`;
                 }
@@ -1492,7 +1500,7 @@
                 archivesLoaded = true;
                 
                 // Animate entry
-                gsap.fromTo('#view-archives tr', {opacity: 0, x: -20}, {opacity: 1, x: 0, stagger: 0.03, duration: 0.3});
+                gsap.fromTo('#archives-scroll tr', {opacity: 0, x: -20}, {opacity: 1, x: 0, stagger: 0.03, duration: 0.3});
 
             } catch (error) {
                 console.error("Archive Error:", error);
