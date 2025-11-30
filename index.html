@@ -178,6 +178,12 @@
             margin-bottom: 1rem;
         }
 
+        /* --- OVERRIDE FOR ARCHIVES SLIDE (FULL WIDTH) --- */
+        #slide-5 .slide-content {
+            max-width: 100% !important; /* Override the default max-width */
+            padding: 0 1vw !important;  /* Use minimal side padding */
+        }
+
         /* --- TYPOGRAPHY & GLITCH --- */
         .tech-font { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; line-height: 0.9; }
         .mono-font { font-family: 'JetBrains Mono', monospace; }
@@ -300,7 +306,7 @@
 
         /* --- ARCHIVES TABLE SPECIFICS (NEW) --- */
         /* Enable horizontal scrolling for the archives table */
-        #archives-scroll { overflow-x: auto; width: 100%; height: 100%; }
+        #archives-scroll { overflow-x: auto; width: 100%; height: 100%; padding-right: 0; }
         #archives-scroll .standings-table { min-width: 100%; }
         
         /* Sticky Column Logic for Archives */
