@@ -21,14 +21,14 @@
             --glass-bg: rgba(20, 20, 20, 0.6);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; /* Hide default cursor */ }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
         
         html, body {
             width: 100%; height: 100%; margin: 0; padding: 0;
             background-color: var(--bg-main);
             font-family: 'Inter', sans-serif;
             color: var(--text-primary);
-            overflow: hidden; /* Enforce no scrolling on the main page */
+            overflow: hidden;
             overscroll-behavior: none;
         }
 
@@ -46,7 +46,6 @@
             width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3);
             transition: transform 0.1s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
         }
-        /* Hover State for Cursor */
         body.hovering #cursor { width: 0px; height: 0px; opacity: 0; }
         body.hovering #cursor-follower {
             width: 60px; height: 60px; border-color: var(--accent-red);
@@ -58,7 +57,7 @@
             #cursor, #cursor-follower { display: none !important; }
         }
 
-        /* --- LOADING SCREEN --- */
+        /* --- LOADER --- */
         #loader {
             position: fixed; inset: 0; z-index: 10000; background: #000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -67,14 +66,6 @@
         .loader-progress {
             position: absolute; top: 0; left: 0; height: 100%; width: 0%;
             background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan);
-        }
-
-        /* --- CINEMATICS --- */
-        .cinematic-grain {
-            position: fixed; inset: 0; pointer-events: none; z-index: 998;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.04; /* Restored Visual Quality */
-            mix-blend-mode: screen;
         }
 
         /* --- UI COMPONENTS --- */
@@ -86,61 +77,26 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
         }
         
-        .logo { 
-            height: 3.5rem; 
-            width: auto; 
-            pointer-events: auto; 
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
+        .logo { height: 3.5rem; width: auto; pointer-events: auto; cursor: pointer; transition: transform 0.3s ease; }
         .logo:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 1.5rem; }
         
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        
-        /* NEW TOP NAVIGATION BAR */
         .top-nav {
-            display: flex;
-            gap: 1rem;
-            pointer-events: auto;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-size: 0.9rem;
+            display: flex; gap: 1rem; pointer-events: auto;
+            font-family: 'Rajdhani', sans-serif; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.9rem;
         }
         .top-nav a {
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            position: relative;
-            padding: 0.5rem 0.5rem;
-            transition: color 0.3s ease;
-            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6); text-decoration: none; position: relative;
+            padding: 0.5rem 0.5rem; transition: color 0.3s ease; cursor: pointer;
         }
-        .top-nav a:hover {
-            color: var(--accent-cyan);
-        }
+        .top-nav a:hover { color: var(--accent-cyan); }
         .top-nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background: var(--accent-red);
-            transition: width 0.3s ease;
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 0; height: 2px; background: var(--accent-red); transition: width 0.3s ease;
         }
-        .top-nav a.active {
-            color: var(--text-primary);
-        }
-        .top-nav a.active::after {
-            width: 100%;
-            background: var(--accent-cyan);
-        }
+        .top-nav a.active { color: var(--text-primary); }
+        .top-nav a.active::after { width: 100%; background: var(--accent-cyan); }
         
         /* --- SLIDES --- */
         .slides-wrapper { position: fixed; inset: 0; width: 100%; height: 100%; }
@@ -156,8 +112,7 @@
             position: absolute; inset: 0; z-index: 1;
             background-size: cover; background-position: center;
             filter: brightness(0.3) grayscale(0.2);
-            transform: scale(1.1); 
-            will-change: transform;
+            transform: scale(1.1); will-change: transform;
         }
         #vanta-bg { filter: brightness(1) grayscale(0); }
         #vanta-bg canvas { width: 100% !important; height: 100% !important; }
@@ -167,20 +122,9 @@
             display: flex; flex-direction: column; justify-content: center; height: 100%;
         }
         
-        #slide-2 .slide-content {
-            justify-content: flex-start;
-            padding-top: 6vh; 
-        }
-        
-        #slide-5 .slide-content {
-            justify-content: flex-start;
-            padding-top: 6vh;
-            max-width: 100% !important; 
-            padding-left: 1vw !important;
-            padding-right: 1vw !important;
-        }
+        #slide-2 .slide-content, #slide-5 .slide-content { justify-content: flex-start; padding-top: 6vh; }
 
-        /* --- TYPOGRAPHY & GLITCH --- */
+        /* --- TYPOGRAPHY --- */
         .tech-font { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; line-height: 0.9; }
         .mono-font { font-family: 'JetBrains Mono', monospace; }
         
@@ -192,101 +136,31 @@
         }
         
         .slide-title {
-            font-size: clamp(2.5rem, 7vw, 6rem);
-            font-weight: 800; 
-            margin-bottom: 0.8rem;
+            font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; margin-bottom: 0.5rem;
             color: #fff; position: relative; z-index: 2; mix-blend-mode: hard-light;
         }
-        
-        #slide-1 .slide-title, 
-        #slide-2 .slide-title, 
-        #slide-3 .slide-title, 
-        #slide-4 .slide-title,
-        #slide-5 .slide-title {
-            font-size: clamp(2rem, 5vw, 4rem);
-            margin-bottom: 0.5rem;
-        }
-
         .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.85); color: transparent; }
 
-        /* Glitch Effect Keyframes */
-        .glitch-effect { position: relative; display: inline-block; }
-        .glitch-effect::before, .glitch-effect::after {
-            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; opacity: 0.8;
-            color: transparent;
-        }
-        .glitch-effect::before {
-            -webkit-text-stroke: 2px var(--accent-cyan);
-            z-index: -1; 
-            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-            transform: translate(-2px, -2px); opacity: 0;
-        }
-        .glitch-effect::after {
-            -webkit-text-stroke: 2px var(--accent-red);
-            z-index: -2; 
-            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
-            transform: translate(2px, 2px); opacity: 0;
-        }
-        .slide.active .glitch-effect::before { animation: glitch-anim-1 2.5s infinite linear alternate-reverse; opacity: 1; }
-        .slide.active .glitch-effect::after { animation: glitch-anim-2 3s infinite linear alternate-reverse; opacity: 1; }
-
-        @keyframes glitch-anim-1 {
-            0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); transform: translate(-2px, 0); }
-            20% { clip-path: polygon(0 15%, 100% 15%, 100% 15%, 0 15%); transform: translate(2px, 0); }
-            40% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(-2px, 0); }
-            60% { clip-path: polygon(0 1%, 100% 1%, 100% 2%, 0 2%); transform: translate(2px, 0); }
-            80% { clip-path: polygon(0 33%, 100% 33%, 100% 33%, 0 33%); transform: translate(-1px, 0); }
-            100% { clip-path: polygon(0 44%, 100% 44%, 100% 44%, 0 44%); transform: translate(1px, 0); }
-        }
-        @keyframes glitch-anim-2 {
-            0% { clip-path: polygon(0 25%, 100% 25%, 100% 30%, 0 30%); transform: translate(2px, 0); }
-            20% { clip-path: polygon(0 3%, 100% 3%, 100% 3%, 0 3%); transform: translate(-2px, 0); }
-            40% { clip-path: polygon(0 5%, 100% 5%, 100% 20%, 0 20%); transform: translate(2px, 0); }
-            60% { clip-path: polygon(0 20%, 100% 20%, 100% 20%, 0 20%); transform: translate(-2px, 0); }
-            80% { clip-path: polygon(0 40%, 100% 40%, 100% 40%, 0 40%); transform: translate(1px, 0); }
-            100% { clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%); transform: translate(-1px, 0); }
-        }
-
-        .slide-desc {
-            font-size: 1rem; max-width: 600px; color: #a1a1aa; margin-bottom: 2rem; position: relative; z-index: 2;
-        }
-
-        /* --- COUNTDOWN DASHBOARD --- */
-        .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 3rem; }
-        .countdown-item {
-            background: rgba(20, 20, 20, 0.4);
-            border: 1px solid var(--glass-border);
-            border-top: 2px solid var(--accent-red);
-            padding: 0.8rem 1rem; text-align: center; min-width: 80px;
-            clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
-            backdrop-filter: blur(10px); /* Restored High Quality Blur */
-            transition: transform 0.3s ease;
-        }
-        .countdown-item:hover { transform: translateY(-5px); border-color: var(--accent-red); background: rgba(255, 31, 75, 0.1); }
-        .countdown-val {
-            display: block; 
-            font-family: 'JetBrains Mono', monospace; 
-            font-size: clamp(2rem, 3vw, 3rem);
-            font-weight: 700; color: #fff; line-height: 1;
-            font-variant-numeric: tabular-nums;
-        }
-        .countdown-label {
-            display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
-            color: var(--accent-red); margin-top: 0.5rem; letter-spacing: 0.2em;
-        }
-
         /* --- STANDINGS --- */
+        .standings-tabs { display: flex; gap: 1rem; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 5px;}
+        .tab-btn {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5);
+            padding: 0.5rem 1.5rem; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.9rem;
+            text-transform: uppercase; letter-spacing: 0.1em; pointer-events: auto; transition: all 0.3s ease;
+            white-space: nowrap; cursor: pointer;
+        }
+        .tab-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .tab-btn.active { background: var(--accent-red); color: #fff; border-color: var(--accent-red); box-shadow: 0 0 20px rgba(255,31,75,0.3); }
+
         .standings-wrapper { width: 100%; height: 75vh; margin-top: 0.5rem; position: relative; }
         .standings-view {
             position: absolute; inset: 0; width: 100%; height: 100%;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0; visibility: hidden; transform: translateY(20px); pointer-events: none;
-            will-change: opacity, transform;
         }
         .standings-view.active-view { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
 
-        .table-scroll { height: 100%; overflow-y: auto; padding-right: 1rem; scrollbar-width: none; }
+        .table-scroll { height: 100%; overflow: auto; padding-right: 1rem; scrollbar-width: none; }
         .table-scroll::-webkit-scrollbar { display: none; }
         
         .standings-table { width: 100%; border-collapse: separate; border-spacing: 0 0.5rem; font-family: 'JetBrains Mono', monospace; }
@@ -297,346 +171,91 @@
             white-space: nowrap; font-size: 0.9rem;
         }
         .standings-table td { padding: 0.8rem; background: var(--glass-bg); border-top: 1px solid transparent; border-bottom: 1px solid transparent; transition: all 0.2s ease; white-space: nowrap; font-size: 0.9rem;}
-        
-        /* Dynamic Team Border on Left */
         .standings-table td:first-child { border-radius: 4px 0 0 4px; border-left: 3px solid var(--team-color, transparent); }
         .standings-table td:last-child { border-radius: 0 4px 4px 0; border-right: 1px solid transparent; }
-        
         .standings-table tr:hover td { background: rgba(255, 255, 255, 0.1); transform: scale(1.01); }
         
         .team-cell { display: flex; align-items: center; gap: 0.8rem; }
         .team-logo-mini { height: 20px; width: auto; max-width: 30px; object-fit: contain; }
 
-        /* --- ARCHIVES TABLE SPECIFICS --- */
-        #archives-scroll { 
-            overflow: auto; /* Handles both X and Y */
-            width: 100%; 
-            height: 100%; 
-            padding-right: 0; 
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-red) rgba(0,0,0,0.3);
-        }
-        
-        /* Custom Scrollbars for Archives */
-        #archives-scroll::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-            display: block;
-        }
-        #archives-scroll::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
-        }
-        #archives-scroll::-webkit-scrollbar-thumb {
-            background: var(--accent-red);
-            border-radius: 4px;
-        }
-        #archives-scroll::-webkit-scrollbar-corner {
-            background: transparent;
-        }
-
-        #archives-scroll .standings-table { min-width: 100%; }
-        
-        /* Sticky Header for Archives - Ensure High Z-Index */
-        #archives-scroll th {
-            background: #000 !important; /* Force solid black background */
-            z-index: 40; /* High z-index to stay above body content */
-            border-bottom: 1px solid var(--glass-border);
-            position: sticky;
-            top: 0;
-        }
-
-        /* Use row-bg variable for colored rows in archives */
-        #archives-scroll td {
-            background: var(--row-bg, var(--glass-bg));
-        }
-
-        /* Sticky Column Logic for Archives - Ensure proper layering */
-        .sticky-col, .sticky-col-2 {
-            position: sticky; 
-            left: 0; 
-            z-index: 30 !important; /* Higher than normal cells (auto), Lower than Header (40) */
-            background: #0a0a0a !important; 
-            border-right: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .sticky-col-2 {
-            left: 0; /* JS will calculate real offset, fallback to 0 */
-        }
-        
-        /* Intersection Fix: Header Cells that are ALSO Sticky Columns */
-        #archives-scroll th.sticky-col, #archives-scroll th.sticky-col-2 {
-            z-index: 50 !important; /* Highest Z-Index (Header + Sticky) */
-            background: #000 !important;
-        }
-        
-        @media (min-width: 768px) {
-           .sticky-col-2 { left: 150px; } 
-        }
-
-        
-        .archive-loading {
-            width: 100%; height: 100%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; color: var(--accent-cyan);
-            font-family: 'JetBrains Mono', monospace; gap: 1rem;
-        }
-
-        /* --- 3D GARAGE CARDS --- */
+        /* --- GARAGE GRID --- */
         .garage-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem; 
-            height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem;
-            scrollbar-width: none; 
-            grid-auto-rows: 1fr;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem; height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem;
+            scrollbar-width: none;
         }
-        
-        @media (min-width: 1200px) {
-            .garage-grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
-        }
-        
         .garage-grid::-webkit-scrollbar { display: none; }
+        
+        @media (min-width: 1200px) { .garage-grid { grid-template-columns: repeat(5, 1fr); } }
 
         .constructor-card {
             background: linear-gradient(145deg, rgba(30,30,30,0.6) 0%, rgba(10,10,10,0.8) 100%);
-            border: 1px solid var(--glass-border); border-radius: 12px;
-            padding: 1rem;
+            border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem;
             display: flex; flex-direction: column; position: relative;
             transform-style: preserve-3d; transition: transform 0.1s linear, box-shadow 0.3s ease;
-            cursor: none;
-            will-change: transform;
-            height: 100%;
-            justify-content: space-between;
-        }
-        .constructor-card::after {
-            content: ''; position: absolute; inset: 0; border-radius: 12px;
-            box-shadow: 0 0 20px var(--team-color, var(--accent-cyan));
-            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+            height: 100%; justify-content: space-between;
         }
         .constructor-card:hover { border-color: var(--team-color, #fff); }
-        .constructor-card:hover::after { opacity: 0.2; }
-
-        .cc-bg-rank {
-            position: absolute; top: -0.5rem; right: 0.5rem; font-size: 4rem;
-            font-family: 'Rajdhani', sans-serif; font-weight: 800;
-            color: rgba(255,255,255,0.03); z-index: 0; pointer-events: none;
-            transform: translateZ(20px);
-        }
-        .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; position: relative; z-index: 2; transform: translateZ(30px); }
-        .cc-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem; white-space: nowrap; }
-        .cc-points {
-            color: var(--team-color, var(--accent-cyan)); font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.8rem;
-            background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px;
-        }
         
-        .cc-img-container {
-            flex-grow: 1; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            margin: 0; 
-            position: relative; 
-            z-index: 1; 
-            transform: translateZ(50px);
-            height: 70px;
-            width: 100%;
-        }
-        .cc-car-img { 
-            width: auto;
-            height: auto;
-            max-width: 100%; 
-            max-height: 100%; 
-            object-fit: contain; 
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
-        }
+        .cc-bg-rank { position: absolute; top: -0.5rem; right: 0.5rem; font-size: 4rem; font-family: 'Rajdhani'; font-weight: 800; color: rgba(255,255,255,0.03); pointer-events: none; }
+        .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; z-index: 2; transform: translateZ(30px); }
+        .cc-name { font-family: 'Rajdhani'; font-weight: 700; font-size: 1rem; }
+        .cc-points { color: var(--team-color); font-family: 'JetBrains Mono'; font-weight: 700; background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px; }
+        .cc-img-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; transform: translateZ(50px); height: 70px; }
+        .cc-car-img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
 
-        /* --- ACCORDION STYLE DOTD (HOVER BASED) --- */
-        .dotd-accordion-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            overflow: hidden;
-        }
-        
-        @media (min-width: 768px) {
-            .dotd-accordion-container {
-                flex-direction: row;
-            }
-        }
-
+        /* --- DOTD (Accordion) --- */
+        .dotd-accordion-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 0; overflow: hidden; }
+        @media (min-width: 768px) { .dotd-accordion-container { flex-direction: row; } }
         .dotd-panel {
-            flex: 1;
-            display: flex;
-            position: relative;
-            background-size: cover;
-            background-position: center top;
-            background-repeat: no-repeat;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            cursor: pointer;
-            min-height: 60px;
-            border: 1px solid rgba(255,255,255,0.05);
+            flex: 1; display: flex; position: relative; background-size: cover; background-position: center top;
+            background-repeat: no-repeat; overflow: hidden; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer; min-height: 60px; border: 1px solid rgba(255,255,255,0.05);
         }
-        
         .dotd-panel::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%);
-            z-index: 1;
-            transition: background 0.5s;
+            content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%);
+            z-index: 1; transition: background 0.5s;
         }
-        
-        .dotd-panel:hover {
-            flex: 4; 
-            cursor: default;
-            border-color: var(--team-color);
-        }
-        
-        .dotd-panel:hover::before {
-             background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
-        }
-
+        .dotd-panel:hover { flex: 4; cursor: default; border-color: var(--team-color); }
+        .dotd-panel:hover::before { background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%); }
         .dotd-label {
-            position: absolute;
-            z-index: 2;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            white-space: nowrap;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.7);
-            transition: all 0.3s;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            pointer-events: none;
+            position: absolute; z-index: 2; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            white-space: nowrap; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.2rem;
+            text-transform: uppercase; color: rgba(255,255,255,0.7); transition: all 0.3s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none;
         }
-
         @media (min-width: 768px) {
-            .dotd-label {
-                transform: translate(-50%, -50%) rotate(-90deg);
-                font-size: 1.5rem;
-            }
-            .dotd-panel:hover .dotd-label {
-                opacity: 0;
-                transform: translate(-50%, -200%) rotate(-90deg);
-            }
+            .dotd-label { transform: translate(-50%, -50%) rotate(-90deg); font-size: 1.5rem; }
+            .dotd-panel:hover .dotd-label { opacity: 0; transform: translate(-50%, -200%) rotate(-90deg); }
         }
-        
         @media (max-width: 767px) {
-            .dotd-panel:hover .dotd-label {
-                opacity: 0;
-                transform: translate(-200%, -50%);
-            }
+            .dotd-panel:hover .dotd-label { opacity: 0; transform: translate(-200%, -50%); }
         }
-
         .dotd-content {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 1.5rem;
-            z-index: 3;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s 0.1s ease-out;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 1.5rem; z-index: 3;
+            opacity: 0; transform: translateY(20px); transition: all 0.4s 0.1s ease-out;
+            display: flex; flex-direction: column; justify-content: flex-end;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
         }
-
-        .dotd-panel:hover .dotd-content {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .dotd-gp-name {
-            color: var(--accent-cyan);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            margin-bottom: 0.5rem;
-            letter-spacing: 1px;
-        }
-        
-        .dotd-driver-name {
-            color: #fff;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 2rem;
-            font-weight: 800;
-            line-height: 1;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .dotd-team-name {
-            color: var(--team-color);
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
+        .dotd-panel:hover .dotd-content { opacity: 1; transform: translateY(0); }
+        .dotd-gp-name { color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 1px; }
+        .dotd-driver-name { color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; text-transform: uppercase; margin-bottom: 0.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .dotd-team-name { color: var(--team-color); font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 600; text-transform: uppercase; }
         .dotd-badge-icon {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            font-size: 1.5rem;
-            color: #FFD700;
-            opacity: 0;
-            transform: scale(0);
-            transition: all 0.3s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 4;
-            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+            position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: #FFD700; opacity: 0;
+            transform: scale(0); transition: all 0.3s 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 4; filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
         }
-        
-        .dotd-panel:hover .dotd-badge-icon {
-            opacity: 1;
-            transform: scale(1);
-        }
+        .dotd-panel:hover .dotd-badge-icon { opacity: 1; transform: scale(1); }
 
-
-        /* --- CONTROLS --- */
-        .standings-tabs { display: flex; gap: 1rem; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 5px;}
-        .tab-btn {
-            background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5);
-            padding: 0.5rem 1.5rem; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.9rem;
-            text-transform: uppercase; letter-spacing: 0.1em; pointer-events: auto; transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        .tab-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .tab-btn.active { background: var(--accent-red); color: #fff; border-color: var(--accent-red); box-shadow: 0 0 20px rgba(255,31,75,0.3); }
-
-        .btn-tech {
-            pointer-events: auto; display: inline-block; padding: 0.8rem 2.5rem;
-            background: var(--accent-red); color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.2em; text-decoration: none; border: none; font-size: 0.9rem;
-            clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%); transition: all 0.3s ease;
-            position: relative; overflow: hidden;
-        }
-        .btn-tech::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.5s ease;
-        }
-        .btn-tech:hover { transform: translateY(-2px); box-shadow: 10px 10px 30px -10px var(--accent-red); }
-        .btn-tech:hover::before { left: 100%; }
-
-        /* --- CALENDAR --- */
+        /* --- CALENDAR GRID --- */
         .cal-grid { display: flex; flex-wrap: wrap; gap: 1rem; max-width: 1200px; margin-top: 1rem; }
         .cal-item {
             border: 1px solid var(--glass-border); padding: 1.2rem; text-align: center;
-            transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
             display: flex; flex-direction: column; justify-content: center;
             background: var(--glass-bg); opacity: 0.5; flex: 1 1 140px; min-width: 140px;
             position: relative; overflow: hidden;
-            will-change: transform, opacity; /* Hint for browser */
         }
         .cal-item::before {
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
@@ -644,14 +263,12 @@
         }
         .cal-item:hover { opacity: 1 !important; transform: translateY(-5px); border-color: rgba(255,255,255,0.3); }
         .cal-item:hover::before { transform: scaleX(1); }
-        
         .cal-item.future-race { opacity: 0.8; }
-        .cal-item.next-race {
-            opacity: 1; border: 1px solid var(--accent-cyan); background: rgba(0, 240, 255, 0.05);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1);
-        }
+        .cal-item.next-race { opacity: 1; border: 1px solid var(--accent-cyan); background: rgba(0, 240, 255, 0.05); box-shadow: 0 0 30px rgba(0, 240, 255, 0.1); }
         .cal-item.next-race .gp { color: var(--accent-cyan); text-shadow: 0 0 10px var(--accent-cyan); }
-        
+        .round { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent-red); display: block; margin-bottom: 0.3rem; letter-spacing: 0.1em; }
+        .gp { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.2rem; color: #fff; line-height: 1.1; margin-bottom: 0.3rem; display: block; }
+        .date { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #888; display: block; }
         .btn-ai-intel {
             margin-top: 0.8rem; padding: 0.4rem; background: rgba(255,255,255,0.1); 
             border: 1px solid var(--accent-cyan); color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace;
@@ -660,7 +277,26 @@
         }
         .btn-ai-intel:hover { background: var(--accent-cyan); color: #000; }
 
-        /* --- CONTACT --- */
+        /* --- ARCHIVE SECTION --- */
+        .archive-loading { text-align: center; padding: 2rem; color: var(--accent-cyan); font-family: 'JetBrains Mono'; }
+        
+        /* Sticky Headers for Archive */
+        .sticky-left { position: sticky; left: 0; z-index: 20; background: #000; border-right: 1px solid rgba(255,255,255,0.1); }
+        .sticky-top { position: sticky; top: 0; z-index: 30; background: #000; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sticky-corner { position: sticky; left: 0; top: 0; z-index: 40; background: #000; border-right: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        /* Other UI */
+        .btn-tech {
+            pointer-events: auto; display: inline-block; padding: 0.8rem 2.5rem;
+            background: var(--accent-red); color: #fff; font-family: 'Rajdhani'; font-weight: 700;
+            text-decoration: none; clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+        }
+        .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 3rem; }
+        .countdown-item { background: rgba(20, 20, 20, 0.4); border: 1px solid var(--glass-border); border-top: 2px solid var(--accent-red); padding: 0.8rem; text-align: center; }
+        .countdown-val { font-family: 'JetBrains Mono'; font-size: 2.5rem; font-weight: 700; display: block; }
+        .countdown-label { font-size: 0.7rem; color: var(--accent-red); letter-spacing: 0.2em; }
+        
+        /* Contact Grid */
         .contact-grid { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
         .contact-item {
             display: flex; align-items: center; gap: 1rem; padding: 1.5rem 2rem;
@@ -669,169 +305,57 @@
         }
         .contact-item:hover { background: #fff; color: #000; transform: translateY(-5px); }
 
-        /* --- Modals --- */
+        /* Modals */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            backdrop-filter: blur(10px); /* Restored High Quality Blur */
-            z-index: 9990; display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; pointer-events: none; 
-            transition: all 0.3s ease;
-            will-change: opacity, visibility; /* Hint for browser optimization */
+            backdrop-filter: blur(10px); z-index: 9990; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
         
-        /* Intel Modal */
         .intel-modal {
-            width: 90%; max-width: 800px; 
-            background: #000; border: 1px solid var(--accent-cyan);
+            width: 90%; max-width: 800px; background: #000; border: 1px solid var(--accent-cyan);
             padding: 2rem; position: relative; clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
             display: flex; flex-direction: column;
-            will-change: transform, opacity; /* Hint for browser optimization */
         }
         .intel-title { color: var(--accent-cyan); font-family: 'Rajdhani', sans-serif; font-size: 2rem; margin-bottom: 1rem; text-transform: uppercase; }
-        
-        /* NEW GRID LAYOUT FOR INTEL CONTENT */
         .intel-content-layout {
-            display: grid;
-            grid-template-columns: 3fr 2fr; /* 60% Left, 40% Right */
-            gap: 2rem;
-            flex-grow: 1; 
-            max-height: 55vh; /* Allow modal to take most of the height */
-            overflow: hidden;
+            display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; flex-grow: 1; max-height: 55vh; overflow: hidden;
         }
-        
-        .intel-left-column {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto; /* Allows left column content (map + briefing) to scroll if needed */
-            padding-right: 10px;
-        }
-        
-        .intel-right-column {
-            overflow-y: auto; /* Allows right column content (setup) to scroll if needed */
-            padding-right: 10px;
-        }
-        
-        /* Ensure map container is sized correctly within the left column */
-        .intel-map-container {
-            flex-shrink: 0;
-            width: 100%;
-            height: 0;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            position: relative;
-        }
-        .intel-map-container img {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.8) contrast(1.1);
-        }
-
-        .ai-briefing {
-            font-family: 'JetBrains Mono', monospace; 
-            line-height: 1.6; 
-            color: #ccc;
-        }
-
-        .close-modal { cursor: pointer; pointer-events: auto; font-size: 1.5rem; color: #fff; transition: color 0.2s; }
+        .intel-left-column, .intel-right-column { overflow-y: auto; padding-right: 10px; }
+        .intel-map-container { flex-shrink: 0; width: 100%; height: 0; padding-bottom: 56.25%; position: relative; }
+        .intel-map-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8) contrast(1.1); }
+        .ai-briefing { font-family: 'JetBrains Mono', monospace; line-height: 1.6; color: #ccc; }
+        .close-modal { cursor: pointer; font-size: 1.5rem; color: #fff; transition: color 0.2s; float: right; }
         .close-modal:hover { color: var(--accent-cyan); }
-
-        /* NEW SETUP DISPLAY STYLES */
-        .setup-display {
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--accent-red);
-            padding: 1rem;
-            background: rgba(255, 31, 75, 0.05);
-        }
-        .setup-display h4 {
-            color: var(--accent-red);
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-        }
-        .setup-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            /* Ensure text aligns centrally within the setup card */
-            text-align: left; 
-        }
-        .setup-table td {
-            padding: 0.4rem 0.5rem;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
-            text-align: left; /* Default left align */
-        }
-        .setup-table td:first-child {
-            color: var(--accent-cyan);
-            font-weight: 700;
-            width: 50%; /* Give enough space for parameter name */
-        }
-        /* ALIGNMENT FIX: Right-align the numerical/value column */
-        .setup-table td:last-child {
-            text-align: right; 
-            color: #fff;
-            font-weight: 500;
-            width: 50%;
-        }
-
+        .setup-display { margin-bottom: 1.5rem; border: 1px solid var(--accent-red); padding: 1rem; background: rgba(255, 31, 75, 0.05); }
+        .setup-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
+        .setup-table td { padding: 0.4rem 0.5rem; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+        .setup-table td:first-child { color: var(--accent-cyan); font-weight: 700; width: 50%; }
+        .setup-table td:last-child { text-align: right; color: #fff; font-weight: 500; }
 
         @media (max-width: 768px) {
-            .countdown-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-            .countdown-item { min-width: auto; padding: 0.8rem; }
+            .fixed-ui { padding: 1rem; }
+            .top-nav { display: none; }
+            .countdown-grid { grid-template-columns: repeat(2, 1fr); }
             .slide-title { font-size: 3rem; }
             .garage-grid { grid-template-columns: 1fr; }
-            .table-scroll { overflow-x: auto; }
-            .intel-modal { padding: 1rem; }
-            
-            /* Mobile Grid Stack */
-            .intel-content-layout {
-                grid-template-columns: 1fr; /* Stack vertically */
-                max-height: 80vh;
-                overflow-y: auto; /* Main modal content scrolls */
-            }
-            .intel-left-column, .intel-right-column {
-                overflow-y: visible; /* Let the main modal scroll */
-                padding-right: 0;
-            }
-            .intel-map-container {
-                height: 200px; /* Fixed height for mobile view */
-                padding-bottom: 0;
-            }
-            .intel-map-container img {
-                position: static;
-                height: 100%;
-            }
-            
-            /* Mobile menu button adjustment */
-            .fixed-ui { padding: 1rem 1.5rem; }
-            .header-right { gap: 1rem; }
-            .top-nav { display: none; /* Hide full menu on mobile */ }
+            .intel-content-layout { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- CUSTOM CURSOR -->
-    <div id="cursor"></div>
-    <div id="cursor-follower"></div>
+    <div id="cursor"></div><div id="cursor-follower"></div>
 
-    <!-- LOADER -->
     <div id="loader">
         <div class="tech-font" style="letter-spacing: 0.3em; font-size: 1.5rem;">INITIALIZING RACE CONTROL</div>
         <div class="loader-bar"><div class="loader-progress" id="load-bar"></div></div>
-        <div class="mono-font" style="margin-top: 10px; font-size: 0.8rem; color: #666;">V 2.6.0 // TTRL SYSTEM</div>
     </div>
 
-    <div class="cinematic-grain"></div>
-
     <div class="fixed-ui">
-        <!-- UPDATED: Added ID for click functionality -->
         <img id="app-logo" src="https://raw.githubusercontent.com/HARISHWINNER/TTRL/ade50d630c482acbb96676fc69c2849a58494f7f/RESOURCES/image.png" alt="TTRL" class="logo hover-target">
         <div class="header-right">
-            <!-- NEW TOP NAVIGATION LINKS -->
             <div class="top-nav">
                 <a href="#" class="nav-link active hover-target" data-slide="0">HOME</a>
                 <a href="#" class="nav-link hover-target" data-slide="1">CALENDAR</a>
@@ -840,67 +364,43 @@
                 <a href="#" class="nav-link hover-target" data-slide="4">PADDOCK</a>
                 <a href="#" class="nav-link hover-target" data-slide="5">ARCHIVES</a>
             </div>
-            <div class="mono-font text-sm uppercase tracking-widest">
-                <!-- UPDATED STATUS -->
-                <span style="color: var(--accent-cyan)">Season 1</span> <span style="color: #666">// Completed</span>
-            </div>
+            <div class="mono-font text-sm uppercase tracking-widest"><span style="color: var(--accent-cyan)">Season 1</span> <span style="color: #666">// Completed</span></div>
         </div>
     </div>
-
-    <!-- TEAM RADIO BUTTON REMOVED -->
-    <!-- TEAM RADIO MODAL REMOVED -->
 
     <!-- INTEL MODAL -->
     <div class="modal-overlay" id="intel-modal-overlay">
         <div class="intel-modal">
-            <div class="chat-header" style="background:transparent; padding:0; margin-bottom:1rem;">
-                <span style="color:var(--accent-cyan)">TACTICAL BRIEFING</span>
+            <div style="margin-bottom:1rem; overflow:hidden;">
                 <span class="close-modal hover-target" onclick="closeIntel()">&times;</span>
+                <span style="color:var(--accent-cyan); font-family:'Rajdhani'; font-weight:700;">TACTICAL BRIEFING</span>
             </div>
             <div class="intel-title" id="intel-title">GP NAME</div>
-            
-            <!-- NEW GRID LAYOUT: Map (L-Top), Briefing (L-Bottom), Setup (R-Full) -->
             <div class="intel-content-layout">
-                
-                <!-- LEFT COLUMN: MAP + AI BRIEFING (Stacked) -->
                 <div class="intel-left-column">
-                    <div class="intel-map-container">
-                        <img id="intel-map" src="" alt="Track Map Placeholder" onerror="this.onerror=null; this.src='https://placehold.co/768x432/111111/FFFFFF?text=MAP+LOADING...'">
-                    </div>
-                    <!-- AI Briefing goes here -->
-                    <div id="ai-briefing" class="ai-briefing"></div>
+                    <div class="intel-map-container"><img id="intel-map" src="" alt="Map"></div>
+                    <div id="ai-briefing" class="ai-briefing" style="margin-top:1rem;"></div>
                 </div>
-                
-                <!-- RIGHT COLUMN: SETUP TABLE -->
                 <div class="intel-right-column">
                     <div id="setup-display" class="setup-display mono-font"></div>
                 </div>
-                
             </div>
         </div>
     </div>
-    
-    <!-- REMOVED: Nav Dots -->
 
     <div class="slides-wrapper">
         <!-- SLIDE 0: HERO -->
         <section class="slide active" id="slide-0">
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/001-EA-Sports-F1-2023-Video-Game-Review.jpg')"></div>
             <div class="slide-content" style="align-items: center; text-align: center;">
-                <div class="slide-tag" id="hero-next-tag">NEXT RACE // LOADING...</div>
-                <h1 class="slide-title tech-font">
-                    <span class="glitch-effect" data-text="TURBO">TURBO</span><br>
-                    <span class="text-outline glitch-effect" data-text="TRIBE">TRIBE</span>
-                </h1>
-                
+                <div class="slide-tag" id="hero-next-tag">SEASON COMPLETED</div>
+                <h1 class="slide-title tech-font"><span class="glitch-effect" data-text="TURBO">TURBO</span> <span class="text-outline glitch-effect" data-text="TRIBE">TRIBE</span></h1>
                 <div class="countdown-grid hover-target" id="hero-countdown">
                     <div class="countdown-item"><span class="countdown-val" id="cd-days">00</span><span class="countdown-label">DAYS</span></div>
                     <div class="countdown-item"><span class="countdown-val" id="cd-hours">00</span><span class="countdown-label">HRS</span></div>
                     <div class="countdown-item"><span class="countdown-val" id="cd-minutes">00</span><span class="countdown-label">MIN</span></div>
                     <div class="countdown-item"><span class="countdown-val" id="cd-seconds">00</span><span class="countdown-label">SEC</span></div>
                 </div>
-                
-                <p class="slide-desc">Experience the pinnacle of F1 25 sim racing. Elite competition, precision driving, and a community like no other.</p>
                 <div class="btn-container"><button id="start-engine-btn" class="btn-tech hover-target">ENTER PADDOCK</button></div>
             </div>
         </section>
@@ -910,34 +410,39 @@
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/Belgium.avif')"></div>
             <div class="slide-content">
                 <div class="slide-tag">02 // GLOBAL TOUR</div>
-                <h2 class="slide-title tech-font glitch-effect" data-text="RACE CALENDAR">RACE<br><span class="text-outline">CALENDAR</span></h2>
+                <h2 class="slide-title tech-font">RACE <span class="text-outline">CALENDAR</span></h2>
                 <div id="calendar-grid" class="cal-grid mono-font"></div>
             </div>
         </section>
 
-        <!-- SLIDE 2: STANDINGS -->
+        <!-- SLIDE 2: STANDINGS (FIREBASE CONNECTED) -->
         <section class="slide" id="slide-2">
             <div class="slide-bg" style="background-image: url('https://f1chronicle.com/wp-content/uploads/2024/01/SI202412010400-1920x1080.jpg')"></div>
             <div class="slide-content">
                 <div class="slide-tag">03 // LEADERBOARD</div>
-                <h2 class="slide-title tech-font glitch-effect" data-text="TOP PERFORMERS">TOP<br><span class="text-outline">PERFORMERS</span></h2>
+                <h2 class="slide-title tech-font">TOP <span class="text-outline">PERFORMERS</span></h2>
                 <div class="standings-tabs">
                     <button class="tab-btn active hover-target" data-tab="drivers">DRIVERS</button>
                     <button class="tab-btn hover-target" data-tab="constructors">TEAMS</button>
                     <button class="tab-btn hover-target" data-tab="dotd">AWARDS</button>
                 </div>
                 <div class="standings-wrapper">
+                    <!-- DRIVERS -->
                     <div class="standings-view active-view" id="view-drivers">
                          <div class="table-scroll">
                             <table class="standings-table">
                                 <thead><tr><th>POS</th><th>DRIVER</th><th>TEAM</th><th>PTS</th></tr></thead>
-                                <tbody id="drivers-body"></tbody>
+                                <tbody id="drivers-body"><tr><td colspan="4" class="archive-loading">CONNECTING TO DATABASE...</td></tr></tbody>
                             </table>
                         </div>
                     </div>
+                    <!-- CONSTRUCTORS -->
                     <div class="standings-view" id="view-constructors">
-                        <div class="garage-grid" id="garage-grid"></div>
+                        <div class="garage-grid" id="garage-grid">
+                            <div class="archive-loading">CALCULATING POINTS...</div>
+                        </div>
                     </div>
+                    <!-- DOTD (RESTORED) -->
                     <div class="standings-view" id="view-dotd">
                         <div class="dotd-accordion-container" id="dotd-container"></div>
                     </div>
@@ -950,22 +455,17 @@
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/1-w-GettyImages-2048270135.webp')"></div>
             <div class="slide-content">
                 <div class="slide-tag">04 // ENLIST</div>
-                <h2 class="slide-title tech-font glitch-effect" data-text="JOIN THE GRID">JOIN<br><span class="text-outline">THE GRID</span></h2>
-                <p class="slide-desc">Seats are limited for Season 2. Secure your place in the most competitive league on the platform.</p>
+                <h2 class="slide-title tech-font">JOIN <span class="text-outline">THE GRID</span></h2>
                 <div class="btn-container"><a href="https://docs.google.com/forms/d/e/1FAIpQLSc1xE8SkAOIKoHaryLjNgTNXJfmBCSv73vdgxaAA0_uxnmUTw/viewform" target="_blank" class="btn-tech hover-target">REGISTER NOW</a></div>
             </div>
         </section>
 
-         <!-- SLIDE 4: CONTACT -->
+         <!-- SLIDE 4: PADDOCK (ADDED EMAIL) -->
         <section class="slide" id="slide-4">
             <div class="slide-bg" id="vanta-bg"></div>
             <div class="slide-content">
                 <div class="slide-tag">05 // PADDOCK</div>
-                <h2 class="slide-title tech-font">
-                    <span class="glitch-effect" data-text="CONNECT">CONNECT</span><br>
-                    <span class="text-outline glitch-effect" data-text="WITH US">WITH US</span>
-                </h2>
-                <p class="slide-desc">Join our Discord server for live race updates.</p>
+                <h2 class="slide-title tech-font">CONNECT <span class="text-outline">WITH US</span></h2>
                 <div class="contact-grid mono-font">
                     <a href="https://discord.gg/EuyPTXqbg6" target="_blank" class="contact-item hover-target"><i class="fa-brands fa-discord"></i> <span>DISCORD</span></a>
                     <a href="https://www.youtube.com/@TurboTribeRacingLeague" target="_blank" class="contact-item hover-target"><i class="fa-brands fa-youtube"></i> <span>YOUTUBE</span></a>
@@ -974,197 +474,87 @@
             </div>
         </section>
 
-        <!-- SLIDE 5: ARCHIVES (NEW SECTION) -->
+        <!-- SLIDE 5: ARCHIVES (MATRIX TABLE) -->
         <section class="slide" id="slide-5">
             <div class="slide-bg" style="background-image: url('https://media.formula1.com/image/upload/f_auto,c_limit,w_1440,q_auto/f_auto/q_auto/content/dam/fom-website/manual/Misc/2021-Master-Folder/Mercedes%20W12/MERCEDES_AMG_PETRONAS_F1_W12_E_PERFORMANCE_04'); filter: brightness(0.2);"></div>
             <div class="slide-content">
                 <div class="slide-tag">06 // DATA VAULT</div>
-                <h2 class="slide-title tech-font glitch-effect" data-text="SEASON ARCHIVES">SEASON<br><span class="text-outline">ARCHIVES</span></h2>
+                <h2 class="slide-title tech-font">SEASON <span class="text-outline">ARCHIVES</span></h2>
+                
                 <div class="standings-wrapper" style="height: 65vh;">
-                    <div class="table-scroll" id="archives-scroll">
-                         <div class="archive-loading">
-                            <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
-                            <span>INITIALIZING DATALINK...</span>
-                         </div>
+                    <div class="table-scroll" id="archives-scroll-container">
+                         <!-- Injected via JS -->
+                         <div class="archive-loading">LOADING FULL SEASON MATRIX...</div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- REQUIRED LIBRARIES -->
+    <!-- SCRIPTS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Observer.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
 
-    <script>
-        gsap.registerPlugin(Observer);
-        
-        // --- API KEY CONFIGURATION ---
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyApUD33ao9DfFa8IAfA2qby3IFKhLtcNFU",
+            authDomain: "ttrl-9f3ef.firebaseapp.com",
+            projectId: "ttrl-9f3ef",
+            storageBucket: "ttrl-9f3ef.firebasestorage.app",
+            messagingSenderId: "51144639440",
+            appId: "1:51144639440:web:8a027b773bc2cddefe2fd5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // API KEY
         const _k_parts = ["AIzaSyBUpBE", "iHMqvfc5PCFn", "3aqTwfBZg8d9QThI"];
         const apiKey = _k_parts.join('');
 
-        // --- GEMINI API INTEGRATION ---
-        async function callGemini(prompt, systemInstruction = "") {
-            try {
-                const maxRetries = 3;
-                let delay = 1000;
-                for (let i = 0; i < maxRetries; i++) {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            systemInstruction: { parts: [{ text: systemInstruction }] }
-                        })
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        return data.candidates[0].content.parts[0].text;
-                    }
-                    if (i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2;
-                    }
-                }
-                throw new Error('API Call Failed after retries');
-            } catch (error) {
-                console.error(error);
-                return "Radio interference... Signal lost. Please check your connection.";
-            }
-        }
-
-        // --- NAVIGATION LOGIC ---
-        const navLinks = document.querySelectorAll('.top-nav .nav-link');
-        function updateActiveLink(index) {
-            navLinks.forEach(link => link.classList.remove('active'));
-            if (navLinks[index]) navLinks[index].classList.add('active');
-        }
-        navLinks.forEach((link, index) => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                gotoSlide(index);
-            });
-        });
-
-        function getSetupDataForAI(gpName) {
-             const setup = f125SetupData[gpName];
-             if (!setup) return "No specific setup data available for this track.";
-             return `
-             --- F1 25 Setup Prediction for ${gpName} ---
-             Aero: ${setup.aero}
-             Differential: ${setup.differential}
-             Suspension Geometry: ${setup.suspGeometry}
-             Suspension: ${setup.suspension}
-             Brakes: ${setup.brakes}
-             Tire Pressure: ${setup.tiresQ} / ${setup.tiresR}
-             Notes: ${setup.notes}
-             ----------------------------------------`;
-        }
-
-        function getLeagueContext(currentQuery = "") {
-            const drivers = driverData.map(d => `${d.driver} (${d.team}): ${d.points}pts`).join(', ');
-            const teams = getConstructorData().map(c => `${c.team}: ${c.points}pts`).join(', ');
-            const schedule = leagueCalendar.map(r => `Rd ${r.round} ${r.gp} (${r.date})`).filter(r => r.round !== 'break').join(', ');
-            const dotdHistory = dotdData.map(d => `${d.gp}: ${d.driver} (${d.team})`).join(', ');
-
-            const lastQuery = currentQuery.toLowerCase();
-            let setupHint = '';
-            
-            if (lastQuery.includes('setup') || lastQuery.includes('aero') || lastQuery.includes('diff') || lastQuery.includes('suspension')) {
-                const availableTracks = Object.keys(f125SetupData);
-                for (const gpName of availableTracks) {
-                    const firstWord = gpName.split(' ')[0].toLowerCase();
-                    const isMatch = lastQuery.includes(firstWord) || 
-                                   (firstWord === 'australian' && lastQuery.includes('australia')) ||
-                                   (firstWord === 'emilia' && lastQuery.includes('imola')) ||
-                                   (firstWord === 'great' && (lastQuery.includes('britain') || lastQuery.includes('silverstone'))) ||
-                                   (firstWord === 'são' && (lastQuery.includes('brazil') || lastQuery.includes('sao')));
-
-                    if (isMatch) {
-                        setupHint = getSetupDataForAI(gpName);
-                        break;
-                    }
-                }
-                if (!setupHint) setupHint = `SYSTEM NOTE: User asked for setup. Available Setups: ${availableTracks.map(t => t.split(' ')[0]).join(', ')}.`;
-            }
-
-            return `
-            CURRENT STANDINGS: Drivers: ${drivers} | Constructors: ${teams}
-            DOTD AWARDS: ${dotdHistory}
-            CALENDAR: ${schedule}
-            ${setupHint}
-            `;
-        }
-
-        // --- TRACK INTEL LOGIC ---
-        const intelModal = document.getElementById('intel-modal-overlay');
-        const intelTitle = document.getElementById('intel-title');
-        const intelMap = document.getElementById('intel-map');
-        const setupDisplay = document.getElementById('setup-display');
-        const aiBriefing = document.getElementById('ai-briefing');
-
-        function closeIntel() { intelModal.classList.remove('active'); }
-
-        function displaySetupData(setup) {
-            if (!setup) {
-                setupDisplay.innerHTML = "<h4>Baseline Setup Prediction</h4><p>No specific data available.</p>";
-                return;
-            }
-            setupDisplay.innerHTML = `
-                <h4>F1 25 Baseline Setup</h4>
-                <table class="setup-table">
-                    <tr><td>Aero (F/R)</td><td>${setup.aero}</td></tr>
-                    <tr><td>Differential</td><td>${setup.differential}</td></tr>
-                    <tr><td>Suspension</td><td>${setup.suspension}</td></tr>
-                    <tr><td>Brakes</td><td>${setup.brakes}</td></tr>
-                    <tr><td>Tires (Q/R)</td><td>${setup.tiresQ.split('/')[0].trim()} / ${setup.tiresR.split('/')[0].trim()}</td></tr>
-                </table>
-            `;
-        }
-
-        async function fetchTrackIntel(gpName) {
-            intelModal.classList.add('active');
-            requestAnimationFrame(async () => {
-                const raceData = leagueCalendar.find(r => r.gp === gpName);
-                const setup = f125SetupData[gpName];
-                const mapUrl = raceData ? raceData.mapUrl : 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND';
-                intelTitle.innerText = gpName.toUpperCase();
-                intelMap.src = mapUrl;
-                displaySetupData(setup);
-                aiBriefing.innerHTML = `<i class="fa-solid fa-satellite-dish fa-spin"></i> DOWNLOADING BRIEFING...`;
-                const prompt = `Tactical summary for ${gpName} in F1 23/24. Key overtaking & tire wear. Under 50 words.`;
-                const briefing = await callGemini(prompt);
-                aiBriefing.textContent = "";
-                let i = 0;
-                function typeWriter() {
-                    if (i < briefing.length) {
-                        aiBriefing.textContent += briefing.slice(i, i + 3);
-                        i += 3;
-                        if (i < briefing.length) setTimeout(() => requestAnimationFrame(typeWriter), 20); 
-                    }
-                }
-                typeWriter();
-            });
-        }
-
-        // --- ASSETS & DATA ---
-        const teamColors = {
-            "FERRARI": "#E80020", "WILLIAMS": "#64C4FF", "ALPINE": "#0093CC", "HAAS": "#B6BABD", "MCLAREN": "#FF8000",
-            "KICK SAUBER": "#52E252", "ASTON MARTIN": "#229971", "RACING BULLS": "#6692FF", "MERCEDES": "#27F4D2",
-            "RED BULL RACING": "#3671C6"
+        // DATA CONSTANTS
+        const TEAMS = [
+            {id:'red-bull-racing', name:'Red Bull'}, {id:'ferrari', name:'Ferrari'}, {id:'mercedes', name:'Mercedes'},
+            {id:'mclaren', name:'McLaren'}, {id:'aston-martin', name:'Aston Martin'}, {id:'alpine', name:'Alpine'},
+            {id:'williams', name:'Williams'}, {id:'racing-bulls', name:'Racing Bulls'}, {id:'kick-sauber', name:'Kick Sauber'},
+            {id:'haas', name:'Haas'}, {id:'reserve', name:'Reserve'}
+        ];
+        
+        const TRACK_KEYS = ['bahrain', 'australia', 'imola', 'spain', 'uk', 'vegas', 'belgium', 'austria', 'brazil', 'abu_dhabi'];
+        const TRACK_LABELS = {
+            'bahrain': 'BAH', 'australia': 'AUS', 'imola': 'IMO', 'spain': 'ESP',
+            'uk': 'GBR', 'vegas': 'LVG', 'belgium': 'BEL', 'austria': 'AUT',
+            'brazil': 'BRA', 'abu_dhabi': 'ABU'
         };
-        const teamLogoMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/ferrari.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/williams.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/alpine.png", "HAAS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/haas.png", "MCLAREN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mclaren.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/kick_sauber.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/martin.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/vcarb.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/mercedes.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL-RESOURCES/d4faca0970a4d20419af0e364a9e1aebb9af0fe0/LOGOS/redbull.png" };
-        const teamCarMap = { "FERRARI": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025ferraricarright.png", "WILLIAMS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025williamscarright.png", "ALPINE": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025alpinecarright.png", "HAAS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025haasf1teamcarright.png", "ASTON MARTIN": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025astonmartincarright.png", "KICK SAUBER": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025kicksaubercarright.png", "MCLAREN": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mclarencarright.png", "RED BULL RACING": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025redbullracingcarright.png", "RACING BULLS": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025racingbullscarright.png", "MERCEDES": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mercedescarright.png" };
 
-        const leagueCalendar = [
-            { round: 0, gp: "Pre-Season Testing", date: "12/09/25", track: "Suzuka International Racing Course", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Suzuka-International-Racing-Course--768x432.png", insight: "Crucial for data gathering.", stats: null },
+        const TEAM_COLORS = {
+            "red-bull-racing": "#3671C6", "ferrari": "#E80020", "mercedes": "#27F4D2", "mclaren": "#FF8000",
+            "aston-martin": "#229971", "alpine": "#0093CC", "williams": "#64C4FF", "racing-bulls": "#6692FF",
+            "kick-sauber": "#52E252", "haas": "#B6BABD", "reserve": "#666666"
+        };
+        const CAR_IMAGES = {
+            "red-bull-racing": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025redbullracingcarright.png",
+            "ferrari": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025ferraricarright.png",
+            "mercedes": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mercedescarright.png",
+            "mclaren": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025mclarencarright.png",
+            "aston-martin": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025astonmartincarright.png",
+            "alpine": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025alpinecarright.png",
+            "williams": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025williamscarright.png",
+            "racing-bulls": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025racingbullscarright.png",
+            "kick-sauber": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025kicksaubercarright.png",
+            "haas": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025haasf1teamcarright.png"
+        };
+
+        const CALENDAR = [
             { round: 1, gp: "Bahrain Grand Prix", date: "19/09/25", track: "Bahrain International Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Bahrain-circuit-768x432.png", insight: "Stop and go track.", stats: null },
             { round: 2, gp: "Australian Grand Prix", date: "26/09/25", track: "Albert Park Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Albert-Park-Circuit-768x432.png", insight: "Fast flowing street circuit.", stats: null },
             { round: 3, gp: "Emilia Romagna Grand Prix", date: "03/10/25", track: "Autodromo Enzo e Dino Ferrari", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Autodromo-Enzo-e-Dino-Ferrari-768x432.png", insight: "Narrow and technical.", stats: null },
             { round: 4, gp: "Spanish Grand Prix", date: "10/10/25", track: "Circuit de Barcelona-Catalunya", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Circuit-de-Barcelona-768x432.png", insight: "Test of aerodynamics.", stats: null },
-            { round: "break", gp: "Season Break", date: "17/10/25", track: "Time to regroup.", mapUrl: "https://placehold.co/768x432/1f2937/e11d48?text=SEASON+BREAK", insight: "Mid-season break.", stats: null },
             { round: 5, gp: "Great Britain Grand Prix", date: "24/10/25", track: "Silverstone Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Silverstone-Circuit--768x432.png", insight: "High speed corners.", stats: null },
             { round: 6, gp: "Las Vegas Grand Prix", date: "31/10/25", track: "Las Vegas Strip Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Las-Vegas-GP-768x432.png", insight: "High speed street fight.", stats: null },
             { round: 7, gp: "Belgian Grand Prix", date: "07/11/25", track: "Circuit de Spa-Francorchamps", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Circuit-de-Spa-Francorchamps-768x432.png", insight: "Longest track on calendar.", stats: null },
@@ -1173,30 +563,17 @@
             { round: 10, gp: "Abu Dhabi Grand Prix", date: "28/11/25", track: "Yas Marina Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Yas-Marina-Circuit--768x432.png", insight: "Season finale.", stats: null }
         ];
 
-        const dotdData = [
-            { gp: "Bahrain Grand Prix", driver: "Sanju Vibhi", team: "ASTON MARTIN", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju.png", desc: "Voted Driver of the Day." },
-            { gp: "Australian Grand Prix", driver: "Apex Entropy", team: "KICK SAUBER", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex%201.png", desc: "Exceptional pace down under." },
-            { gp: "Emilia Romagna GP", driver: "Mahesh", team: "WILLIAMS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Mahesh.png", desc: "Fan-favorite drive." },
-            { gp: "Spanish Grand Prix", driver: "Apex Entropy", team: "ALPINE", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex.png", desc: "Superb driving at Catalunya." },
-            { gp: "Great Britain GP", driver: "Sanju Vibhi", team: "ASTON MARTIN", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju%201.png", desc: "Standout at Silverstone." },
-            { gp: "Las Vegas Grand Prix", driver: "Harish", team: "HAAS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Harish.png", desc: "Electrifying on the Strip." },
-            { gp: "Belgian Grand Prix", driver: "Sandeep Mareedu", team: "RACING BULLS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sandeep.png", desc: "Incredible reserve drive." },
-            { gp: "Austrian Grand Prix", driver: "Wi7ard", team: "WILLIAMS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Wizard.png", desc: "Magical performance." },
-            { gp: "São Paulo Grand Prix", driver: "TheGodfather", team: "ALPINE", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Godfather.png", desc: "Offer Interlagos couldn't refuse." }
+        const DOTD_DATA = [
+            { gp: "Bahrain", driver: "Sanju Vibhi", team: "ASTON MARTIN", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju.png", desc: "Voted Driver of the Day." },
+            { gp: "Australia", driver: "Apex Entropy", team: "KICK SAUBER", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex%201.png", desc: "Exceptional pace down under." },
+            { gp: "Imola", driver: "Mahesh", team: "WILLIAMS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Mahesh.png", desc: "Fan-favorite drive." },
+            { gp: "Spain", driver: "Apex Entropy", team: "ALPINE", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex.png", desc: "Superb driving at Catalunya." },
+            { gp: "Great Britain", driver: "Sanju Vibhi", team: "ASTON MARTIN", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju%201.png", desc: "Standout at Silverstone." },
+            { gp: "Las Vegas", driver: "Harish", team: "HAAS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Harish.png", desc: "Electrifying on the Strip." },
+            { gp: "Belgium", driver: "Sandeep Mareedu", team: "RACING BULLS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sandeep.png", desc: "Incredible reserve drive." },
+            { gp: "Austria", driver: "Wi7ard", team: "WILLIAMS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Wizard.png", desc: "Magical performance." },
+            { gp: "Brazil", driver: "TheGodfather", team: "ALPINE", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Godfather.png", desc: "Offer Interlagos couldn't refuse." }
         ];
-
-        const driverData = [ 
-            { driver: "SIMMAN", team: "FERRARI", points: 158 }, { driver: "WI7ARD", team: "WILLIAMS", points: 160 }, { driver: "THEGODFATHER", team: "ALPINE", points: 72 }, { driver: "HARISH", team: "HAAS", points: 74 }, 
-            { driver: "APEXENTROPY", team: "ALPINE", points: 58 }, { driver: "OVERLOAD", team: "MCLAREN", points: 34 }, { driver: "VIBIN", team: "ASTON MARTIN", points: 88 }, { driver: "KENTUCKY", team: "HAAS", points: 41 }, 
-            { driver: "MAHESH", team: "WILLIAMS", points: 35 }, { driver: "OXYGEN", team: "KICK SAUBER", points: 18 }, { driver: "MEMB", team: "MERCEDES", points: 18 }, { driver: "APURRV", team: "ASTON MARTIN", points: 21 },
-            { driver: "BOPEDOPE", team: "MCLAREN", points: 24 }, { driver: "CLONE", team: "RACING BULLS", points: 8 }, { driver: "DENJI", team: "RED BULL RACING", points: 8 }, { driver: "MAAYAONE", team: "MERCEDES", points: 0 }, 
-            { driver: "BALA", team: "KICK SAUBER", points: 0 }, { driver: "NIGHTFURY", team: "FERRARI", points: 0 }, { driver: "SPARTAN GAMER", team: "RACING BULLS", points: 0 }, { driver: "HARRYBECKHAM", team: "RED BULL RACING", points: 1 } 
-        ];
-
-        const manualConstructorPoints = {
-            "WILLIAMS": 195, "FERRARI": 162, "ALPINE": 116, "HAAS": 116, "ASTON MARTIN": 111,
-            "MCLAREN": 60, "KICK SAUBER": 51, "MERCEDES": 42, "RACING BULLS": 34, "RED BULL RACING": 30
-        };
 
         const f125SetupData = {
             "Australian Grand Prix": { aero: "13-9 (Q) / 9-3 (R)", differential: "100 (On) - 20 (Off)", suspGeometry: "LLLL", suspension: "41-3-7-16-21-40", brakes: "100% / 54%", tiresQ: "27.0 PSI / 23.5 PSI", tiresR: "27.5 PSI / 23.5 PSI", notes: "High deg." },
@@ -1211,276 +588,252 @@
             "Abu Dhabi Grand Prix": { aero: "25-20", differential: "70 (On) - 55 (Off)", suspGeometry: "LLRL", suspension: "3-5-2-1-20-40", brakes: "100% / 53%", tiresQ: "23.8 PSI / 21.3 PSI", tiresR: "21.8 PSI / 19.8 PSI", notes: "Technical S3." }
         };
 
-        // --- CORE FUNCTIONS ---
-        window.addEventListener('load', () => {
-            gsap.to('#load-bar', { width: '100%', duration: 1.5, ease: 'power2.inOut', onComplete: () => {
-                gsap.to('#loader', { y: '-100%', duration: 0.8, ease: 'power3.inOut' });
-                setTimeout(() => { revealSlideContent(document.querySelector('#slide-0')); }, 500);
-            }});
-        });
+        let allDrivers = [];
 
-        function initCursor() {
-            const cursor = document.getElementById('cursor');
-            const follower = document.getElementById('cursor-follower');
-            let mouseX = 0, mouseY = 0, posX = 0, posY = 0;
-            document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; cursor.style.left = mouseX + 'px'; cursor.style.top = mouseY + 'px'; });
-            gsap.ticker.add(() => { posX += (mouseX - posX) / 6; posY += (mouseY - posY) / 6; follower.style.left = posX + 'px'; follower.style.top = posY + 'px'; });
-            document.querySelectorAll('a, button, .hover-target, .tab-btn').forEach(el => {
-                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-            });
-        }
-
-        function initTilt() {
-            if (window.matchMedia("(pointer: coarse)").matches) return;
-            document.querySelectorAll('.constructor-card').forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const rotateX = ((y - rect.height/2) / (rect.height/2)) * -10;
-                    const rotateY = ((x - rect.width/2) / (rect.width/2)) * 10;
-                    gsap.to(card, { transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`, duration: 0.1 });
-                });
-                card.addEventListener('mouseleave', () => { gsap.to(card, { transform: `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`, duration: 0.5 }); });
-            });
-        }
-
-        function getConstructorData() {
-            const teamMap = {};
-            Object.keys(manualConstructorPoints).forEach(team => { teamMap[team] = { points: manualConstructorPoints[team], drivers: [] }; });
-            driverData.forEach(d => { if (teamMap[d.team]) teamMap[d.team].drivers.push(d.driver); });
-            return Object.entries(teamMap).map(([team, data]) => ({ team, points: data.points, drivers: data.drivers.join(', ') })).sort((a, b) => b.points - a.points);
-        }
-
-        function populateCalendar() {
-            const now = new Date();
-            const RACE_TIME = { hours: 17, minutes: 0 };
-            document.getElementById('calendar-grid').innerHTML = leagueCalendar.filter(r => r.round !== 0).map(r => {
-                const roundText = r.round === 'break' ? 'BREAK' : 'RD ' + String(r.round).padStart(2, '0');
-                const [d, m, y] = r.date.split('/').map(Number);
-                const raceDate = new Date(Date.UTC(y + 2000, m - 1, d, RACE_TIME.hours, RACE_TIME.minutes)); // Fixed Year
-                let statusClass = '', statusText = roundText;
-                let footerContent = '';
-
-                if (r.round !== 'break') {
-                    if (raceDate > now) {
-                        statusClass = 'future-race';
-                         // Simple check if it's the *next* race
-                        const isNext = !leagueCalendar.some(prev => {
-                             if (prev.round === 'break' || prev.round === 0) return false;
-                             const [pd, pm, py] = prev.date.split('/').map(Number);
-                             const prevDate = new Date(Date.UTC(py+2000, pm-1, pd, RACE_TIME.hours, RACE_TIME.minutes));
-                             return prevDate > now && prevDate < raceDate;
-                        });
-                        if(isNext) { statusClass = 'next-race'; statusText = 'NEXT UP'; }
-                    }
-                    footerContent = `<button class="btn-ai-intel hover-target" onclick="fetchTrackIntel('${r.gp}')"><i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY</button>`;
-                } else {
-                    footerContent = `<span style="margin-top: 0.8rem; display: block; color: #555; font-size: 0.75rem;">TEAM REGROUP</span>`;
-                }
-
-                return `<div class="cal-item ${statusClass} hover-target"><span class="round">${statusText}</span><span class="gp">${r.gp.split(' ')[0].toUpperCase()}</span><span class="date">${r.date.slice(0, 5)}</span>${footerContent}</div>`;
-            }).join('');
-        }
-        
-        function populateDrivers() {
-             document.getElementById('drivers-body').innerHTML = [...driverData].sort((a,b)=>b.points-a.points).map((d,i) => {
-                 const tColor = teamColors[d.team] || '#fff';
-                 return `<tr style="--team-color: ${tColor}"><td style="color:${i<3?['#FFD700','#C0C0C0','#CD7F32'][i]:'inherit'}">${String(i+1).padStart(2,'0')}</td><td style="font-weight:700;color:#fff">${d.driver}</td><td class="team-cell"><img src="${teamLogoMap[d.team] || ''}" class="team-logo-mini" alt="${d.team}"> ${d.team}</td><td style="color:var(--accent-cyan);font-weight:700">${d.points}</td></tr>`;
-             }).join('');
-        }
-
-        function populateGarage() {
-            document.getElementById('garage-grid').innerHTML = getConstructorData().map((c,i) => {
-                const tColor = teamColors[c.team] || '#fff';
-                let customImgStyle = c.team === 'FERRARI' ? 'transform: translateY(-8px) scale(1.15);' : '';
-                return `<div class="constructor-card hover-target" data-rank="${String(i+1).padStart(2,'0')}" style="--team-color: ${tColor}"><div class="cc-bg-rank">${String(i+1).padStart(2,'0')}</div><div class="cc-header"><span class="cc-name">${c.team}</span><span class="cc-points" data-drivers="${c.drivers}">${c.points} PTS</span></div><div class="cc-img-container"><img src="${teamCarMap[c.team] || 'https://placehold.co/300x100?text=Car'}" class="cc-car-img" alt="${c.team} Car" style="${customImgStyle}"></div></div>`;
-            }).join('');
-            setTimeout(initTilt, 100);
-        }
-
-        function renderDOTDAccordion() {
-            document.getElementById('dotd-container').innerHTML = dotdData.map((data) => {
-                const tColor = teamColors[data.team] || '#fff';
-                return `<div class="dotd-panel" style="background-image: url('${data.image}'); --team-color: ${tColor}"><div class="dotd-label">${data.driver.split(' ')[0]}</div><div class="dotd-badge-icon"><i class="fa-solid fa-award"></i></div><div class="dotd-content"><div class="dotd-gp-name">${data.gp}</div><div class="dotd-driver-name">${data.driver}</div><div class="dotd-team-name" style="color:${tColor}">${data.team}</div><div class="mono-font" style="font-size:0.8rem; color:#ccc; margin-top:0.5rem;">${data.desc}</div></div></div>`;
-            }).join('');
-        }
-
-        function initSyncedCountdown() {
-            const now = new Date();
-            const RACE_TIME = { hours: 17, minutes: 0 };
-            let nextRace = null;
-            for (const race of leagueCalendar) {
-                if (race.round === 'break' || race.round === 0) continue;
-                let [d, m, y] = race.date.split('/').map(Number);
-                if (y < 100) y += 2000;
-                const raceDate = new Date(Date.UTC(y, m - 1, d, RACE_TIME.hours, RACE_TIME.minutes));
-                if (raceDate.getTime() > now.getTime()) { nextRace = { ...race, raceDate }; break; }
-            }
-            const nextTagEl = document.getElementById('hero-next-tag');
-            const els = { d: document.getElementById('cd-days'), h: document.getElementById('cd-hours'), m: document.getElementById('cd-minutes'), s: document.getElementById('cd-seconds') };
-
-            if (!nextRace) { 
-                nextTagEl.textContent = "SEASON COMPLETED"; 
-                Object.values(els).forEach(e => e.textContent = "00"); 
-                return; 
-            }
-            nextTagEl.textContent = `NEXT RACE // ${nextRace.gp.toUpperCase().replace(' GRAND PRIX', '')}`;
-            function updateTimer() {
-                const currentTime = new Date().getTime();
-                const dist = nextRace.raceDate.getTime() - currentTime;
-                if (dist < 0) { Object.values(els).forEach(e => e.textContent = "00"); return; }
-                els.d.textContent = String(Math.floor(dist / 864e5)).padStart(2, '0');
-                els.h.textContent = String(Math.floor((dist % 864e5) / 36e5)).padStart(2, '0');
-                els.m.textContent = String(Math.floor((dist % 36e5) / 6e4)).padStart(2, '0');
-                els.s.textContent = String(Math.floor((dist % 6e4) / 1000)).padStart(2, '0');
-            }
-            updateTimer(); setInterval(updateTimer, 1000);
-        }
-        
-        // --- NEW: CSV ARCHIVE PARSER ---
-        // Your specific Raw GitHub URL
-        const CSV_URL = 'https://raw.githubusercontent.com/S-HARISH44/TTRL/7408b20236f47ee697f06bce5e7d1f7a993a86a6/RESOURCES/Result/TTRL%20point%20table%20-%20Race%20Results.csv';
-        let archivesLoaded = false;
-
-        function hexToRgba(hex, alpha) {
-            let r = 0, g = 0, b = 0;
-            if (hex.length == 4) {
-                r = "0x" + hex[1] + hex[1];
-                g = "0x" + hex[2] + hex[2];
-                b = "0x" + hex[3] + hex[3];
-            } else if (hex.length == 7) {
-                r = "0x" + hex[1] + hex[2];
-                g = "0x" + hex[3] + hex[4];
-                b = "0x" + hex[5] + hex[6];
-            }
-            return "rgba(" + +r + "," + +g + "," + +b + "," + alpha + ")";
-        }
-
-        async function loadArchives() {
-            if(archivesLoaded) return;
-            const container = document.getElementById('archives-scroll');
-            
+        // --- GEMINI & MODAL FUNCTIONS ---
+        async function callGemini(prompt, systemInstruction = "") {
             try {
-                const response = await fetch(CSV_URL);
-                if (!response.ok) throw new Error("Network response was not ok");
-                const csvText = await response.text();
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        systemInstruction: { parts: [{ text: systemInstruction }] }
+                    })
+                });
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error(error);
+                return "Signal lost. Check connection.";
+            }
+        }
+
+        const intelModal = document.getElementById('intel-modal-overlay');
+        const intelTitle = document.getElementById('intel-title');
+        const intelMap = document.getElementById('intel-map');
+        const setupDisplay = document.getElementById('setup-display');
+        const aiBriefing = document.getElementById('ai-briefing');
+
+        function closeIntel() { intelModal.classList.remove('active'); }
+        window.closeIntel = closeIntel; // EXPOSE FOR HTML
+
+        function displaySetupData(setup) {
+            if (!setup) {
+                setupDisplay.innerHTML = "<h4>Baseline Setup Prediction</h4><p>No specific data available.</p>";
+                return;
+            }
+            setupDisplay.innerHTML = `
+                <h4>F1 25 Baseline Setup</h4>
+                <table class="setup-table">
+                    <tr><td>Aero (F/R)</td><td>${setup.aero}</td></tr>
+                    <tr><td>Differential</td><td>${setup.differential}</td></tr>
+                    <tr><td>Suspension</td><td>${setup.suspension}</td></tr>
+                    <tr><td>Brakes</td><td>${setup.brakes}</td></tr>
+                    <tr><td>Tires (Q/R)</td><td>${setup.tiresQ} / ${setup.tiresR}</td></tr>
+                </table>
+            `;
+        }
+
+        async function fetchTrackIntel(gpName) {
+            intelModal.classList.add('active');
+            requestAnimationFrame(async () => {
+                const raceData = CALENDAR.find(r => r.gp === gpName);
+                const setup = f125SetupData[gpName];
+                const mapUrl = raceData ? raceData.mapUrl : 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND';
                 
-                // Parse CSV - Enhanced for Quotes
-                // Handle new lines, then split commas respecting quotes
-                const rows = csvText.split('\n').map(row => row.trim()).filter(row => row.length > 0);
+                intelTitle.innerText = gpName.toUpperCase();
+                intelMap.src = mapUrl;
+                displaySetupData(setup);
                 
-                if (rows.length === 0) {
-                     container.innerHTML = '<div class="archive-loading" style="color:#f00">NO DATA FOUND IN ARCHIVES</div>';
-                     return;
+                aiBriefing.innerHTML = `<i class="fa-solid fa-satellite-dish fa-spin"></i> DOWNLOADING BRIEFING...`;
+                const prompt = `Tactical summary for ${gpName} in F1 23/24. Key overtaking & tire wear. Under 50 words.`;
+                const briefing = await callGemini(prompt);
+                
+                aiBriefing.textContent = "";
+                let i = 0;
+                function typeWriter() {
+                    if (i < briefing.length) {
+                        aiBriefing.textContent += briefing.slice(i, i + 3);
+                        i += 3;
+                        if (i < briefing.length) setTimeout(() => requestAnimationFrame(typeWriter), 20); 
+                    }
+                }
+                typeWriter();
+            });
+        }
+        window.fetchTrackIntel = fetchTrackIntel; // EXPOSE FOR HTML
+
+        // --- FIREBASE LOGIC ---
+        function initDataSync() {
+            const q = query(collection(db, "standings"), orderBy("totalPoints", "desc"));
+            onSnapshot(q, (snapshot) => {
+                allDrivers = [];
+                snapshot.forEach(doc => allDrivers.push(doc.data()));
+                
+                renderDrivers();
+                renderConstructors();
+                renderArchiveMatrix();
+            });
+        }
+
+        // 1. DRIVER STANDINGS
+        function renderDrivers() {
+            const tbody = document.getElementById("drivers-body");
+            tbody.innerHTML = "";
+            allDrivers.forEach((d, i) => {
+                const color = TEAM_COLORS[d.team] || '#fff';
+                let teamName = TEAMS.find(t => t.id === d.team)?.name || d.team;
+                
+                if(d.team === 'reserve') {
+                    const subTeams = new Set();
+                    if(d.results) Object.values(d.results).forEach(r => {
+                        if(typeof r === 'object' && r.team && r.team !== 'reserve') subTeams.add(TEAMS.find(t => t.id === r.team)?.name);
+                    });
+                    if(subTeams.size > 0) teamName += ` (${Array.from(subTeams).join(', ')})`;
                 }
 
-                // Regex to split by comma ONLY if not inside quotes
-                const splitCSV = (row) => {
-                    const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
-                    return row.split(regex).map(cell => cell.replace(/^"|"$/g, '').trim());
-                };
+                tbody.innerHTML += `<tr style="--team-color: ${color}">
+                    <td style="color:${i<3?['#FFD700','#C0C0C0','#CD7F32'][i]:'inherit'}">${String(i+1).padStart(2,'0')}</td>
+                    <td style="font-weight:700">${d.name}</td>
+                    <td style="text-transform:uppercase; font-size:0.8rem; letter-spacing:1px; opacity:0.8">${teamName}</td>
+                    <td style="color:var(--accent-cyan); font-weight:700">${d.totalPoints}</td>
+                </tr>`;
+            });
+        }
 
-                const headers = splitCSV(rows[0]);
-                
-                let tableHtml = `<table class="standings-table"><thead><tr>`;
-                
-                // Build Headers (Sticky First 2 Cols)
-                headers.forEach((h, index) => {
-                    let cls = '';
-                    if(index === 0) cls = 'sticky-col'; // Position/Driver
-                    else if (index === 1) cls = 'sticky-col-2'; // Team usually
-                    
-                    tableHtml += `<th class="${cls}">${h.toUpperCase()}</th>`;
+        // 2. CONSTRUCTOR STANDINGS
+        function renderConstructors() {
+            const teamPoints = {};
+            TEAMS.forEach(t => { if(t.id !== 'reserve') teamPoints[t.id] = 0; });
+
+            allDrivers.forEach(d => {
+                const results = d.results || {};
+                Object.values(results).forEach(r => {
+                    let pts = 0;
+                    let teamId = d.team;
+                    if (typeof r === 'object') {
+                        pts = Number(r.points || 0);
+                        teamId = r.team || d.team;
+                    } else {
+                        pts = Number(r || 0);
+                    }
+                    if (teamId !== 'reserve' && teamPoints[teamId] !== undefined) {
+                        teamPoints[teamId] += pts;
+                    }
                 });
-                tableHtml += `</tr></thead><tbody>`;
+            });
+
+            const sortedTeams = Object.keys(teamPoints)
+                .map(id => ({ id, name: TEAMS.find(t=>t.id===id).name, points: teamPoints[id] }))
+                .sort((a,b) => b.points - a.points);
+
+            document.getElementById('garage-grid').innerHTML = sortedTeams.map((c, i) => {
+                const color = TEAM_COLORS[c.id];
+                return `<div class="constructor-card hover-target" style="--team-color: ${color}">
+                    <div class="cc-bg-rank">${String(i+1).padStart(2,'0')}</div>
+                    <div class="cc-header"><span class="cc-name">${c.name}</span><span class="cc-points">${c.points} PTS</span></div>
+                    <div class="cc-img-container"><img src="${CAR_IMAGES[c.id] || 'https://placehold.co/300x100?text=Car'}" class="cc-car-img"></div>
+                </div>`;
+            }).join('');
+            
+            if (!window.matchMedia("(pointer: coarse)").matches) {
+                document.querySelectorAll('.constructor-card').forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left - rect.width/2;
+                        const y = e.clientY - rect.top - rect.height/2;
+                        gsap.to(card, { transform: `perspective(1000px) rotateX(${-y/10}deg) rotateY(${x/10}deg) scale3d(1.02, 1.02, 1.02)`, duration: 0.1 });
+                    });
+                    card.addEventListener('mouseleave', () => { gsap.to(card, { transform: `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`, duration: 0.5 }); });
+                });
+            }
+        }
+
+        // 3. ARCHIVES (MATRIX TABLE)
+        function renderArchiveMatrix() {
+            const container = document.getElementById("archives-scroll-container");
+            
+            let html = `<table class="standings-table">`;
+            
+            html += `<thead><tr><th class="sticky-corner">DRIVER</th>`;
+            TRACK_KEYS.forEach(k => {
+                html += `<th class="sticky-top" style="text-align:center">${TRACK_LABELS[k]}</th>`;
+            });
+            html += `<th class="sticky-top" style="text-align:center">TOTAL</th></tr></thead>`;
+
+            html += `<tbody>`;
+            allDrivers.forEach(d => {
+                const results = d.results || {};
+                const tColor = TEAM_COLORS[d.team] || '#fff';
                 
-                // Build Rows
-                for (let i = 1; i < rows.length; i++) {
-                    const cells = splitCSV(rows[i]);
-                    // Attempt to find team color from the second column (assuming it's Team Name)
-                    const teamName = cells[1] ? cells[1].trim().toUpperCase() : '';
-                    // Partial match for team colors (e.g. "RED BULL" in "RED BULL RACING")
-                    let rowColor = 'transparent';
-                    let rgbaBg = 'transparent';
-                    
-                    for(const key of Object.keys(teamColors)) {
-                        if(teamName.includes(key)) { 
-                            rowColor = teamColors[key]; 
-                            rgbaBg = hexToRgba(rowColor, 0.25); // 25% opacity
-                            break; 
+                html += `<tr style="--team-color: ${tColor}">`;
+                html += `<td class="sticky-left" style="font-weight:700; background:var(--glass-bg); border-left:3px solid ${tColor}">${d.name}</td>`;
+                
+                let rowTotal = 0;
+                TRACK_KEYS.forEach(k => {
+                    let pts = '-';
+                    if (results[k]) {
+                        const val = typeof results[k] === 'object' ? results[k].points : results[k];
+                        if (val > 0) {
+                            pts = val;
+                            rowTotal += val;
                         }
                     }
-
-                    // Apply rgba background to rows
-                    tableHtml += `<tr style="--team-color: ${rowColor}; --row-bg: ${rgbaBg}">`;
-                    cells.forEach((cell, index) => {
-                        let cls = '';
-                        if(index === 0) cls = 'sticky-col';
-                        else if (index === 1) cls = 'sticky-col-2';
-                        
-                        // Center align numbers (points), Left align text (names)
-                        const isNum = !isNaN(cell) && cell !== '';
-                        const alignStyle = isNum ? 'text-align:center;' : 'text-align:left;';
-                        
-                        tableHtml += `<td class="${cls}" style="${alignStyle}">${cell}</td>`;
-                    });
-                    tableHtml += `</tr>`;
-                }
-                tableHtml += `</tbody></table>`;
-                
-                container.innerHTML = tableHtml;
-                
-                // Calculate and set offset for sticky-col-2 after render
-                requestAnimationFrame(() => {
-                    const firstCol = container.querySelector('th.sticky-col');
-                    if(firstCol) {
-                        const width = firstCol.offsetWidth;
-                        // Update CSS variable or style rule dynamically if needed, 
-                        // but for simplicity we rely on the CSS media query approximation or simple JS set
-                        document.querySelectorAll('.sticky-col-2').forEach(el => el.style.left = width + 'px');
-                    }
+                    html += `<td style="text-align:center; opacity:${pts === '-' ? 0.3 : 1}">${pts}</td>`;
                 });
-
-                archivesLoaded = true;
                 
-                // Animate entry
-                gsap.fromTo('#archives-scroll tr', {opacity: 0, x: -20}, {opacity: 1, x: 0, stagger: 0.03, duration: 0.3});
+                html += `<td style="text-align:center; color:var(--accent-cyan); font-weight:700">${rowTotal}</td>`;
+                html += `</tr>`;
+            });
+            html += `</tbody></table>`;
 
-            } catch (error) {
-                console.error("Archive Error:", error);
-                container.innerHTML = `<div class="archive-loading" style="color:#f00">
-                    <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
-                    <span>CONNECTION FAILURE<br>ARCHIVE RETRIEVAL FAILED</span>
-                </div>`;
-            }
+            container.innerHTML = html;
         }
 
-        // --- ANIMATION ENGINE ---
+        // --- CALENDAR & DOTD RENDERERS ---
+        function renderCalendar() {
+            document.getElementById('calendar-grid').innerHTML = CALENDAR.map(r => 
+                `<div class="cal-item hover-target">
+                    <span class="round">RD ${String(r.round).padStart(2,'0')}</span>
+                    <span class="gp">${r.gp.toUpperCase()}</span>
+                    <span class="date">${r.date}</span>
+                    <button class="btn-ai-intel hover-target" onclick="fetchTrackIntel('${r.gp}')"><i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY</button>
+                </div>`
+            ).join('');
+        }
+
+        function renderDOTD() {
+            document.getElementById('dotd-container').innerHTML = DOTD_DATA.map(d => {
+                const tColor = TEAM_COLORS[d.team.toUpperCase().replace(' ', '-').toLowerCase()] || '#fff';
+                return `<div class="dotd-panel" style="background-image: url('${d.image}'); --team-color: ${tColor}">
+                    <div class="dotd-label">${d.driver.split(' ')[0]}</div>
+                    <div class="dotd-badge-icon"><i class="fa-solid fa-award"></i></div>
+                    <div class="dotd-content">
+                        <div class="dotd-gp-name">${d.gp}</div>
+                        <div class="dotd-driver-name">${d.driver}</div>
+                        <div class="dotd-team-name" style="color:${tColor}">${d.team}</div>
+                        <div class="mono-font" style="font-size:0.8rem; color:#ccc; margin-top:0.5rem;">${d.desc}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- ANIMATIONS ---
         const slides = document.querySelectorAll('.slide');
         let currentIndex = 0;
         let isAnimating = false;
 
-        function revealSlideContent(slide) {
-            const elements = slide.querySelectorAll('.slide-tag, .slide-title, .slide-desc, .btn-container, .countdown-grid, .cal-grid, .contact-grid, .standings-tabs, .standings-wrapper');
-            gsap.fromTo(elements, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" });
-            const chars = slide.querySelectorAll('.char');
-            if(chars.length > 0) gsap.fromTo(chars, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.02, ease: "back.out(1.7)" });
-            if(slide.id === 'slide-1') gsap.fromTo(slide.querySelectorAll('.cal-item'), {y: 50, opacity: 0}, {y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out"});
-            if(slide.id === 'slide-2') gsap.fromTo(slide.querySelectorAll('#view-drivers tr'), {x: -30, opacity: 0}, {x: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: "power2.out"});
-            if(slide.id === 'slide-4') gsap.fromTo(slide.querySelectorAll('.contact-item'), {scale: 0.8, opacity: 0}, {scale: 1, opacity: 1, duration: 0.5, stagger: 0.1, ease: "back.out(1.7)"});
-            // NEW: Trigger Archive Load when entering slide 5
-            if(slide.id === 'slide-5') loadArchives();
-        }
-
         function gotoSlide(index) {
             if (isAnimating || index === currentIndex) return;
             isAnimating = true;
-            let nextIndex = gsap.utils.wrap(0, slides.length, index);
+            let nextIndex = index;
             const currentSlide = slides[currentIndex];
             const nextSlide = slides[nextIndex];
-            updateActiveLink(nextIndex);
+            
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.nav-link')[index].classList.add('active');
+
             gsap.set(nextSlide, { zIndex: 20, visibility: 'visible', opacity: 0 });
             const tl = gsap.timeline({
                 defaults: { ease: "power2.inOut", duration: 1.2 },
@@ -1492,51 +845,51 @@
             });
             tl.to(currentSlide, { scale: 0.9, opacity: 0, filter: 'brightness(0.5)' }, 0);
             tl.fromTo(nextSlide, { scale: 1.1, opacity: 0, filter: 'brightness(1.5)' }, { scale: 1, opacity: 1, filter: 'brightness(1)' }, "-=0.8");
-            setTimeout(() => revealSlideContent(nextSlide), 400);
+            
+            const elements = nextSlide.querySelectorAll('.slide-tag, .slide-title, .btn-container, .cal-item, .standings-wrapper, .contact-grid');
+            gsap.fromTo(elements, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, delay: 0.5 });
         }
 
+        document.querySelectorAll('.nav-link').forEach((link, idx) => {
+            link.addEventListener('click', (e) => { e.preventDefault(); gotoSlide(idx); });
+        });
         document.getElementById('start-engine-btn').addEventListener('click', () => gotoSlide(1));
         document.getElementById('app-logo').addEventListener('click', () => gotoSlide(0));
 
-        // TAB LOGIC (REMOVED ARCHIVE TAB LOGIC FROM HERE)
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const targetTab = e.target.dataset.tab;
-                if (document.querySelector('.tab-btn.active').dataset.tab === targetTab) return;
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                
-                const views = {
-                    'drivers': document.getElementById('view-drivers'),
-                    'constructors': document.getElementById('view-constructors'),
-                    'dotd': document.getElementById('view-dotd')
-                };
-                
-                Object.values(views).forEach(v => v.classList.remove('active-view'));
-                views[targetTab].classList.add('active-view');
-
-                if (targetTab === 'constructors') { 
-                    gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all", onComplete: initTilt});
-                } else if (targetTab === 'dotd') {
+                const tab = e.target.dataset.tab;
+                document.querySelectorAll('.standings-view').forEach(v => v.classList.remove('active-view'));
+                document.getElementById('view-'+tab).classList.add('active-view');
+                if (tab === 'dotd') {
                     gsap.fromTo('.dotd-panel', { width: "10%", opacity: 0 }, { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" });
-                } else { 
-                    gsap.fromTo('#view-drivers tr', {x: -20, opacity: 0}, {x: 0, opacity: 1, stagger: 0.05, duration: 0.4});
                 }
             });
         });
-        
-        VANTA.NET({
-            el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false,
-            minHeight: 200.00, minWidth: 200.00, scale: 1.00, scaleMobile: 1.00,
-            color: 0x00f0ff, backgroundColor: 0x050505, points: 8.00, maxDistance: 22.00, spacing: 35.00
-        });
 
-        populateCalendar();
-        populateDrivers();
-        populateGarage();
-        renderDOTDAccordion();
-        initSyncedCountdown();
-        initCursor();
+        window.onload = () => {
+            gsap.to('#load-bar', { width: '100%', duration: 1, onComplete: () => {
+                gsap.to('#loader', { y: '-100%', duration: 0.8 });
+                initDataSync();
+                renderCalendar();
+                renderDOTD();
+            }});
+            
+            const cursor = document.getElementById('cursor');
+            const follower = document.getElementById('cursor-follower');
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+                gsap.to(follower, { x: e.clientX - 20, y: e.clientY - 20, duration: 0.1 });
+            });
+            
+            VANTA.NET({
+                el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false,
+                minHeight: 200.00, minWidth: 200.00, scale: 1.00, scaleMobile: 1.00,
+                color: 0x00f0ff, backgroundColor: 0x050505, points: 12.00, maxDistance: 22.00, spacing: 18.00
+            });
+        };
     </script>
 </body>
 </html>
