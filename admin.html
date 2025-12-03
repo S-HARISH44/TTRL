@@ -10,8 +10,12 @@
         :root { --bg: #0b0c10; --card: #1f2833; --accent: #66fcf1; --text: #c5c6c7; --red: #ff1f4b; }
         body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; margin: 0; padding: 20px; }
         
+        /* LOGIN OVERLAY */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
+        .login-box { background: var(--card); padding: 2rem; border-radius: 8px; text-align: center; border: 1px solid #333; width: 300px; box-shadow: 0 0 30px rgba(102, 252, 241, 0.1); }
+        
         /* LAYOUT */
-        .container { max-width: 800px; margin: 0 auto; display: block; } /* Visible by default */
+        .container { max-width: 800px; margin: 0 auto; display: none; } /* HIDDEN BY DEFAULT */
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
         h1 { margin: 0; color: var(--accent); text-transform: uppercase; }
         
@@ -29,28 +33,42 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: #888; font-size: 0.9rem; }
         input, select { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
-        
-        button.action-btn { width: 100%; padding: 15px; background: var(--accent); color: #0b0c10; border: none; font-weight: 800; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        button.action-btn:hover { background: #fff; }
+        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(102, 252, 241, 0.2); }
+
+        button.action-btn { width: 100%; padding: 15px; background: var(--accent); color: #0b0c10; border: none; font-weight: 800; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
+        button.action-btn:hover { background: #fff; transform: translateY(-2px); }
         
         button.delete-btn { background: var(--red); color: white; border: none; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; }
+        button.delete-btn:hover { background: #ff0000; }
 
         /* LIST */
         .driver-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 5px; border-left: 3px solid #555; }
         .team-badge { font-size: 0.8rem; padding: 2px 6px; background: #333; margin-left: 10px; color: #aaa; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
-        .status { margin-top: 10px; text-align: center; font-weight: bold; }
+        .status { margin-top: 10px; text-align: center; font-weight: bold; min-height: 20px; }
         .success { color: #00ff00; } .error { color: #ff0000; }
     </style>
 </head>
 <body>
 
+    <!-- LOGIN SCREEN -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2><i class="fas fa-lock"></i> PITWALL ACCESS</h2>
+            <div class="form-group">
+                <input type="password" id="adminPass" placeholder="Enter Password">
+            </div>
+            <button class="action-btn" onclick="checkLogin()">UNLOCK</button>
+            <div id="login-msg" class="status error"></div>
+        </div>
+    </div>
+
     <!-- MAIN INTERFACE -->
     <div class="container" id="main-interface">
         <header>
             <h1>TTRL Admin</h1>
-            <div style="font-size: 0.8rem; color: #666;">v2.1 (Open Access)</div>
+            <div style="font-size: 0.8rem; color: #666;">v2.5 (Live Database)</div>
         </header>
 
         <div class="nav-tabs">
@@ -70,8 +88,20 @@
             </div>
 
             <div class="form-group">
-                <label>Track Name (e.g., monaco)</label>
-                <input type="text" id="trackName" placeholder="Lowercase, no spaces (e.g. bahrain)">
+                <label>Grand Prix (TTRL Calendar)</label>
+                <select id="trackName">
+                    <option value="">-- Select Track --</option>
+                    <option value="bahrain">Bahrain GP</option>
+                    <option value="australia">Australian GP</option>
+                    <option value="imola">Imola GP</option>
+                    <option value="spain">Spain GP</option>
+                    <option value="uk">Great Britain GP</option>
+                    <option value="vegas">Las Vegas GP</option>
+                    <option value="belgium">Belgium GP</option>
+                    <option value="austria">Austria GP</option>
+                    <option value="brazil">Brazil GP</option>
+                    <option value="abu_dhabi">Abu Dhabi GP</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -105,7 +135,7 @@
                     <option value="racing-bulls">Racing Bulls</option>
                     <option value="kick-sauber">Kick Sauber</option>
                     <option value="haas">Haas</option>
-                    <option value="reserve">Reserve</option>
+                    <option value="reserve">Reserve / Free Agent</option>
                 </select>
             </div>
 
@@ -122,7 +152,7 @@
             <h3><i class="fas fa-users"></i> Current Driver Database</h3>
             <div id="driverList">
                 <!-- List loads here -->
-                <div style="text-align:center; padding:20px;">Loading database...</div>
+                <div style="text-align:center; padding:20px;">Waiting for login...</div>
             </div>
         </div>
     </div>
@@ -147,7 +177,32 @@
         const db = getFirestore(app);
         const collectionName = "standings";
 
-        // --- UI FUNCTIONS ---
+        // --- AUTH LOGIC ---
+        window.checkLogin = () => {
+            const pass = document.getElementById("adminPass").value;
+            const overlay = document.getElementById("login-overlay");
+            const msg = document.getElementById("login-msg");
+            
+            if(pass === "admin123") { // PASSWORD CHECK
+                overlay.style.opacity = "0";
+                setTimeout(() => { overlay.style.display = "none"; }, 500);
+                document.getElementById("main-interface").style.display = "block";
+                
+                // Only load data AFTER login
+                initRealtimeListeners();
+            } else {
+                msg.innerText = "ACCESS DENIED";
+                document.getElementById("adminPass").value = "";
+            }
+        };
+
+        // Allow pressing "Enter" to login
+        document.getElementById("adminPass").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkLogin();
+            }
+        });
+
         window.switchTab = (tabId) => {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -172,13 +227,13 @@
                     const data = docSnap.data();
                     const id = docSnap.id;
 
-                    // Populate Dropdown
+                    // Populate Dropdown for Updates
                     const option = document.createElement("option");
                     option.value = id;
                     option.text = `${data.name} (${data.team})`;
                     driverSelect.appendChild(option);
 
-                    // Populate List
+                    // Populate Visual List
                     const item = document.createElement("div");
                     item.className = "driver-item";
                     item.innerHTML = `
@@ -194,9 +249,6 @@
             });
         }
 
-        // Initialize immediately (No Login Required)
-        initRealtimeListeners();
-
         // 2. Add New Driver
         window.registerDriver = async () => {
             const name = document.getElementById("newDriverName").value;
@@ -209,7 +261,6 @@
             status.innerText = "Adding...";
             
             try {
-                // We use addDoc to let Firebase create a unique ID
                 await addDoc(collection(db, collectionName), {
                     name: name,
                     team: team,
@@ -219,7 +270,7 @@
                 });
                 status.className = "status success";
                 status.innerText = "Driver Added Successfully!";
-                document.getElementById("newDriverName").value = ""; // Reset form
+                document.getElementById("newDriverName").value = ""; 
             } catch (e) {
                 console.error(e);
                 status.className = "status error";
@@ -230,13 +281,13 @@
         // 3. Update Race Data
         window.submitRaceData = async () => {
             const driverId = document.getElementById("updateDriverSelect").value;
-            const track = document.getElementById("trackName").value.toLowerCase().replace(/\s/g, '');
+            const track = document.getElementById("trackName").value;
             const points = Number(document.getElementById("pointsScored").value);
             const status = document.getElementById("race-status");
 
             if(!driverId || !track) {
                 status.className = "status error";
-                status.innerText = "Please select a driver and enter a track.";
+                status.innerText = "Please select a driver and a track.";
                 return;
             }
 
@@ -244,6 +295,7 @@
 
             try {
                 const driverRef = doc(db, collectionName, driverId);
+                // Dynamically update the specific track field in the results object
                 await updateDoc(driverRef, {
                     [`results.${track}`]: points,
                     totalPoints: increment(points)
