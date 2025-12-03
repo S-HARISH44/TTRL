@@ -14,7 +14,299 @@
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; justify-content: center; align-items: center; }
         .login-box { background: var(--card); padding: 2rem; border-radius: 8px; text-align: center; border: 1px solid #333; }
 
+        /* LAYOUT */<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTRL Pitwall</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --bg: #0b0c10; --card: #1f2833; --accent: #66fcf1; --text: #c5c6c7; --red: #ff1f4b; }
+        body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; margin: 0; padding: 20px; }
+        
+        /* LOGIN */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: var(--card); padding: 2rem; border-radius: 8px; text-align: center; border: 1px solid #333; }
+
         /* LAYOUT */
+        .container { max-width: 800px; margin: 0 auto; display: none; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
+        h1 { margin: 0; color: var(--accent); text-transform: uppercase; }
+        
+        /* TABS */
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 15px; background: var(--card); border: none; color: #fff; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 1.2rem; font-weight: bold; text-transform: uppercase; transition: 0.3s; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+        .tab-btn:hover { background: #2c3e50; }
+        .tab-btn.active { background: var(--accent); color: #000; }
+
+        /* SECTIONS */
+        .section { display: none; background: var(--card); padding: 20px; border-radius: 8px; animation: fadeIn 0.3s ease; }
+        .section.active { display: block; }
+        
+        /* FORMS */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #888; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
+        
+        button.action-btn { width: 100%; padding: 15px; background: var(--accent); color: #0b0c10; border: none; font-weight: 800; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        button.action-btn:hover { background: #fff; }
+        
+        button.delete-btn { background: var(--red); color: white; border: none; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; }
+
+        /* LIST */
+        .driver-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 5px; border-left: 3px solid #555; }
+        .team-badge { font-size: 0.8rem; padding: 2px 6px; background: #333; margin-left: 10px; color: #aaa; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
+        .status { margin-top: 10px; text-align: center; font-weight: bold; }
+        .success { color: #00ff00; } .error { color: #ff0000; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>PITWALL ACCESS</h2>
+            <input type="password" id="adminPass" placeholder="Password" style="margin-bottom: 10px;">
+            <button class="action-btn" onclick="checkLogin()">Login</button>
+        </div>
+    </div>
+
+    <!-- MAIN INTERFACE -->
+    <div class="container" id="main-interface">
+        <header>
+            <h1>TTRL Admin</h1>
+            <div style="font-size: 0.8rem; color: #666;">v2.0</div>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('race-control')">Race Control</button>
+            <button class="tab-btn" onclick="switchTab('manage-drivers')">Manage Drivers</button>
+        </div>
+
+        <!-- TAB 1: UPDATE POINTS -->
+        <div id="race-control" class="section active">
+            <h3><i class="fas fa-flag-checkered"></i> Update Race Result</h3>
+            
+            <div class="form-group">
+                <label>Select Driver</label>
+                <select id="updateDriverSelect">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Track Name (e.g., monaco)</label>
+                <input type="text" id="trackName" placeholder="Lowercase, no spaces (e.g. bahrain)">
+            </div>
+
+            <div class="form-group">
+                <label>Points Scored</label>
+                <input type="number" id="pointsScored" placeholder="e.g. 25">
+            </div>
+
+            <button class="action-btn" onclick="submitRaceData()">Update Standings</button>
+            <div id="race-status" class="status"></div>
+        </div>
+
+        <!-- TAB 2: MANAGE DRIVERS -->
+        <div id="manage-drivers" class="section">
+            <h3><i class="fas fa-user-plus"></i> Register New Driver</h3>
+            
+            <div class="form-group">
+                <label>Driver Name</label>
+                <input type="text" id="newDriverName" placeholder="Gamertag / Name">
+            </div>
+
+            <div class="form-group">
+                <label>Team</label>
+                <select id="newDriverTeam">
+                    <option value="red-bull-racing">Red Bull Racing</option>
+                    <option value="ferrari">Ferrari</option>
+                    <option value="mercedes">Mercedes</option>
+                    <option value="mclaren">McLaren</option>
+                    <option value="aston-martin">Aston Martin</option>
+                    <option value="alpine">Alpine</option>
+                    <option value="williams">Williams</option>
+                    <option value="racing-bulls">Racing Bulls</option>
+                    <option value="kick-sauber">Kick Sauber</option>
+                    <option value="haas">Haas</option>
+                    <option value="reserve">Reserve</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Initial Points (Usually 0)</label>
+                <input type="number" id="initialPoints" value="0">
+            </div>
+
+            <button class="action-btn" style="background-color: #45a29e;" onclick="registerDriver()">Add Driver to Database</button>
+            <div id="register-status" class="status"></div>
+
+            <hr style="border-color: #333; margin: 30px 0;">
+
+            <h3><i class="fas fa-users"></i> Current Driver Database</h3>
+            <div id="driverList">
+                <!-- List loads here -->
+                <div style="text-align:center; padding:20px;">Loading database...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, increment, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // ==========================================
+        //  YOUR FIREBASE CONFIG
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyApUD33ao9DfFa8IAfA2qby3IFKhLtcNFU",
+            authDomain: "ttrl-9f3ef.firebaseapp.com",
+            projectId: "ttrl-9f3ef",
+            storageBucket: "ttrl-9f3ef.firebasestorage.app",
+            messagingSenderId: "51144639440",
+            appId: "1:51144639440:web:8a027b773bc2cddefe2fd5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const collectionName = "standings";
+
+        // --- UI FUNCTIONS ---
+        window.checkLogin = () => {
+            const pass = document.getElementById("adminPass").value;
+            if(pass === "admin123") { // CHANGE THIS!
+                document.getElementById("login-overlay").style.display = "none";
+                document.getElementById("main-interface").style.display = "block";
+                initRealtimeListeners();
+            } else {
+                alert("Access Denied");
+            }
+        };
+
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        };
+
+        // --- FIREBASE LOGIC ---
+
+        // 1. Listen to Database Changes (Real-time List)
+        function initRealtimeListeners() {
+            const q = query(collection(db, collectionName), orderBy("totalPoints", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                const driverSelect = document.getElementById("updateDriverSelect");
+                const driverList = document.getElementById("driverList");
+                
+                driverSelect.innerHTML = '<option value="">-- Select Driver --</option>';
+                driverList.innerHTML = '';
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+
+                    // Populate Dropdown
+                    const option = document.createElement("option");
+                    option.value = id;
+                    option.text = `${data.name} (${data.team})`;
+                    driverSelect.appendChild(option);
+
+                    // Populate List
+                    const item = document.createElement("div");
+                    item.className = "driver-item";
+                    item.innerHTML = `
+                        <div>
+                            <strong>${data.name}</strong> 
+                            <span class="team-badge" style="border-left: 2px solid var(--accent)">${data.team}</span>
+                            <span style="color: var(--accent); margin-left: 10px;">${data.totalPoints} pts</span>
+                        </div>
+                        <button class="delete-btn" onclick="deleteDriver('${id}', '${data.name}')">DELETE</button>
+                    `;
+                    driverList.appendChild(item);
+                });
+            });
+        }
+
+        // 2. Add New Driver
+        window.registerDriver = async () => {
+            const name = document.getElementById("newDriverName").value;
+            const team = document.getElementById("newDriverTeam").value;
+            const points = Number(document.getElementById("initialPoints").value);
+            const status = document.getElementById("register-status");
+
+            if(!name) return;
+
+            status.innerText = "Adding...";
+            
+            try {
+                // We use addDoc to let Firebase create a unique ID
+                await addDoc(collection(db, collectionName), {
+                    name: name,
+                    team: team,
+                    totalPoints: points,
+                    results: {}, 
+                    notes: ""
+                });
+                status.className = "status success";
+                status.innerText = "Driver Added Successfully!";
+                document.getElementById("newDriverName").value = ""; // Reset form
+            } catch (e) {
+                console.error(e);
+                status.className = "status error";
+                status.innerText = "Error adding driver.";
+            }
+        };
+
+        // 3. Update Race Data
+        window.submitRaceData = async () => {
+            const driverId = document.getElementById("updateDriverSelect").value;
+            const track = document.getElementById("trackName").value.toLowerCase().replace(/\s/g, '');
+            const points = Number(document.getElementById("pointsScored").value);
+            const status = document.getElementById("race-status");
+
+            if(!driverId || !track) {
+                status.className = "status error";
+                status.innerText = "Please select a driver and enter a track.";
+                return;
+            }
+
+            status.innerText = "Updating...";
+
+            try {
+                const driverRef = doc(db, collectionName, driverId);
+                await updateDoc(driverRef, {
+                    [`results.${track}`]: points,
+                    totalPoints: increment(points)
+                });
+                status.className = "status success";
+                status.innerText = `Success! Added ${points} points for ${track}.`;
+            } catch (e) {
+                console.error(e);
+                status.className = "status error";
+                status.innerText = "Error updating database.";
+            }
+        };
+
+        // 4. Delete Driver
+        window.deleteDriver = async (id, name) => {
+            if(confirm(`Are you sure you want to delete ${name}? This cannot be undone.`)) {
+                try {
+                    await deleteDoc(doc(db, collectionName, id));
+                } catch(e) {
+                    alert("Error deleting: " + e.message);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
         .container { max-width: 800px; margin: 0 auto; display: none; }
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
         h1 { margin: 0; color: var(--accent); text-transform: uppercase; }
