@@ -15,7 +15,7 @@
         .login-box { background: var(--card); padding: 2rem; border-radius: 8px; text-align: center; border: 1px solid #333; width: 300px; box-shadow: 0 0 30px rgba(102, 252, 241, 0.1); }
         
         /* LAYOUT */
-        .container { max-width: 800px; margin: 0 auto; display: none; } /* HIDDEN BY DEFAULT */
+        .container { max-width: 900px; margin: 0 auto; display: none; }
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
         h1 { margin: 0; color: var(--accent); text-transform: uppercase; }
         
@@ -35,11 +35,22 @@
         input, select { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
         input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(102, 252, 241, 0.2); }
 
-        button.action-btn { width: 100%; padding: 15px; background: var(--accent); color: #0b0c10; border: none; font-weight: 800; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
+        /* TRACK GRID */
+        .track-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+        .track-input { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; border: 1px solid #333; }
+        .track-input label { color: var(--accent); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .track-input input { width: 100%; padding: 8px; font-size: 1.1rem; text-align: center; border: 1px solid #444; }
+        
+        /* TOTAL BOX */
+        .total-box { margin-top: 20px; padding: 15px; background: #000; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center; }
+        .total-label { color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .total-value { font-size: 2rem; font-weight: bold; color: #fff; }
+
+        button.action-btn { width: 100%; padding: 15px; background: var(--accent); color: #0b0c10; border: none; font-weight: 800; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 20px; transition: 0.2s; }
         button.action-btn:hover { background: #fff; transform: translateY(-2px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
         
         button.delete-btn { background: var(--red); color: white; border: none; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; }
-        button.delete-btn:hover { background: #ff0000; }
 
         /* LIST */
         .driver-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 5px; border-left: 3px solid #555; }
@@ -68,49 +79,39 @@
     <div class="container" id="main-interface">
         <header>
             <h1>TTRL Admin</h1>
-            <div style="font-size: 0.8rem; color: #666;">v2.5 (Live Database)</div>
+            <div style="font-size: 0.8rem; color: #666;">v3.0 (Full Editor)</div>
         </header>
 
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('race-control')">Race Control</button>
+            <button class="tab-btn active" onclick="switchTab('race-control')">Results Editor</button>
             <button class="tab-btn" onclick="switchTab('manage-drivers')">Manage Drivers</button>
         </div>
 
-        <!-- TAB 1: UPDATE POINTS -->
+        <!-- TAB 1: FULL EDITOR -->
         <div id="race-control" class="section active">
-            <h3><i class="fas fa-flag-checkered"></i> Update Race Result</h3>
+            <h3><i class="fas fa-edit"></i> Edit Driver Results</h3>
+            <p style="color:#888; font-size:0.9rem;">Select a driver to load their scorecard. Enter '0' or leave blank if no points.</p>
             
             <div class="form-group">
                 <label>Select Driver</label>
-                <select id="updateDriverSelect">
-                    <option value="">Loading...</option>
+                <select id="editorDriverSelect" onchange="loadDriverData()">
+                    <option value="">-- Select Driver --</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Grand Prix (TTRL Calendar)</label>
-                <select id="trackName">
-                    <option value="">-- Select Track --</option>
-                    <option value="bahrain">Bahrain GP</option>
-                    <option value="australia">Australian GP</option>
-                    <option value="imola">Imola GP</option>
-                    <option value="spain">Spain GP</option>
-                    <option value="uk">Great Britain GP</option>
-                    <option value="vegas">Las Vegas GP</option>
-                    <option value="belgium">Belgium GP</option>
-                    <option value="austria">Austria GP</option>
-                    <option value="brazil">Brazil GP</option>
-                    <option value="abu_dhabi">Abu Dhabi GP</option>
-                </select>
-            </div>
+            <div id="editor-area" style="display:none;">
+                <div class="track-grid" id="trackGrid">
+                    <!-- Inputs injected by JS -->
+                </div>
 
-            <div class="form-group">
-                <label>Points Scored</label>
-                <input type="number" id="pointsScored" placeholder="e.g. 25">
-            </div>
+                <div class="total-box">
+                    <div class="total-label">Calculated Season Total</div>
+                    <div class="total-value" id="calculatedTotal">0</div>
+                </div>
 
-            <button class="action-btn" onclick="submitRaceData()">Update Standings</button>
-            <div id="race-status" class="status"></div>
+                <button class="action-btn" onclick="saveAllChanges()">SAVE CHANGES</button>
+                <div id="editor-status" class="status"></div>
+            </div>
         </div>
 
         <!-- TAB 2: MANAGE DRIVERS -->
@@ -139,19 +140,13 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Initial Points (Usually 0)</label>
-                <input type="number" id="initialPoints" value="0">
-            </div>
-
-            <button class="action-btn" style="background-color: #45a29e;" onclick="registerDriver()">Add Driver to Database</button>
+            <button class="action-btn" style="background-color: #45a29e;" onclick="registerDriver()">Create Driver Profile</button>
             <div id="register-status" class="status"></div>
 
             <hr style="border-color: #333; margin: 30px 0;">
 
-            <h3><i class="fas fa-users"></i> Current Driver Database</h3>
+            <h3><i class="fas fa-users"></i> Driver Database</h3>
             <div id="driverList">
-                <!-- List loads here -->
                 <div style="text-align:center; padding:20px;">Waiting for login...</div>
             </div>
         </div>
@@ -159,10 +154,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, increment, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ==========================================
-        //  YOUR FIREBASE CONFIG
+        //  FIREBASE CONFIG
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyApUD33ao9DfFa8IAfA2qby3IFKhLtcNFU",
@@ -177,31 +172,31 @@
         const db = getFirestore(app);
         const collectionName = "standings";
 
-        // --- AUTH LOGIC ---
+        // --- TTRL CALENDAR DEFINITION ---
+        const TRACK_LIST = [
+            { id: 'bahrain', name: 'Bahrain GP' },
+            { id: 'australia', name: 'Australia GP' },
+            { id: 'imola', name: 'Imola GP' },
+            { id: 'spain', name: 'Spain GP' },
+            { id: 'uk', name: 'Great Britain GP' },
+            { id: 'vegas', name: 'Las Vegas GP' },
+            { id: 'belgium', name: 'Belgium GP' },
+            { id: 'austria', name: 'Austria GP' },
+            { id: 'brazil', name: 'Brazil GP' },
+            { id: 'abu_dhabi', name: 'Abu Dhabi GP' }
+        ];
+
+        // --- AUTH & SETUP ---
         window.checkLogin = () => {
             const pass = document.getElementById("adminPass").value;
-            const overlay = document.getElementById("login-overlay");
-            const msg = document.getElementById("login-msg");
-            
-            if(pass === "admin123") { // PASSWORD CHECK
-                overlay.style.opacity = "0";
-                setTimeout(() => { overlay.style.display = "none"; }, 500);
+            if(pass === "admin123") { 
+                document.getElementById("login-overlay").style.display = "none";
                 document.getElementById("main-interface").style.display = "block";
-                
-                // Only load data AFTER login
                 initRealtimeListeners();
             } else {
-                msg.innerText = "ACCESS DENIED";
-                document.getElementById("adminPass").value = "";
+                document.getElementById("login-msg").innerText = "ACCESS DENIED";
             }
         };
-
-        // Allow pressing "Enter" to login
-        document.getElementById("adminPass").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                checkLogin();
-            }
-        });
 
         window.switchTab = (tabId) => {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
@@ -210,38 +205,41 @@
             event.target.classList.add('active');
         };
 
-        // --- FIREBASE LOGIC ---
+        // --- GLOBAL DATA ---
+        let driversCache = {}; // Store data locally for quick access
 
-        // 1. Listen to Database Changes (Real-time List)
+        // 1. Listen to Database
         function initRealtimeListeners() {
             const q = query(collection(db, collectionName), orderBy("totalPoints", "desc"));
             
             onSnapshot(q, (snapshot) => {
-                const driverSelect = document.getElementById("updateDriverSelect");
+                const driverSelect = document.getElementById("editorDriverSelect");
                 const driverList = document.getElementById("driverList");
                 
-                driverSelect.innerHTML = '<option value="">-- Select Driver --</option>';
+                // Only clear if empty to prevent UI jumping while typing
+                if(driverSelect.options.length <= 1) {
+                    driverSelect.innerHTML = '<option value="">-- Select Driver --</option>';
+                }
                 driverList.innerHTML = '';
 
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     const id = docSnap.id;
+                    driversCache[id] = data; // Cache data
 
-                    // Populate Dropdown for Updates
-                    const option = document.createElement("option");
-                    option.value = id;
-                    option.text = `${data.name} (${data.team})`;
-                    driverSelect.appendChild(option);
+                    // Populate Dropdown (check if exists to avoid dupes)
+                    if(!document.querySelector(`option[value="${id}"]`)) {
+                        const option = document.createElement("option");
+                        option.value = id;
+                        option.text = `${data.name} (${data.team})`;
+                        driverSelect.appendChild(option);
+                    }
 
-                    // Populate Visual List
+                    // Populate List
                     const item = document.createElement("div");
                     item.className = "driver-item";
                     item.innerHTML = `
-                        <div>
-                            <strong>${data.name}</strong> 
-                            <span class="team-badge" style="border-left: 2px solid var(--accent)">${data.team}</span>
-                            <span style="color: var(--accent); margin-left: 10px;">${data.totalPoints} pts</span>
-                        </div>
+                        <div><strong>${data.name}</strong> <span class="team-badge">${data.team}</span> <span style="color:var(--accent)">${data.totalPoints} pts</span></div>
                         <button class="delete-btn" onclick="deleteDriver('${id}', '${data.name}')">DELETE</button>
                     `;
                     driverList.appendChild(item);
@@ -249,74 +247,123 @@
             });
         }
 
-        // 2. Add New Driver
+        // 2. Load Driver Data into Grid
+        window.loadDriverData = () => {
+            const driverId = document.getElementById("editorDriverSelect").value;
+            const editorArea = document.getElementById("editor-area");
+            const grid = document.getElementById("trackGrid");
+
+            if(!driverId) {
+                editorArea.style.display = "none";
+                return;
+            }
+
+            editorArea.style.display = "block";
+            grid.innerHTML = ""; // Clear old inputs
+
+            const driverData = driversCache[driverId];
+            const results = driverData.results || {};
+
+            // Generate Input for EVERY track
+            TRACK_LIST.forEach(track => {
+                const points = results[track.id] || 0; // Default to 0 if empty
+                
+                const div = document.createElement("div");
+                div.className = "track-input";
+                div.innerHTML = `
+                    <label>${track.name}</label>
+                    <input type="number" 
+                           class="points-input" 
+                           data-track="${track.id}" 
+                           value="${points}" 
+                           oninput="calculateLiveTotal()">
+                `;
+                grid.appendChild(div);
+            });
+
+            calculateLiveTotal(); // Run once to set initial sum
+        };
+
+        // 3. Live Calculator (Client Side)
+        window.calculateLiveTotal = () => {
+            const inputs = document.querySelectorAll(".points-input");
+            let sum = 0;
+            inputs.forEach(input => {
+                sum += Number(input.value) || 0;
+            });
+            document.getElementById("calculatedTotal").innerText = sum;
+        };
+
+        // 4. Save ALL Data (The Fix)
+        window.saveAllChanges = async () => {
+            const driverId = document.getElementById("editorDriverSelect").value;
+            const status = document.getElementById("editor-status");
+            const inputs = document.querySelectorAll(".points-input");
+            
+            status.innerText = "Saving...";
+            
+            let newResults = {};
+            let newTotal = 0;
+
+            // Build new results object from inputs
+            inputs.forEach(input => {
+                const trackId = input.dataset.track;
+                const val = Number(input.value);
+                if(val > 0) {
+                    newResults[trackId] = val;
+                    newTotal += val;
+                }
+            });
+
+            try {
+                const driverRef = doc(db, collectionName, driverId);
+                
+                // OVERWRITE results and UPDATE total
+                // This fixes the "increment" bug by setting the absolute correct value
+                await updateDoc(driverRef, {
+                    results: newResults,
+                    totalPoints: newTotal
+                });
+
+                status.className = "status success";
+                status.innerText = `Saved! New Total: ${newTotal} pts`;
+            } catch (e) {
+                console.error(e);
+                status.className = "status error";
+                status.innerText = "Error saving data.";
+            }
+        };
+
+        // 5. Register New Driver
         window.registerDriver = async () => {
             const name = document.getElementById("newDriverName").value;
             const team = document.getElementById("newDriverTeam").value;
-            const points = Number(document.getElementById("initialPoints").value);
             const status = document.getElementById("register-status");
 
             if(!name) return;
-
             status.innerText = "Adding...";
             
             try {
                 await addDoc(collection(db, collectionName), {
                     name: name,
                     team: team,
-                    totalPoints: points,
+                    totalPoints: 0,
                     results: {}, 
                     notes: ""
                 });
                 status.className = "status success";
-                status.innerText = "Driver Added Successfully!";
+                status.innerText = "Driver Created!";
                 document.getElementById("newDriverName").value = ""; 
             } catch (e) {
-                console.error(e);
                 status.className = "status error";
-                status.innerText = "Error adding driver.";
+                status.innerText = "Error creating driver.";
             }
         };
 
-        // 3. Update Race Data
-        window.submitRaceData = async () => {
-            const driverId = document.getElementById("updateDriverSelect").value;
-            const track = document.getElementById("trackName").value;
-            const points = Number(document.getElementById("pointsScored").value);
-            const status = document.getElementById("race-status");
-
-            if(!driverId || !track) {
-                status.className = "status error";
-                status.innerText = "Please select a driver and a track.";
-                return;
-            }
-
-            status.innerText = "Updating...";
-
-            try {
-                const driverRef = doc(db, collectionName, driverId);
-                // Dynamically update the specific track field in the results object
-                await updateDoc(driverRef, {
-                    [`results.${track}`]: points,
-                    totalPoints: increment(points)
-                });
-                status.className = "status success";
-                status.innerText = `Success! Added ${points} points for ${track}.`;
-            } catch (e) {
-                console.error(e);
-                status.className = "status error";
-                status.innerText = "Error updating database.";
-            }
-        };
-
-        // 4. Delete Driver
+        // 6. Delete
         window.deleteDriver = async (id, name) => {
-            if(confirm(`Are you sure you want to delete ${name}? This cannot be undone.`)) {
-                try {
-                    await deleteDoc(doc(db, collectionName, id));
-                } catch(e) {
-                    alert("Error deleting: " + e.message);
-                }
+            if(confirm(`Delete ${name}?`)) {
+                await deleteDoc(doc(db, collectionName, id));
             }
         };
     </script>
