@@ -481,11 +481,27 @@
                 <div class="slide-tag">06 // DATA VAULT</div>
                 <h2 class="slide-title tech-font">SEASON <span class="text-outline">ARCHIVES</span></h2>
                 
-                <div class="standings-wrapper" style="height: 65vh;">
-                    <div class="table-scroll" id="archives-scroll-container">
-                         <!-- Injected via JS -->
-                         <div class="archive-loading">LOADING FULL SEASON MATRIX...</div>
+                <div class="standings-tabs">
+                    <button class="tab-btn active hover-target" data-tab="archive-drivers">DRIVERS</button>
+                    <button class="tab-btn hover-target" data-tab="archive-teams">TEAMS</button>
+                </div>
+
+                <div class="standings-wrapper" style="height: 60vh;">
+                    
+                    <!-- DRIVER ARCHIVE -->
+                    <div class="standings-view active-view" id="view-archive-drivers">
+                        <div class="table-scroll" id="archives-drivers-container">
+                             <div class="archive-loading">LOADING DRIVER MATRIX...</div>
+                        </div>
                     </div>
+
+                    <!-- TEAM ARCHIVE -->
+                    <div class="standings-view" id="view-archive-teams">
+                        <div class="table-scroll" id="archives-teams-container">
+                             <div class="archive-loading">LOADING TEAM MATRIX...</div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -551,28 +567,28 @@
         };
 
         const CALENDAR = [
-            { round: 1, gp: "Bahrain Grand Prix", date: "19/09/25", track: "Bahrain International Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Bahrain-circuit-768x432.png", insight: "Stop and go track.", stats: null },
-            { round: 2, gp: "Australian Grand Prix", date: "26/09/25", track: "Albert Park Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Albert-Park-Circuit-768x432.png", insight: "Fast flowing street circuit.", stats: null },
-            { round: 3, gp: "Emilia Romagna Grand Prix", date: "03/10/25", track: "Autodromo Enzo e Dino Ferrari", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Autodromo-Enzo-e-Dino-Ferrari-768x432.png", insight: "Narrow and technical.", stats: null },
-            { round: 4, gp: "Spanish Grand Prix", date: "10/10/25", track: "Circuit de Barcelona-Catalunya", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Circuit-de-Barcelona-768x432.png", insight: "Test of aerodynamics.", stats: null },
-            { round: 5, gp: "Great Britain Grand Prix", date: "24/10/25", track: "Silverstone Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Silverstone-Circuit--768x432.png", insight: "High speed corners.", stats: null },
-            { round: 6, gp: "Las Vegas Grand Prix", date: "31/10/25", track: "Las Vegas Strip Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Las-Vegas-GP-768x432.png", insight: "High speed street fight.", stats: null },
-            { round: 7, gp: "Belgian Grand Prix", date: "07/11/25", track: "Circuit de Spa-Francorchamps", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Circuit-de-Spa-Francorchamps-768x432.png", insight: "Longest track on calendar.", stats: null },
-            { round: 8, gp: "Austrian Grand Prix", date: "14/11/25", track: "Red Bull Ring", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Red-Bull-Ring-768x432.png", insight: "Short power lap.", stats: null },
-            { round: 9, gp: "São Paulo Grand Prix", date: "21/11/25", track: "Autódromo José Carlos Pace", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Auto%CC%81dromo-Jose%CC%81-Carlos-Pace--768x432.png", insight: "Classic anti-clockwise track.", stats: null },
-            { round: 10, gp: "Abu Dhabi Grand Prix", date: "28/11/25", track: "Yas Marina Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Yas-Marina-Circuit--768x432.png", insight: "Season finale.", stats: null }
+            { round: 1, gp: "Bahrain GP", date: "19/09", insight: "Night race." }, 
+            { round: 2, gp: "Australia GP", date: "26/09", insight: "Street circuit." },
+            { round: 3, gp: "Imola GP", date: "03/10", insight: "Old school." }, 
+            { round: 4, gp: "Spain GP", date: "10/10", insight: "High deg." },
+            { round: 5, gp: "Great Britain GP", date: "24/10", insight: "Fast corners." }, 
+            { round: 6, gp: "Las Vegas GP", date: "31/10", insight: "Cold temps." },
+            { round: 7, gp: "Belgium GP", date: "07/11", insight: "Long lap." }, 
+            { round: 8, gp: "Austria GP", date: "14/11", insight: "Short lap." },
+            { round: 9, gp: "Brazil GP", date: "21/11", insight: "Weather chaos." }, 
+            { round: 10, gp: "Abu Dhabi GP", date: "28/11", insight: "Finale." }
         ];
 
         const DOTD_DATA = [
-            { gp: "Bahrain", driver: "Sanju Vibhi", team: "ASTON MARTIN", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju.png", desc: "Voted Driver of the Day." },
-            { gp: "Australia", driver: "Apex Entropy", team: "KICK SAUBER", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex%201.png", desc: "Exceptional pace down under." },
-            { gp: "Imola", driver: "Mahesh", team: "WILLIAMS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Mahesh.png", desc: "Fan-favorite drive." },
-            { gp: "Spain", driver: "Apex Entropy", team: "ALPINE", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex.png", desc: "Superb driving at Catalunya." },
-            { gp: "Great Britain", driver: "Sanju Vibhi", team: "ASTON MARTIN", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju%201.png", desc: "Standout at Silverstone." },
-            { gp: "Las Vegas", driver: "Harish", team: "HAAS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Harish.png", desc: "Electrifying on the Strip." },
-            { gp: "Belgium", driver: "Sandeep Mareedu", team: "RACING BULLS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sandeep.png", desc: "Incredible reserve drive." },
-            { gp: "Austria", driver: "Wi7ard", team: "WILLIAMS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Wizard.png", desc: "Magical performance." },
-            { gp: "Brazil", driver: "TheGodfather", team: "ALPINE", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Godfather.png", desc: "Offer Interlagos couldn't refuse." }
+            { gp: "Bahrain", driver: "Sanju", team: "aston-martin", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju.png", desc: "P10 to Podium charge." },
+            { gp: "Australia", driver: "Apex", team: "kick-sauber", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex%201.png", desc: "Defensive masterclass." },
+            { gp: "Imola", driver: "Mahesh", team: "williams", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Mahesh.png", desc: "Strategy gamble paid off." },
+            { gp: "Spain", driver: "Apex", team: "alpine", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Apex.png", desc: "Strategy gamble paid off." },
+            { gp: "Great Britain", driver: "Sanju", team: "aston-martin", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju%201.png", desc: "Strategy gamble paid off." },
+            { gp: "Las Vegas", driver: "Harish", team: "haas", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Harish.png", desc: "Strategy gamble paid off." },
+            { gp: "Belgium", driver: "Sandeep", team: "racing-bulls", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sandeep.png", desc: "Strategy gamble paid off." },
+            { gp: "Austria", driver: "Wi7ard", team: "williams", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Wizard.png", desc: "Strategy gamble paid off." },
+            { gp: "Brazil", driver: "TheGodfather", team: "alpine", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Godfather.png", desc: "Strategy gamble paid off." }
         ];
 
         const f125SetupData = {
@@ -673,7 +689,7 @@
                 
                 renderDrivers();
                 renderConstructors();
-                renderArchiveMatrix();
+                renderArchiveDrivers(); // Default view
             });
         }
 
@@ -750,9 +766,9 @@
             }
         }
 
-        // 3. ARCHIVES (MATRIX TABLE)
-        function renderArchiveMatrix() {
-            const container = document.getElementById("archives-scroll-container");
+        // 3. ARCHIVES - DRIVER MATRIX
+        function renderArchiveDrivers() {
+            const container = document.getElementById("archives-drivers-container");
             
             let html = `<table class="standings-table">`;
             
@@ -784,6 +800,74 @@
                 });
                 
                 html += `<td style="text-align:center; color:var(--accent-cyan); font-weight:700">${rowTotal}</td>`;
+                html += `</tr>`;
+            });
+            html += `</tbody></table>`;
+
+            container.innerHTML = html;
+        }
+
+        // 4. ARCHIVES - TEAM MATRIX
+        function renderArchiveTeams() {
+            const container = document.getElementById("archives-teams-container");
+            
+            // Aggregate points per team per track
+            const teamTrackPoints = {};
+            // Initialize
+            TEAMS.forEach(t => {
+                if (t.id === 'reserve') return;
+                teamTrackPoints[t.id] = { total: 0 };
+                TRACK_KEYS.forEach(k => teamTrackPoints[t.id][k] = 0);
+            });
+
+            allDrivers.forEach(d => {
+                const results = d.results || {};
+                Object.keys(results).forEach(trackKey => {
+                    if(!TRACK_KEYS.includes(trackKey)) return;
+                    
+                    const r = results[trackKey];
+                    let pts = 0;
+                    let teamId = d.team;
+
+                    if (typeof r === 'object') {
+                        pts = Number(r.points || 0);
+                        teamId = r.team || d.team;
+                    } else {
+                        pts = Number(r || 0);
+                    }
+
+                    if(teamId !== 'reserve' && teamTrackPoints[teamId]) {
+                        teamTrackPoints[teamId][trackKey] += pts;
+                        teamTrackPoints[teamId].total += pts;
+                    }
+                });
+            });
+
+            // Sort teams by total points
+            const sortedTeamIds = Object.keys(teamTrackPoints).sort((a,b) => teamTrackPoints[b].total - teamTrackPoints[a].total);
+
+            let html = `<table class="standings-table">`;
+            html += `<thead><tr><th class="sticky-corner">TEAM</th>`;
+            TRACK_KEYS.forEach(k => {
+                html += `<th class="sticky-top" style="text-align:center">${TRACK_LABELS[k]}</th>`;
+            });
+            html += `<th class="sticky-top" style="text-align:center">TOTAL</th></tr></thead>`;
+
+            html += `<tbody>`;
+            sortedTeamIds.forEach(tId => {
+                const tColor = TEAM_COLORS[tId];
+                const tName = TEAMS.find(t => t.id === tId)?.name;
+                
+                html += `<tr style="--team-color: ${tColor}">`;
+                html += `<td class="sticky-left" style="font-weight:700; background:var(--glass-bg); border-left:3px solid ${tColor}; text-transform:uppercase;">${tName}</td>`;
+                
+                TRACK_KEYS.forEach(k => {
+                    const pts = teamTrackPoints[tId][k];
+                    const display = pts > 0 ? pts : '-';
+                    html += `<td style="text-align:center; opacity:${pts === 0 ? 0.3 : 1}">${display}</td>`;
+                });
+                
+                html += `<td style="text-align:center; color:var(--accent-cyan); font-weight:700">${teamTrackPoints[tId].total}</td>`;
                 html += `</tr>`;
             });
             html += `</tbody></table>`;
@@ -856,15 +940,34 @@
         document.getElementById('start-engine-btn').addEventListener('click', () => gotoSlide(1));
         document.getElementById('app-logo').addEventListener('click', () => gotoSlide(0));
 
+        // GLOBAL TAB LISTENER
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                const targetTab = e.target.dataset.tab;
+                
+                // Find parent container to scope active class removal (handle multiple tab groups)
+                const parentGroup = e.target.closest('.standings-tabs') || e.target.parentNode;
+                parentGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                const tab = e.target.dataset.tab;
-                document.querySelectorAll('.standings-view').forEach(v => v.classList.remove('active-view'));
-                document.getElementById('view-'+tab).classList.add('active-view');
-                if (tab === 'dotd') {
-                    gsap.fromTo('.dotd-panel', { width: "10%", opacity: 0 }, { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" });
+                
+                // Find relevant view container
+                const wrapper = e.target.closest('.slide-content').querySelector('.standings-wrapper');
+                if(wrapper) {
+                    wrapper.querySelectorAll('.standings-view').forEach(v => v.classList.remove('active-view'));
+                    const targetView = document.getElementById('view-'+targetTab);
+                    if(targetView) {
+                        targetView.classList.add('active-view');
+                        
+                        // Trigger specific render functions if needed on tab switch
+                        if(targetTab === 'constructors') {
+                             // constructor animations
+                             gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
+                        } else if (targetTab === 'dotd') {
+                             gsap.fromTo('.dotd-panel', { width: "10%", opacity: 0 }, { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" });
+                        } else if (targetTab === 'archive-teams') {
+                             renderArchiveTeams(); // Ensure updated
+                        }
+                    }
                 }
             });
         });
