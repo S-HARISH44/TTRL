@@ -141,91 +141,169 @@
         }
         .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.85); color: transparent; }
 
-        /* --- NEW HOME STYLES (ENHANCED) --- */
-        .hero-layout {
-            display: grid;
-            grid-template-columns: 1fr 0.8fr;
-            gap: 2rem;
+        /* =========================================
+           UPDATED HOME DESIGN CSS
+           ========================================= */
+        /* --- HOME DESIGN CONTAINER --- */
+        .home-design-container {
+            display: flex;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100%;
+            width: 100%;
+            position: relative;
+            z-index: 5;
+            padding-top: 4rem; /* Clear header space */
         }
-        
-        /* Scrolling Text Background */
-        .marquee-strip {
-            position: absolute; top: 30%; left: 0; width: 100%; z-index: 1;
-            transform: rotate(-5deg) scale(1.2); opacity: 0.1; pointer-events: none;
-            overflow: hidden; white-space: nowrap;
-        }
-        .marquee-content {
-            display: inline-block;
-            font-family: 'Rajdhani'; font-weight: 900; font-size: 15vh; color: transparent;
-            -webkit-text-stroke: 2px #fff;
-            animation: marquee 20s linear infinite;
-        }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        /* Hero Text Side */
-        .hero-left { display: flex; flex-direction: column; align-items: flex-start; z-index: 4; }
-        
-        .hero-main-title {
-            font-size: clamp(3.5rem, 8vw, 8rem);
-            font-weight: 800; line-height: 0.85;
+        /* --- TITLE GROUP (Fill vs Stroke) --- */
+        .home-title-group {
+            text-align: center;
             margin-bottom: 1.5rem;
-            text-shadow: 0 0 30px rgba(0,240,255,0.1);
+            line-height: 0.85;
         }
+        .home-title-main {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 800;
+            font-size: clamp(3rem, 7vw, 6rem);
+            color: #fff;
+            text-transform: uppercase;
+            display: flex; gap: 0.5em; justify-content: center;
+        }
+        .home-title-sub {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 800;
+            font-size: clamp(2rem, 5vw, 4.5rem);
+            color: #fff;
+            text-transform: uppercase;
+            display: flex; gap: 0.5em; justify-content: center;
+        }
+        .text-fill { color: #fff; }
+        .text-stroke {
+            color: transparent;
+            -webkit-text-stroke: 1px #fff;
+        }
+        /* --- COUNTDOWN TIMER --- */
+        .home-countdown {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        .cd-box {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.8rem 1.2rem;
+            text-align: center;
+            min-width: 80px;
+            backdrop-filter: blur(5px);
+        }
+        .cd-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 2rem;
+            color: #fff;
+            display: block;
+            line-height: 1;
+        }
+        .cd-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            margin-top: 0.2rem;
+            display: block;
+        }
+        /* --- FEATURE CARDS CONTAINER --- */
+        .home-cards-container {
+            display: flex;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 2rem;
+            justify-content: center;
+            align-items: stretch;
+        }
+        /* --- INDIVIDUAL CARD STYLES --- */
+        .home-card {
+            flex: 1;
+            max-width: 500px;
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-decoration: none; /* In case anchor wraps it */
+        }
+        /* Dark gradient overlay for text readability */
+        .home-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+            z-index: 1;
+        }
+        .home-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
+        .hc-content { position: relative; z-index: 2; width: 100%; }
+        .hc-tag {
+            color: var(--accent-red);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .hc-sub {
+            color: #ccc;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+            display: block;
+        }
+        .hc-title {
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 800;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+        /* --- CARD BUTTONS --- */
+        .hc-btn {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #fff;
+            pointer-events: auto;
+        }
+        .hc-btn-red { background-color: #D00000; }
+        .hc-btn-red:hover { background-color: #ff0000; }
+        .hc-btn-grey { background-color: #444; color: #fff; }
+        .hc-btn-grey:hover { background-color: #666; }
         
-        .hero-subtitle {
-            font-size: 1.1rem; color: #aaa; margin-bottom: 2.5rem; max-width: 500px;
-            border-left: 3px solid var(--accent-red); padding-left: 1rem;
-        }
-
-        .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .btn-outline {
-            padding: 0.8rem 2.5rem; border: 1px solid rgba(255,255,255,0.3); background: transparent;
-            color: #fff; font-family: 'Rajdhani'; font-weight: 700; clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
-            transition: all 0.3s;
-        }
-        .btn-outline:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0,240,255,0.05); }
-
-        /* Hero Visual Side (Right) */
-        .hero-right {
-            position: relative; display: flex; justify-content: center; align-items: center;
-            perspective: 1000px;
-        }
-
-        .glass-stat-card {
-            width: 100%; max-width: 500px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1); border-top: 1px solid rgba(255,255,255,0.3);
-            border-radius: 16px; padding: 2rem;
-            transform: rotateY(-10deg) rotateX(5deg);
-            transition: transform 0.5s ease;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-        .glass-stat-card:hover { transform: rotateY(0) rotateX(0) scale(1.02); border-color: var(--accent-cyan); }
-        
-        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .stat-badge { background: var(--accent-cyan); color: #000; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 700; font-size: 0.8rem; }
-        
-        .champ-display { text-align: center; margin-top: 1rem; }
-        .champ-label { color: #888; font-size: 0.9rem; letter-spacing: 0.2em; margin-bottom: 0.5rem; }
-        .champ-name { font-size: 2.5rem; font-weight: 800; color: #fff; font-family: 'Rajdhani'; line-height: 1; }
-        .champ-car { width: 100%; height: auto; margin-top: -1rem; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)); transition: transform 0.5s; }
-        .glass-stat-card:hover .champ-car { transform: scale(1.1) translateX(10px); }
-
-        .season-progress { margin-top: 1.5rem; }
-        .progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: #ccc; margin-bottom: 0.5rem; }
-        .progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
-        .progress-fill { width: 5%; height: 100%; background: var(--accent-red); box-shadow: 0 0 10px var(--accent-red); }
-
-        @media (max-width: 1024px) {
-            .hero-layout { grid-template-columns: 1fr; text-align: center; }
-            .hero-left { align-items: center; }
-            .hero-subtitle { text-align: center; border-left: none; border-bottom: 3px solid var(--accent-red); padding-bottom: 1rem; padding-left: 0; }
-            .hero-right { display: none; } /* Hide card on mobile to save space or adjust */
-            .marquee-strip { top: 15%; }
-            .hero-main-title { font-size: 4rem; }
+        /* Mobile Responsiveness for Home */
+        @media (max-width: 900px) {
+            .home-cards-container { flex-direction: column; align-items: center; }
+            .home-card { width: 100%; height: 200px; }
+            .home-title-main, .home-title-sub { font-size: 3rem; }
         }
 
         /* --- STANDINGS --- */
@@ -454,11 +532,6 @@
         }
         .btn-tech:hover { background: #fff; color: var(--accent-red); box-shadow: 0 0 20px rgba(255,31,75,0.5); }
         
-        .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 3rem; }
-        .countdown-item { background: rgba(20, 20, 20, 0.4); border: 1px solid var(--glass-border); border-top: 2px solid var(--accent-red); padding: 0.8rem; text-align: center; }
-        .countdown-val { font-family: 'JetBrains Mono'; font-size: 2.5rem; font-weight: 700; display: block; }
-        .countdown-label { font-size: 0.7rem; color: var(--accent-red); letter-spacing: 0.2em; }
-        
         /* Contact Grid */
         .contact-grid { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
         .contact-item {
@@ -500,7 +573,6 @@
         @media (max-width: 768px) {
             .fixed-ui { padding: 1rem; }
             .top-nav { display: none; }
-            .countdown-grid { grid-template-columns: repeat(2, 1fr); }
             .slide-title { font-size: 3rem; }
             .garage-grid { grid-template-columns: 1fr; }
             .intel-content-layout { grid-template-columns: 1fr; }
@@ -552,55 +624,56 @@
     </div>
 
     <div class="slides-wrapper">
-        <!-- SLIDE 0: HERO (ENHANCED) -->
+        <!-- SLIDE 0: HERO (UPDATED WITH NEW DESIGN) -->
         <section class="slide active" id="slide-0">
-            <!-- Background Elements -->
+            <!-- Background Image -->
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/a63c5b81b6a861f85d3efb76fe0c9bb2590de507/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg'); opacity:0.6;"></div>
-            
-            <!-- Scrolling Text Layer -->
-            <div class="marquee-strip">
-                <div class="marquee-content">TURBO TRIBE RACING LEAGUE // PUSH THE LIMITS // SEASON 2 LOADING // JOIN THE GRID //</div>
-            </div>
 
-            <!-- Enhanced Split Layout -->
-            <div class="slide-content hero-layout">
-                <!-- Left: Heavy Typography -->
-                <div class="hero-left">
-                    <div class="slide-tag" id="hero-next-tag">STATUS: OFF-SEASON</div>
-                    <h1 class="hero-main-title tech-font"><span class="glitch-effect" data-text="TURBO">TURBO</span><br><span class="text-outline glitch-effect" data-text="TRIBE">TRIBE</span></h1>
-                    <p class="hero-subtitle mono-font">
-                        THE ELITE F1 25 SIM RACING EXPERIENCE.<br>
-                        COMPETE AGAINST THE BEST. FORGE YOUR LEGACY.
-                    </p>
-                    <div class="btn-group">
-                        <button id="start-engine-btn" class="btn-tech hover-target">ENTER PADDOCK</button>
-                        <button class="btn-outline hover-target" onclick="document.querySelectorAll('.nav-link')[3].click()">REGISTER NOW</button>
+            <div class="slide-content home-design-container">
+                
+                <!-- TITLE GROUP -->
+                <div class="home-title-group">
+                    <div class="home-title-main">
+                        <span class="text-fill">TURBO</span>
+                        <span class="text-stroke">TRIBE</span>
+                    </div>
+                    <div class="home-title-sub">
+                        <span class="text-stroke">RACING</span>
+                        <span class="text-fill">LEAGUE</span>
                     </div>
                 </div>
 
-                <!-- Right: Glass Info Card -->
-                <div class="hero-right">
-                    <div class="glass-stat-card hover-target">
-                        <div class="stat-header">
-                            <span style="font-family:'Rajdhani'; font-weight:700; color:#fff;">SEASON 1 CHAMPION</span>
-                            <span class="stat-badge">WINNER</span>
+                <!-- COUNTDOWN -->
+                <div class="home-countdown">
+                    <div class="cd-box"><span class="cd-number" id="cd-days">00</span><span class="cd-label">DAYS</span></div>
+                    <div class="cd-box"><span class="cd-number" id="cd-hours">00</span><span class="cd-label">HRS</span></div>
+                    <div class="cd-box"><span class="cd-number" id="cd-mins">00</span><span class="cd-label">MIN</span></div>
+                    <div class="cd-box"><span class="cd-number" id="cd-secs">00</span><span class="cd-label">SEC</span></div>
+                </div>
+
+                <!-- CARDS -->
+                <div class="home-cards-container">
+                    <!-- Left Card: Season 2 -->
+                    <div class="home-card hover-target" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/e892dbee23fd4d1b55f5e04b6ba2bf00f54126e3/RESOURCES/card/button_2.png');">
+                        <div class="hc-content">
+                            <span class="hc-tag">SEASON 2</span>
+                            <span class="hc-sub">YET TO ANNOUNCE</span>
+                            <span class="hc-title">LEAGUE RACE</span>
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSc1xE8SkAOIKoHaryLjNgTNXJfmBCSv73vdgxaAA0_uxnmUTw/viewform" target="_blank" class="hc-btn hc-btn-red hover-target">JOIN NOW</a>
                         </div>
-                        <div class="champ-display">
-                            <div class="champ-label">DRIVER STANDINGS</div>
-                            <div class="champ-name">Wi7ard</div>
-                            <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025williamscarright.png" class="champ-car" alt="Champion Car">
-                        </div>
-                        <div class="season-progress">
-                            <div class="progress-label">
-                                <span>SEASON 2 PREP</span>
-                                <span>15%</span>
-                            </div>
-                            <div class="progress-track">
-                                <div class="progress-fill" style="width: 15%"></div>
-                            </div>
+                    </div>
+
+                    <!-- Right Card: Special Events -->
+                    <div class="home-card hover-target" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/e892dbee23fd4d1b55f5e04b6ba2bf00f54126e3/RESOURCES/card/button_4.png');">
+                        <div class="hc-content">
+                            <span class="hc-tag">SPECIAL EVENTS</span>
+                            <!-- <span class="hc-sub">UPCOMING</span> -->
+                            <span class="hc-title" style="margin-top:1.5rem;">SOCIAL RACE</span>
+                            <a href="https://discord.com/channels/1345718934174957590/1345721726188912671" target="_blank" class="hc-btn hc-btn-grey hover-target">JOIN NOW</a>
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -1132,14 +1205,17 @@
             tl.fromTo(nextSlide, { scale: 1.1, opacity: 0, filter: 'brightness(1.5)' }, { scale: 1, opacity: 1, filter: 'brightness(1)' }, "-=0.8");
             
             // Stagger animation for new home elements
-            const elements = nextSlide.querySelectorAll('.slide-tag, .slide-title, .hero-main-title, .btn-container, .cal-item, .standings-wrapper, .contact-grid, .glass-stat-card');
+            const elements = nextSlide.querySelectorAll('.slide-tag, .slide-title, .hero-main-title, .btn-container, .cal-item, .standings-wrapper, .contact-grid, .glass-stat-card, .home-title-group, .home-countdown, .home-card');
             gsap.fromTo(elements, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, delay: 0.5 });
         }
 
         document.querySelectorAll('.nav-link').forEach((link, idx) => {
             link.addEventListener('click', (e) => { e.preventDefault(); gotoSlide(idx); });
         });
-        document.getElementById('start-engine-btn').addEventListener('click', () => gotoSlide(1));
+        
+        // Updated home button listener (removed old ID, using direct slide nav or card logic)
+        // document.getElementById('start-engine-btn')?.addEventListener('click', () => gotoSlide(1));
+        
         document.getElementById('app-logo').addEventListener('click', () => gotoSlide(0));
 
         // GLOBAL TAB LISTENER
@@ -1174,6 +1250,42 @@
             });
         });
 
+        // Simple Countdown Logic
+        function updateCountdown() {
+            // Target: 2 weeks from now
+            const now = new Date();
+            const target = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // Fixed relative target for demo
+            
+            // To make it persistent or specific, replace 'target' with a fixed Date object
+            // e.g., const target = new Date("2025-10-01T00:00:00");
+
+            function tick() {
+                const current = new Date();
+                const diff = target - current;
+                
+                if (diff <= 0) {
+                    return; // Stop
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((diff / 1000 / 60) % 60);
+                const s = Math.floor((diff / 1000) % 60);
+
+                const elD = document.getElementById('cd-days');
+                const elH = document.getElementById('cd-hours');
+                const elM = document.getElementById('cd-mins');
+                const elS = document.getElementById('cd-secs');
+
+                if(elD) elD.innerText = String(d).padStart(2, '0');
+                if(elH) elH.innerText = String(h).padStart(2, '0');
+                if(elM) elM.innerText = String(m).padStart(2, '0');
+                if(elS) elS.innerText = String(s).padStart(2, '0');
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+
         window.onload = () => {
             gsap.to('#load-bar', { width: '100%', duration: 1, onComplete: () => {
                 gsap.to('#loader', { y: '-100%', duration: 0.8 });
@@ -1181,6 +1293,7 @@
                 initArchiveSync(null); 
                 renderCalendar();
                 renderDOTD();
+                updateCountdown(); // Start countdown
             }});
             
             const cursor = document.getElementById('cursor');
