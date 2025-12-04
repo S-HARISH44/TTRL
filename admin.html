@@ -55,6 +55,28 @@
         .view-table th { text-align: left; padding: 8px; background: rgba(255,255,255,0.1); color: var(--accent); }
         .view-table td { padding: 8px; border-bottom: 1px solid #333; }
         .driver-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 5px; border-left: 3px solid #555; }
+        
+        /* SEASON SELECTOR STYLE */
+        .season-selector-container {
+            background: #000; padding: 15px; border: 1px solid var(--accent); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .season-input {
+            flex-grow: 1; background: #111; border: 1px solid #444; color: #fff; padding: 10px;
+            font-family: 'JetBrains Mono', monospace; text-transform: lowercase;
+        }
+        .season-btn {
+            background: var(--accent); color: #000; border: none; padding: 10px 20px; 
+            font-weight: bold; cursor: pointer; text-transform: uppercase; white-space: nowrap;
+        }
+        .season-btn:hover { background: #fff; }
+        
+        /* SAVED SEASONS LIST (Visual Aid) */
+        #knownSeasonsList {
+            display: flex; gap: 10px; margin-top: 5px; font-size: 0.8rem; color: #666;
+        }
+        .season-tag { cursor: pointer; border-bottom: 1px dotted #666; }
+        .season-tag:hover { color: var(--accent); border-color: var(--accent); }
     </style>
 </head>
 <body>
@@ -73,7 +95,21 @@
     <div class="container" id="main-interface">
         <header>
             <h1>TTRL Admin</h1>
+            <div>v5.3 (Smart Selector)</div>
         </header>
+
+        <!-- DYNAMIC SEASON SELECTOR -->
+        <div style="background: #000; padding: 15px; border: 1px solid var(--accent); margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="margin:0; font-weight:bold; color:var(--accent);">SEASON ID:</label>
+                <input type="text" id="seasonInput" class="season-input" value="season_1" placeholder="Type new ID to create...">
+                <button class="season-btn" onclick="changeSeason()">LOAD / CREATE</button>
+                <button class="season-btn" style="background: #333; color: #fff; border: 1px solid #555;" onclick="changeSeason()"><i class="fas fa-sync-alt"></i></button>
+            </div>
+            <div id="knownSeasonsList">
+                <!-- JS will populate known seasons here -->
+            </div>
+        </div>
 
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('race-control')">Results Editor</button>
@@ -84,7 +120,7 @@
         <!-- 1. EDITOR -->
         <div id="race-control" class="section active">
             <h3><i class="fas fa-edit"></i> Edit Race Results</h3>
-            <p style="color:#888;">Select a driver. If they are a Reserve, confirm the team they drove for in the dropdown for that race.</p>
+            <p style="color:#888;">Editing Data for: <span id="currentSeasonLabel" style="color:var(--accent); font-weight:bold;">season_1</span></p>
             
             <div class="form-group">
                 <select id="editorDriverSelect" onchange="loadDriverData()">
@@ -109,14 +145,14 @@
         <div id="live-view" class="section">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                 <div>
-                    <h4 style="color:var(--accent);">Drivers Championship</h4>
+                    <h4 style="color:var(--accent);">Drivers Championship (<span class="season-display"></span>)</h4>
                     <table class="view-table">
                         <thead><tr><th style="width:10%">Pos</th><th>Driver & Team</th><th style="text-align:right">Pts</th></tr></thead>
                         <tbody id="liveDriversBody"></tbody>
                     </table>
                 </div>
                 <div>
-                    <h4 style="color:var(--accent);">Constructors Championship</h4>
+                    <h4 style="color:var(--accent);">Constructors Championship (<span class="season-display"></span>)</h4>
                     <table class="view-table">
                         <thead><tr><th style="width:10%">Pos</th><th>Team</th><th style="text-align:right">Pts</th></tr></thead>
                         <tbody id="liveConstructorsBody"></tbody>
@@ -128,6 +164,7 @@
         <!-- 3. MANAGE -->
         <div id="manage-drivers" class="section">
             <h3>Register New Driver</h3>
+            <p style="color:#888;">Adding to: <span class="season-display" style="color:var(--accent); font-weight:bold;"></span></p>
             <div class="form-group">
                 <label>Name</label>
                 <input type="text" id="newDriverName" placeholder="Driver Name">
@@ -151,7 +188,7 @@
             <button class="action-btn" onclick="registerDriver()">Add Driver</button>
             <div id="register-status" style="text-align:center; margin-top:10px;"></div>
             <hr style="border-color:#333; margin:20px 0;">
-            <h3>Database</h3>
+            <h3>Database (<span class="season-display"></span>)</h3>
             <div id="driverList">Loading...</div>
         </div>
     </div>
@@ -172,8 +209,12 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const colRef = collection(db, "standings");
-
+        
+        // GLOBAL STATE
+        let currentSeason = "season_1"; // Default start
+        let unsubscribe = null; 
+        let knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1']; // Load from local storage
+        
         // CONSTANTS
         const TRACKS = [
             {id:'bahrain', name:'Bahrain'}, {id:'australia', name:'Australia'}, {id:'imola', name:'Imola'},
@@ -197,13 +238,13 @@
             if(document.getElementById("adminPass").value === "admin123") {
                 document.getElementById("login-overlay").style.display = "none";
                 document.getElementById("main-interface").style.display = "block";
-                initListener();
+                renderKnownSeasons();
+                changeSeason(); // Init with default input value
             } else {
                 document.getElementById("login-msg").innerText = "Wrong Password";
             }
         };
 
-        // UI TABS
         window.switchTab = (id) => {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -211,16 +252,67 @@
             event.target.classList.add('active');
         };
 
+        // --- SEASON MANAGEMENT ---
+        function renderKnownSeasons() {
+            const container = document.getElementById("knownSeasonsList");
+            container.innerHTML = "Quick Select: " + knownSeasons.map(s => 
+                `<span class="season-tag" onclick="selectSeason('${s}')">${s}</span>`
+            ).join(' | ');
+        }
+
+        window.selectSeason = (sid) => {
+            document.getElementById("seasonInput").value = sid;
+            changeSeason();
+        };
+
+        // CHANGE SEASON
+        window.changeSeason = () => {
+            const inputVal = document.getElementById("seasonInput").value.trim().toLowerCase().replace(/\s+/g, '_');
+            if(!inputVal) { alert("Please enter a season ID"); return; }
+            
+            currentSeason = inputVal;
+            
+            // Save to local storage if new
+            if(!knownSeasons.includes(currentSeason)) {
+                knownSeasons.push(currentSeason);
+                localStorage.setItem('ttrl_seasons', JSON.stringify(knownSeasons));
+                renderKnownSeasons();
+            }
+            
+            // Update UI Labels
+            document.getElementById("currentSeasonLabel").innerText = currentSeason;
+            document.querySelectorAll(".season-display").forEach(el => el.innerText = currentSeason);
+
+            // Reset Editor
+            document.getElementById("editorDriverSelect").innerHTML = '<option value="">-- Select Driver --</option>';
+            document.getElementById("driverList").innerHTML = "Loading...";
+            document.getElementById("editor-area").style.display = "none";
+            
+            initListener(); 
+        };
+
         // DATABASE LISTENER
         function initListener() {
-            onSnapshot(query(colRef, orderBy("totalPoints", "desc")), (snap) => {
+            if(unsubscribe) unsubscribe(); 
+
+            // Path: seasons -> {currentSeason} -> drivers
+            const colRef = collection(db, "seasons", currentSeason, "drivers");
+            const q = query(colRef, orderBy("totalPoints", "desc"));
+
+            unsubscribe = onSnapshot(q, (snap) => {
                 const select = document.getElementById("editorDriverSelect");
                 const list = document.getElementById("driverList");
                 
-                // Clear list but keep dropdown placeholder
-                if(select.options.length <= 1) select.innerHTML = '<option value="">-- Select Driver --</option>';
+                select.innerHTML = '<option value="">-- Select Driver --</option>';
                 list.innerHTML = "";
                 allDrivers = [];
+
+                if(snap.empty) {
+                    list.innerHTML = `<div style="padding:20px; text-align:center; color:#888;">
+                        No drivers found in <strong>${currentSeason}</strong>.<br>
+                        Register a driver to start this season table.
+                    </div>`;
+                }
 
                 snap.forEach(doc => {
                     const data = doc.data();
@@ -228,15 +320,11 @@
                     driversCache[doc.id] = data;
                     allDrivers.push(data);
 
-                    // Dropdown
-                    if(!select.querySelector(`option[value="${doc.id}"]`)) {
-                        const opt = document.createElement("option");
-                        opt.value = doc.id;
-                        opt.text = `${data.name} (${data.team})`;
-                        select.appendChild(opt);
-                    }
+                    const opt = document.createElement("option");
+                    opt.value = doc.id;
+                    opt.text = `${data.name} (${data.team})`;
+                    select.appendChild(opt);
 
-                    // Manage List
                     const div = document.createElement("div");
                     div.className = "driver-item";
                     div.innerHTML = `<div><strong>${data.name}</strong> <small>(${data.team})</small></div> <button class="delete-btn" onclick="deleteDriver('${doc.id}', '${data.name}')">DELETE</button>`;
@@ -261,20 +349,18 @@
             const results = data.results || {};
 
             TRACKS.forEach(t => {
-                // Handle new vs old data structure
                 let pts = 0;
-                let team = data.team; // Default to their contract team
+                let team = data.team; 
 
                 if(results[t.id]) {
                     if(typeof results[t.id] === 'object') {
                         pts = results[t.id].points || 0;
                         team = results[t.id].team || data.team;
                     } else {
-                        pts = results[t.id]; // Old format
+                        pts = results[t.id]; // Backwards compat
                     }
                 }
 
-                // Build Team Dropdown for this track
                 let teamOpts = TEAMS.map(tm => `<option value="${tm.id}" ${tm.id === team ? 'selected':''}>${tm.name}</option>`).join('');
 
                 const div = document.createElement("div");
@@ -293,14 +379,12 @@
             calcTotal();
         };
 
-        // CALCULATE TOTAL (UI Only)
         window.calcTotal = () => {
             let sum = 0;
             document.querySelectorAll(".points-input").forEach(i => sum += Number(i.value) || 0);
             document.getElementById("calculatedTotal").innerText = sum;
         };
 
-        // SAVE
         window.saveAllChanges = async () => {
             const id = document.getElementById("editorDriverSelect").value;
             const status = document.getElementById("editor-status");
@@ -324,7 +408,8 @@
             });
 
             try {
-                await updateDoc(doc(db, "standings", id), {
+                const docRef = doc(db, "seasons", currentSeason, "drivers", id);
+                await updateDoc(docRef, {
                     results: newResults,
                     totalPoints: newTotal
                 });
@@ -338,31 +423,13 @@
             }
         };
 
-        // LIVE TABLES LOGIC (UPDATED FOR RESERVE DISPLAY)
         function updateLiveTables() {
-            // 1. Drivers Table
             const dTable = document.getElementById("liveDriversBody");
             dTable.innerHTML = "";
             
             allDrivers.forEach((d, i) => {
-                // Determine team display name
                 let teamDisplay = TEAMS.find(t => t.id === d.team)?.name || d.team;
-                
-                // If reserve, verify which teams they actually drove for
-                if(d.team === 'reserve') {
-                    const drivenTeams = new Set();
-                    if(d.results) {
-                        Object.values(d.results).forEach(r => {
-                            if(typeof r === 'object' && r.team && r.team !== 'reserve') {
-                                const tName = TEAMS.find(t => t.id === r.team)?.name || r.team;
-                                drivenTeams.add(tName);
-                            }
-                        });
-                    }
-                    if(drivenTeams.size > 0) {
-                        teamDisplay = `Reserve <span style="font-size:0.75em; color:#aaa; margin-left:5px;">(for ${Array.from(drivenTeams).join(', ')})</span>`;
-                    }
-                }
+                if(d.team === 'reserve') teamDisplay = "Reserve"; 
 
                 dTable.innerHTML += `
                     <tr>
@@ -376,24 +443,12 @@
                 `;
             });
 
-            // 2. Constructors Table
             const teamPoints = {};
-            
             allDrivers.forEach(d => {
                 const results = d.results || {};
                 Object.values(results).forEach(r => {
-                    // Check if result has team info (new format) or assume driver team (old format)
-                    let p = 0;
-                    let t = d.team; 
-
-                    if(typeof r === 'object') {
-                        p = r.points || 0;
-                        t = r.team || d.team;
-                    } else {
-                        p = r;
-                    }
-
-                    // Only count if it's a real team (not reserve category)
+                    let p = 0, t = d.team; 
+                    if(typeof r === 'object') { p = r.points || 0; t = r.team || d.team; } else { p = r; }
                     if(t !== 'reserve') {
                         if(!teamPoints[t]) teamPoints[t] = 0;
                         teamPoints[t] += p;
@@ -401,7 +456,6 @@
                 });
             });
 
-            // Sort & Render
             const sortedTeams = Object.keys(teamPoints).map(k => ({name: k, pts: teamPoints[k]})).sort((a,b) => b.pts - a.pts);
             const cTable = document.getElementById("liveConstructorsBody");
             cTable.innerHTML = "";
@@ -411,22 +465,23 @@
             });
         }
 
-        // REGISTER
         window.registerDriver = async () => {
             const name = document.getElementById("newDriverName").value;
             const team = document.getElementById("newDriverTeam").value;
             if(!name) return;
             
             try {
+                const colRef = collection(db, "seasons", currentSeason, "drivers");
                 await addDoc(colRef, { name, team, totalPoints: 0, results: {} });
                 document.getElementById("newDriverName").value = "";
                 document.getElementById("register-status").innerText = "Driver Added!";
             } catch(e) { console.error(e); }
         };
 
-        // DELETE
         window.deleteDriver = async (id, name) => {
-            if(confirm(`Delete ${name}?`)) await deleteDoc(doc(db, "standings", id));
+            if(confirm(`Delete ${name} from ${currentSeason}?`)) {
+                await deleteDoc(doc(db, "seasons", currentSeason, "drivers", id));
+            }
         };
     </script>
 </body>
