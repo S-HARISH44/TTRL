@@ -32,24 +32,29 @@
             overscroll-behavior: none;
         }
 
-        /* --- CUSTOM CURSOR --- */
+        /* --- UPDATED CUSTOM CURSOR --- */
+        /* Follower hidden as requested */
+        #cursor-follower { display: none; }
+
         #cursor, #cursor-follower {
             position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%); border-radius: 50%;
+            transform: translate(-50%, -50%);
             will-change: transform, left, top;
         }
         #cursor {
-            width: 8px; height: 8px; background: var(--accent-cyan);
+            width: 12px; height: 12px; 
+            background: var(--accent-cyan);
+            /* Diamond shape for a sharper look */
+            transform: translate(-50%, -50%) rotate(45deg); 
             transition: width 0.2s, height 0.2s, background 0.2s;
+            box-shadow: 0 0 15px var(--accent-cyan);
+            mix-blend-mode: difference;
         }
-        #cursor-follower {
-            width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3);
-            transition: transform 0.1s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
-        }
-        body.hovering #cursor { width: 0px; height: 0px; opacity: 0; }
-        body.hovering #cursor-follower {
-            width: 60px; height: 60px; border-color: var(--accent-red);
-            background: rgba(255, 31, 75, 0.1); mix-blend-mode: screen;
+        
+        body.hovering #cursor { 
+            transform: translate(-50%, -50%) rotate(45deg) scale(1.5);
+            background: var(--accent-red);
+            box-shadow: 0 0 20px var(--accent-red);
         }
 
         @media (max-width: 768px) {
@@ -142,9 +147,8 @@
         .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.85); color: transparent; }
 
         /* =========================================
-           UPDATED HOME DESIGN CSS
+           HOME DESIGN CSS
            ========================================= */
-        /* --- HOME DESIGN CONTAINER --- */
         .home-design-container {
             display: flex;
             flex-direction: column;
@@ -154,9 +158,8 @@
             width: 100%;
             position: relative;
             z-index: 5;
-            padding-top: 4rem; /* Clear header space */
+            padding-top: 4rem; 
         }
-        /* --- TITLE GROUP (Fill vs Stroke) --- */
         .home-title-group {
             text-align: center;
             margin-bottom: 1.5rem;
@@ -183,11 +186,10 @@
             color: transparent;
             -webkit-text-stroke: 1px #fff;
         }
-        /* --- COUNTDOWN TIMER --- */
         .home-countdown {
             display: flex;
             gap: 1rem;
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
         }
         .cd-box {
             background: rgba(0,0,0,0.6);
@@ -214,7 +216,21 @@
             margin-top: 0.2rem;
             display: block;
         }
-        /* --- FEATURE CARDS CONTAINER --- */
+        
+        .next-race-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 4px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
         .home-cards-container {
             display: flex;
             gap: 2rem;
@@ -224,7 +240,6 @@
             justify-content: center;
             align-items: stretch;
         }
-        /* --- INDIVIDUAL CARD STYLES --- */
         .home-card {
             flex: 1;
             max-width: 500px;
@@ -241,9 +256,8 @@
             padding: 2rem;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            text-decoration: none; /* In case anchor wraps it */
+            text-decoration: none;
         }
-        /* Dark gradient overlay for text readability */
         .home-card::before {
             content: ''; position: absolute; inset: 0;
             background: linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
@@ -278,7 +292,6 @@
             margin-bottom: 1.5rem;
             display: block;
         }
-        /* --- CARD BUTTONS --- */
         .hc-btn {
             display: inline-block;
             padding: 0.6rem 1.5rem;
@@ -299,7 +312,6 @@
         .hc-btn-grey { background-color: #444; color: #fff; }
         .hc-btn-grey:hover { background-color: #666; }
         
-        /* Mobile Responsiveness for Home */
         @media (max-width: 900px) {
             .home-cards-container { flex-direction: column; align-items: center; }
             .home-card { width: 100%; height: 200px; }
@@ -336,7 +348,6 @@
             font-family: 'JetBrains Mono', monospace; 
         }
         
-        /* HEADER: Always on top */
         .standings-table th {
             text-align: left; color: var(--accent-cyan); padding: 0.8rem;
             position: sticky; top: 0; 
@@ -347,7 +358,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         
-        /* REGULAR CELLS */
         .standings-table td { 
             padding: 0.8rem; 
             background: var(--glass-bg); 
@@ -358,29 +368,14 @@
             font-size: 0.9rem;
         }
 
-        /* STICKY FIRST COLUMN */
-        .standings-table td:first-child, .standings-table th:first-child {
-            position: sticky; 
-            left: 0; 
-        }
-
-        /* Corner Header */
-        .standings-table th:first-child {
-            z-index: 40;
-            background: #050505;
-            border-right: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* Row Header */
+        .standings-table td:first-child, .standings-table th:first-child { position: sticky; left: 0; }
+        .standings-table th:first-child { z-index: 40; background: #050505; border-right: 1px solid rgba(255,255,255,0.1); }
         .standings-table td:first-child { 
-            z-index: 20;
-            background: #0a0a0a;
-            border-radius: 4px 0 0 4px; 
+            z-index: 20; background: #0a0a0a; border-radius: 4px 0 0 4px; 
             border-left: 3px solid var(--team-color, transparent); 
             border-right: 1px solid rgba(255,255,255,0.1);
             box-shadow: 2px 0 5px rgba(0,0,0,0.5);
         }
-
         .standings-table td:last-child { border-radius: 0 4px 4px 0; border-right: 1px solid transparent; }
         .standings-table tr:hover td { background: rgba(255, 255, 255, 0.1); transform: scale(1.01); }
         .standings-table tr:hover td:first-child { background: #111; } 
@@ -388,31 +383,79 @@
         .team-cell { display: flex; align-items: center; gap: 0.8rem; }
         .team-logo-mini { height: 20px; width: auto; max-width: 30px; object-fit: contain; }
 
-        /* --- GARAGE GRID --- */
+        /* --- UPDATED GARAGE GRID (ALIGNMENT FIXES) --- */
         .garage-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem; height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem;
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-auto-rows: 1fr; /* Ensures equal height rows */
+            gap: 1.5rem; 
+            height: 100%; 
+            overflow-y: auto; 
+            padding: 0.5rem 1rem 2rem 1rem;
             scrollbar-width: none;
         }
         .garage-grid::-webkit-scrollbar { display: none; }
         
         @media (min-width: 1200px) { .garage-grid { grid-template-columns: repeat(5, 1fr); } }
 
+        /* --- UPDATED CONSTRUCTOR CARD (TEAM COLOR & ALIGNMENT) --- */
         .constructor-card {
-            background: linear-gradient(145deg, rgba(30,30,30,0.6) 0%, rgba(10,10,10,0.8) 100%);
-            border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem;
+            /* Better background */
+            background: linear-gradient(145deg, rgba(30,30,30,0.8) 0%, rgba(10,10,10,0.95) 100%);
+            border: 1px solid var(--glass-border);
+            /* Bottom border for constant team color presence */
+            border-bottom: 4px solid var(--team-color, #444);
+            border-radius: 12px; padding: 1.2rem;
             display: flex; flex-direction: column; position: relative;
-            transform-style: preserve-3d; transition: transform 0.1s linear, box-shadow 0.3s ease;
-            height: 100%; justify-content: space-between;
+            transform-style: preserve-3d; 
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            height: 100%; 
+            justify-content: space-between;
+            min-height: 220px; /* Enforce min height for alignment */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        .constructor-card:hover { border-color: var(--team-color, #fff); }
         
-        .cc-bg-rank { position: absolute; top: -0.5rem; right: 0.5rem; font-size: 4rem; font-family: 'Rajdhani'; font-weight: 800; color: rgba(255,255,255,0.03); pointer-events: none; }
-        .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; z-index: 2; transform: translateZ(30px); }
+        /* Strong Team Color Glow on Hover */
+        .constructor-card:hover { 
+            border-color: rgba(255,255,255,0.3);
+            border-bottom-color: var(--team-color);
+            box-shadow: 0 10px 40px var(--team-color, rgba(255,255,255,0.1)); 
+            transform: translateY(-5px);
+            z-index: 2;
+        }
+        
+        .cc-bg-rank { 
+            position: absolute; top: -0.5rem; right: 0.5rem; 
+            font-size: 4rem; font-family: 'Rajdhani'; font-weight: 800; 
+            color: rgba(255,255,255,0.03); pointer-events: none; 
+        }
+        
+        .cc-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 0.5rem; z-index: 2; transform: translateZ(30px); 
+        }
         .cc-name { font-family: 'Rajdhani'; font-weight: 700; font-size: 1rem; }
-        .cc-points { color: var(--team-color); font-family: 'JetBrains Mono'; font-weight: 700; background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px; }
-        .cc-img-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; transform: translateZ(50px); height: 70px; }
-        .cc-car-img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
+        .cc-points { 
+            color: var(--team-color); 
+            font-family: 'JetBrains Mono'; font-weight: 700; 
+            background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px; 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Fixed height for image container to align content properly */
+        .cc-img-container { 
+            flex-grow: 1; 
+            display: flex; align-items: center; justify-content: center; 
+            transform: translateZ(50px); 
+            height: 80px; /* Fixed height constraint */
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .cc-car-img { 
+            max-width: 100%; max-height: 100%; 
+            object-fit: contain; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
+        }
 
         /* --- DOTD (Accordion) --- */
         .dotd-accordion-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 0; overflow: hidden; }
@@ -518,7 +561,7 @@
             display: flex; gap: 10px; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap;
         }
 
-        /* Sticky Headers for Archive - FIXED OVERLAP */
+        /* Sticky Headers for Archive */
         .sticky-left { position: sticky; left: 0; z-index: 15; background: #050505; border-right: 1px solid rgba(255,255,255,0.1); }
         .sticky-top { position: sticky; top: 0; z-index: 20; background: #000; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sticky-corner { position: sticky; left: 0; top: 0; z-index: 30; background: #000; border-right: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -627,7 +670,7 @@
         <!-- SLIDE 0: HERO (UPDATED WITH NEW DESIGN) -->
         <section class="slide active" id="slide-0">
             <!-- Background Image -->
-            <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/a63c5b81b6a861f85d3efb76fe0c9bb2590de507/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg'); opacity:0.6;"></div>
+            <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/a63c5b81b6a861f85d3efb76fe0c9bb2590de507/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg'); opacity:0.8;"></div>
 
             <div class="slide-content home-design-container">
                 
@@ -649,6 +692,11 @@
                     <div class="cd-box"><span class="cd-number" id="cd-hours">00</span><span class="cd-label">HRS</span></div>
                     <div class="cd-box"><span class="cd-number" id="cd-mins">00</span><span class="cd-label">MIN</span></div>
                     <div class="cd-box"><span class="cd-number" id="cd-secs">00</span><span class="cd-label">SEC</span></div>
+                </div>
+                
+                <!-- NEXT RACE INFO -->
+                <div id="next-race-info" class="next-race-display">
+                    SEASON COMPLETED // WAITING FOR SEASON 2
                 </div>
 
                 <!-- CARDS -->
@@ -1205,16 +1253,13 @@
             tl.fromTo(nextSlide, { scale: 1.1, opacity: 0, filter: 'brightness(1.5)' }, { scale: 1, opacity: 1, filter: 'brightness(1)' }, "-=0.8");
             
             // Stagger animation for new home elements
-            const elements = nextSlide.querySelectorAll('.slide-tag, .slide-title, .hero-main-title, .btn-container, .cal-item, .standings-wrapper, .contact-grid, .glass-stat-card, .home-title-group, .home-countdown, .home-card');
+            const elements = nextSlide.querySelectorAll('.slide-tag, .slide-title, .hero-main-title, .btn-container, .cal-item, .standings-wrapper, .contact-grid, .glass-stat-card, .home-title-group, .home-countdown, .home-card, .next-race-display');
             gsap.fromTo(elements, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, delay: 0.5 });
         }
 
         document.querySelectorAll('.nav-link').forEach((link, idx) => {
             link.addEventListener('click', (e) => { e.preventDefault(); gotoSlide(idx); });
         });
-        
-        // Updated home button listener (removed old ID, using direct slide nav or card logic)
-        // document.getElementById('start-engine-btn')?.addEventListener('click', () => gotoSlide(1));
         
         document.getElementById('app-logo').addEventListener('click', () => gotoSlide(0));
 
@@ -1250,22 +1295,47 @@
             });
         });
 
-        // Simple Countdown Logic
+        // Synced Countdown Logic with Next Race Text
         function updateCountdown() {
-            // Target: 2 weeks from now
             const now = new Date();
-            const target = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // Fixed relative target for demo
-            
-            // To make it persistent or specific, replace 'target' with a fixed Date object
-            // e.g., const target = new Date("2025-10-01T00:00:00");
+            let nextRace = null;
+            let nextRaceInfo = null;
+
+            // Helper to parse "DD/MM/YY"
+            const getRaceDate = (dateStr) => {
+                const parts = dateStr.split('/');
+                return new Date(`20${parts[2]}-${parts[1]}-${parts[0]}T13:00:00`); 
+            };
+
+            // Find the next race
+            for (const race of CALENDAR) {
+                if (race.round === 'break') continue;
+                const raceDate = getRaceDate(race.date);
+                if (raceDate > now) {
+                    nextRace = raceDate;
+                    nextRaceInfo = race;
+                    break;
+                }
+            }
+
+            const infoEl = document.getElementById('next-race-info');
+
+            // If no race found (Season Ended)
+            if (!nextRace) {
+                if(infoEl) infoEl.innerText = "SEASON COMPLETED // WAITING FOR SEASON 2";
+                return;
+            }
+
+            // Update info text if race exists
+            if(infoEl && nextRaceInfo) {
+                infoEl.innerText = `NEXT RACE: ${nextRaceInfo.gp.toUpperCase()} // ${nextRaceInfo.date}`;
+            }
 
             function tick() {
                 const current = new Date();
-                const diff = target - current;
+                const diff = nextRace - current;
                 
-                if (diff <= 0) {
-                    return; // Stop
-                }
+                if (diff <= 0) return;
 
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -1300,7 +1370,8 @@
             const follower = document.getElementById('cursor-follower');
             document.addEventListener('mousemove', (e) => {
                 cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
-                gsap.to(follower, { x: e.clientX - 20, y: e.clientY - 20, duration: 0.1 });
+                // Follower logic kept for structure but element is hidden via CSS
+                if(follower) gsap.to(follower, { x: e.clientX - 20, y: e.clientY - 20, duration: 0.1 });
             });
             
             VANTA.NET({
