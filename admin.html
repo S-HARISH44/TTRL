@@ -14,14 +14,6 @@
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
         .login-box { background: var(--card); padding: 2rem; border-radius: 8px; text-align: center; border: 1px solid #333; width: 350px; box-shadow: 0 0 30px rgba(102, 252, 241, 0.1); }
         
-        /* GOOGLE BUTTON */
-        .btn-google {
-            background: white; color: #333; border: none; padding: 12px 20px; border-radius: 4px;
-            font-family: 'Roboto', sans-serif; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 20px;
-        }
-        .btn-google:hover { background: #f1f1f1; }
-        
         /* LAYOUT */
         .container { max-width: 1100px; margin: 0 auto; display: none; }
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
@@ -88,7 +80,7 @@
         
         /* USER INFO */
         .user-badge { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #aaa; }
-        .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); background: #333; }
     </style>
 </head>
 <body>
@@ -99,10 +91,12 @@
             <h2><i class="fas fa-lock"></i> PITWALL ACCESS</h2>
             <p style="color:#888; font-size:0.9rem; margin-bottom:20px;">Authorized Personnel Only</p>
             
-            <button class="btn-google" onclick="signInWithGoogle()">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
-                Sign in with Google
-            </button>
+            <div class="form-group">
+                <input type="email" id="loginEmail" placeholder="Admin Email" style="margin-bottom:10px; width:100%;">
+                <input type="password" id="loginPass" placeholder="Password" style="margin-bottom:10px; width:100%;">
+            </div>
+            
+            <button class="action-btn" style="margin-top:0;" onclick="checkLogin()">LOGIN</button>
             
             <div id="login-msg" style="color:red; margin-top:15px; font-size:0.9rem;"></div>
         </div>
@@ -117,7 +111,6 @@
             </div>
             <div class="user-badge">
                 <span id="userName">Admin</span>
-                <img id="userPic" class="user-avatar" src="">
                 <button onclick="logout()" style="background:transparent; border:1px solid #555; color:#fff; padding:5px 10px; cursor:pointer; font-size:0.7rem;">LOGOUT</button>
             </div>
         </header>
@@ -215,7 +208,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ==========================================
@@ -230,18 +223,9 @@
             appId: "1:51144639440:web:8a027b773bc2cddefe2fd5"
         };
 
-        // *** SECURITY: ADD ADMIN EMAILS HERE ***
-        const ALLOWED_ADMINS = [
-            "your-email@gmail.com", 
-            "admin2@gmail.com", 
-            "admin3@gmail.com"
-        ];
-        // ***************************************
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
         
         let currentSeason = "season_1"; 
         let unsubscribe = null; 
@@ -265,11 +249,14 @@
         let driversCache = {};
         let allDrivers = [];
 
-        // --- AUTHENTICATION LOGIC ---
-        window.signInWithGoogle = () => {
-            signInWithPopup(auth, provider)
+        // --- AUTHENTICATION LOGIC (EMAIL/PASSWORD) ---
+        window.checkLogin = () => {
+            const email = document.getElementById("loginEmail").value;
+            const pass = document.getElementById("loginPass").value;
+
+            signInWithEmailAndPassword(auth, email, pass)
                 .catch((error) => {
-                    document.getElementById("login-msg").innerText = error.message;
+                    document.getElementById("login-msg").innerText = "Error: " + error.message;
                 });
         };
 
@@ -284,24 +271,16 @@
             const overlay = document.getElementById("login-overlay");
             
             if (user) {
-                // Check if email is allowed
-                if (ALLOWED_ADMINS.includes(user.email)) {
-                    // ACCESS GRANTED
-                    overlay.style.display = "none";
-                    document.getElementById("main-interface").style.display = "block";
-                    
-                    // Update User Badge
-                    document.getElementById("userName").innerText = user.displayName;
-                    document.getElementById("userPic").src = user.photoURL;
-                    
-                    // Start App
-                    renderKnownSeasons();
-                    changeSeason(); 
-                } else {
-                    // ACCESS DENIED (Logged in but not authorized)
-                    document.getElementById("login-msg").innerText = "ACCESS DENIED: Email not authorized.";
-                    signOut(auth); // Force logout
-                }
+                // ACCESS GRANTED
+                overlay.style.display = "none";
+                document.getElementById("main-interface").style.display = "block";
+                
+                // Update User Badge
+                document.getElementById("userName").innerText = user.email.split('@')[0]; // Show username part
+                
+                // Start App
+                renderKnownSeasons();
+                changeSeason(); 
             } else {
                 // Not logged in
                 overlay.style.display = "flex";
