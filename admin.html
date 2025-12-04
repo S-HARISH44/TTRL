@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTRL Pitwall</title>
+    <title>TTRL Pitwall | Secure Access</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --bg: #0b0c10; --card: #1f2833; --accent: #66fcf1; --text: #c5c6c7; --red: #ff1f4b; }
         body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; margin: 0; padding: 20px; }
         
-        /* LOGIN */
+        /* LOGIN OVERLAY */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
-        .login-box { background: var(--card); padding: 2rem; border-radius: 8px; text-align: center; border: 1px solid #333; width: 300px; box-shadow: 0 0 30px rgba(102, 252, 241, 0.1); }
+        .login-box { background: var(--card); padding: 2rem; border-radius: 8px; text-align: center; border: 1px solid #333; width: 350px; box-shadow: 0 0 30px rgba(102, 252, 241, 0.1); }
+        
+        /* GOOGLE BUTTON */
+        .btn-google {
+            background: white; color: #333; border: none; padding: 12px 20px; border-radius: 4px;
+            font-family: 'Roboto', sans-serif; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 20px;
+        }
+        .btn-google:hover { background: #f1f1f1; }
         
         /* LAYOUT */
         .container { max-width: 1100px; margin: 0 auto; display: none; }
@@ -71,44 +79,58 @@
         }
         .season-btn:hover { background: #fff; }
         
-        /* SAVED SEASONS LIST (Visual Aid) */
+        /* SAVED SEASONS LIST */
         #knownSeasonsList {
             display: flex; gap: 10px; margin-top: 5px; font-size: 0.8rem; color: #666;
         }
         .season-tag { cursor: pointer; border-bottom: 1px dotted #666; }
         .season-tag:hover { color: var(--accent); border-color: var(--accent); }
+        
+        /* USER INFO */
+        .user-badge { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #aaa; }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN -->
+    <!-- LOGIN OVERLAY -->
     <div id="login-overlay">
         <div class="login-box">
-            <h2>PITWALL ACCESS</h2>
-            <input type="password" id="adminPass" placeholder="Enter Password" style="margin-bottom:10px; width:100%;">
-            <button class="action-btn" style="margin-top:0;" onclick="checkLogin()">UNLOCK</button>
-            <div id="login-msg" style="color:red; margin-top:10px;"></div>
+            <h2><i class="fas fa-lock"></i> PITWALL ACCESS</h2>
+            <p style="color:#888; font-size:0.9rem; margin-bottom:20px;">Authorized Personnel Only</p>
+            
+            <button class="btn-google" onclick="signInWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+                Sign in with Google
+            </button>
+            
+            <div id="login-msg" style="color:red; margin-top:15px; font-size:0.9rem;"></div>
         </div>
     </div>
 
     <!-- MAIN APP -->
     <div class="container" id="main-interface">
         <header>
-            <h1>TTRL Admin</h1>
-            <div>v5.3 (Smart Selector)</div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <h1>TTRL Admin</h1>
+                <div style="background: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">SECURE MODE</div>
+            </div>
+            <div class="user-badge">
+                <span id="userName">Admin</span>
+                <img id="userPic" class="user-avatar" src="">
+                <button onclick="logout()" style="background:transparent; border:1px solid #555; color:#fff; padding:5px 10px; cursor:pointer; font-size:0.7rem;">LOGOUT</button>
+            </div>
         </header>
 
-        <!-- DYNAMIC SEASON SELECTOR -->
-        <div style="background: #000; padding: 15px; border: 1px solid var(--accent); margin-bottom: 20px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <label style="margin:0; font-weight:bold; color:var(--accent);">SEASON ID:</label>
-                <input type="text" id="seasonInput" class="season-input" value="season_1" placeholder="Type new ID to create...">
-                <button class="season-btn" onclick="changeSeason()">LOAD / CREATE</button>
-                <button class="season-btn" style="background: #333; color: #fff; border: 1px solid #555;" onclick="changeSeason()"><i class="fas fa-sync-alt"></i></button>
-            </div>
-            <div id="knownSeasonsList">
-                <!-- JS will populate known seasons here -->
-            </div>
+        <!-- SEASON SELECTOR -->
+        <div class="season-selector-container">
+            <label style="margin:0; font-weight:bold; color:var(--accent);">SEASON ID:</label>
+            <input type="text" id="seasonInput" class="season-input" value="season_1" placeholder="Type new ID to create...">
+            <button class="season-btn" onclick="changeSeason()">LOAD / CREATE</button>
+            <button class="season-btn" style="background: #333; color: #fff; border: 1px solid #555;" onclick="changeSeason()"><i class="fas fa-sync-alt"></i></button>
+        </div>
+        <div id="knownSeasonsList" style="margin-bottom:20px; padding-left:15px;">
+            <!-- JS Injected -->
         </div>
 
         <div class="nav-tabs">
@@ -130,12 +152,10 @@
 
             <div id="editor-area" style="display:none;">
                 <div class="track-grid" id="trackGrid"></div>
-
                 <div class="total-box">
                     <div style="color:#888; text-transform:uppercase;">Calculated Driver Total</div>
                     <div class="total-value" id="calculatedTotal">0</div>
                 </div>
-
                 <button class="action-btn" onclick="saveAllChanges()">SAVE CHANGES</button>
                 <div id="editor-status" style="text-align:center; margin-top:10px; font-weight:bold;"></div>
             </div>
@@ -195,9 +215,12 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIG
+        // ==========================================
+        //  1. CONFIGURATION
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyApUD33ao9DfFa8IAfA2qby3IFKhLtcNFU",
             authDomain: "ttrl-9f3ef.firebaseapp.com",
@@ -207,15 +230,24 @@
             appId: "1:51144639440:web:8a027b773bc2cddefe2fd5"
         };
 
+        // *** SECURITY: ADD ADMIN EMAILS HERE ***
+        const ALLOWED_ADMINS = [
+            "your-email@gmail.com", 
+            "admin2@gmail.com", 
+            "admin3@gmail.com"
+        ];
+        // ***************************************
+
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
         
-        // GLOBAL STATE
-        let currentSeason = "season_1"; // Default start
+        let currentSeason = "season_1"; 
         let unsubscribe = null; 
-        let knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1']; // Load from local storage
-        
-        // CONSTANTS
+        let knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1'];
+
+        // --- CONSTANTS ---
         const TRACKS = [
             {id:'bahrain', name:'Bahrain'}, {id:'australia', name:'Australia'}, {id:'imola', name:'Imola'},
             {id:'spain', name:'Spain'}, {id:'uk', name:'Great Britain'}, {id:'vegas', name:'Las Vegas'},
@@ -233,18 +265,51 @@
         let driversCache = {};
         let allDrivers = [];
 
-        // AUTH
-        window.checkLogin = () => {
-            if(document.getElementById("adminPass").value === "admin123") {
-                document.getElementById("login-overlay").style.display = "none";
-                document.getElementById("main-interface").style.display = "block";
-                renderKnownSeasons();
-                changeSeason(); // Init with default input value
-            } else {
-                document.getElementById("login-msg").innerText = "Wrong Password";
-            }
+        // --- AUTHENTICATION LOGIC ---
+        window.signInWithGoogle = () => {
+            signInWithPopup(auth, provider)
+                .catch((error) => {
+                    document.getElementById("login-msg").innerText = error.message;
+                });
         };
 
+        window.logout = () => {
+            signOut(auth).then(() => {
+                window.location.reload();
+            });
+        };
+
+        // Auth State Listener (The Gatekeeper)
+        onAuthStateChanged(auth, (user) => {
+            const overlay = document.getElementById("login-overlay");
+            
+            if (user) {
+                // Check if email is allowed
+                if (ALLOWED_ADMINS.includes(user.email)) {
+                    // ACCESS GRANTED
+                    overlay.style.display = "none";
+                    document.getElementById("main-interface").style.display = "block";
+                    
+                    // Update User Badge
+                    document.getElementById("userName").innerText = user.displayName;
+                    document.getElementById("userPic").src = user.photoURL;
+                    
+                    // Start App
+                    renderKnownSeasons();
+                    changeSeason(); 
+                } else {
+                    // ACCESS DENIED (Logged in but not authorized)
+                    document.getElementById("login-msg").innerText = "ACCESS DENIED: Email not authorized.";
+                    signOut(auth); // Force logout
+                }
+            } else {
+                // Not logged in
+                overlay.style.display = "flex";
+                document.getElementById("main-interface").style.display = "none";
+            }
+        });
+
+        // --- UI HELPERS ---
         window.switchTab = (id) => {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -252,7 +317,6 @@
             event.target.classList.add('active');
         };
 
-        // --- SEASON MANAGEMENT ---
         function renderKnownSeasons() {
             const container = document.getElementById("knownSeasonsList");
             container.innerHTML = "Quick Select: " + knownSeasons.map(s => 
@@ -265,25 +329,22 @@
             changeSeason();
         };
 
-        // CHANGE SEASON
+        // --- CORE DATA LOGIC ---
         window.changeSeason = () => {
             const inputVal = document.getElementById("seasonInput").value.trim().toLowerCase().replace(/\s+/g, '_');
-            if(!inputVal) { alert("Please enter a season ID"); return; }
+            if(!inputVal) return;
             
             currentSeason = inputVal;
             
-            // Save to local storage if new
             if(!knownSeasons.includes(currentSeason)) {
                 knownSeasons.push(currentSeason);
                 localStorage.setItem('ttrl_seasons', JSON.stringify(knownSeasons));
                 renderKnownSeasons();
             }
             
-            // Update UI Labels
             document.getElementById("currentSeasonLabel").innerText = currentSeason;
             document.querySelectorAll(".season-display").forEach(el => el.innerText = currentSeason);
 
-            // Reset Editor
             document.getElementById("editorDriverSelect").innerHTML = '<option value="">-- Select Driver --</option>';
             document.getElementById("driverList").innerHTML = "Loading...";
             document.getElementById("editor-area").style.display = "none";
@@ -291,11 +352,8 @@
             initListener(); 
         };
 
-        // DATABASE LISTENER
         function initListener() {
             if(unsubscribe) unsubscribe(); 
-
-            // Path: seasons -> {currentSeason} -> drivers
             const colRef = collection(db, "seasons", currentSeason, "drivers");
             const q = query(colRef, orderBy("totalPoints", "desc"));
 
@@ -308,10 +366,7 @@
                 allDrivers = [];
 
                 if(snap.empty) {
-                    list.innerHTML = `<div style="padding:20px; text-align:center; color:#888;">
-                        No drivers found in <strong>${currentSeason}</strong>.<br>
-                        Register a driver to start this season table.
-                    </div>`;
+                    list.innerHTML = `<div style="padding:20px; text-align:center; color:#888;">No drivers in ${currentSeason} yet.</div>`;
                 }
 
                 snap.forEach(doc => {
@@ -335,7 +390,6 @@
             });
         }
 
-        // LOAD DRIVER DATA
         window.loadDriverData = () => {
             const id = document.getElementById("editorDriverSelect").value;
             const grid = document.getElementById("trackGrid");
@@ -351,29 +405,18 @@
             TRACKS.forEach(t => {
                 let pts = 0;
                 let team = data.team; 
-
                 if(results[t.id]) {
                     if(typeof results[t.id] === 'object') {
                         pts = results[t.id].points || 0;
                         team = results[t.id].team || data.team;
                     } else {
-                        pts = results[t.id]; // Backwards compat
+                        pts = results[t.id]; 
                     }
                 }
-
                 let teamOpts = TEAMS.map(tm => `<option value="${tm.id}" ${tm.id === team ? 'selected':''}>${tm.name}</option>`).join('');
-
                 const div = document.createElement("div");
                 div.className = "track-input";
-                div.innerHTML = `
-                    <label>${t.name}</label>
-                    <div class="row-inputs">
-                        <input type="number" class="points-input" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
-                        <select class="team-input" id="team-${t.id}">
-                            ${teamOpts}
-                        </select>
-                    </div>
-                `;
+                div.innerHTML = `<label>${t.name}</label><div class="row-inputs"><input type="number" class="points-input" data-track="${t.id}" value="${pts}" oninput="calcTotal()"><select class="team-input" id="team-${t.id}">${teamOpts}</select></div>`;
                 grid.appendChild(div);
             });
             calcTotal();
@@ -392,7 +435,6 @@
             const teamInputs = document.querySelectorAll(".team-input");
             
             status.innerText = "Saving...";
-            
             let newResults = {};
             let newTotal = 0;
 
@@ -400,7 +442,6 @@
                 const val = Number(input.value);
                 const track = input.dataset.track;
                 const team = teamInputs[idx].value;
-
                 if(val > 0) {
                     newResults[track] = { points: val, team: team };
                     newTotal += val;
@@ -409,38 +450,24 @@
 
             try {
                 const docRef = doc(db, "seasons", currentSeason, "drivers", id);
-                await updateDoc(docRef, {
-                    results: newResults,
-                    totalPoints: newTotal
-                });
+                await updateDoc(docRef, { results: newResults, totalPoints: newTotal });
                 status.style.color = "#00ff00";
                 status.innerText = "SAVED SUCCESSFULLY!";
                 setTimeout(() => status.innerText = "", 2000);
             } catch(e) {
                 console.error(e);
                 status.style.color = "red";
-                status.innerText = "ERROR SAVING";
+                status.innerText = "ERROR SAVING: " + e.message;
             }
         };
 
         function updateLiveTables() {
             const dTable = document.getElementById("liveDriversBody");
             dTable.innerHTML = "";
-            
             allDrivers.forEach((d, i) => {
                 let teamDisplay = TEAMS.find(t => t.id === d.team)?.name || d.team;
                 if(d.team === 'reserve') teamDisplay = "Reserve"; 
-
-                dTable.innerHTML += `
-                    <tr>
-                        <td>${i+1}</td>
-                        <td>
-                            <div style="font-weight:bold">${d.name}</div>
-                            <div style="font-size:0.85rem; color:#888; text-transform:uppercase">${teamDisplay}</div>
-                        </td>
-                        <td style="text-align:right; font-weight:bold; font-size:1.1rem;">${d.totalPoints}</td>
-                    </tr>
-                `;
+                dTable.innerHTML += `<tr><td>${i+1}</td><td><div style="font-weight:bold">${d.name}</div><div style="font-size:0.85rem; color:#888; text-transform:uppercase">${teamDisplay}</div></td><td style="text-align:right; font-weight:bold; font-size:1.1rem;">${d.totalPoints}</td></tr>`;
             });
 
             const teamPoints = {};
@@ -455,7 +482,6 @@
                     }
                 });
             });
-
             const sortedTeams = Object.keys(teamPoints).map(k => ({name: k, pts: teamPoints[k]})).sort((a,b) => b.pts - a.pts);
             const cTable = document.getElementById("liveConstructorsBody");
             cTable.innerHTML = "";
@@ -469,7 +495,6 @@
             const name = document.getElementById("newDriverName").value;
             const team = document.getElementById("newDriverTeam").value;
             if(!name) return;
-            
             try {
                 const colRef = collection(db, "seasons", currentSeason, "drivers");
                 await addDoc(colRef, { name, team, totalPoints: 0, results: {} });
