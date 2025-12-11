@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTRL Pitwall | Secure Access</title>
+    <title>TTRL Pitwall | Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -34,20 +34,20 @@
         /* LOGIN OVERLAY */
         #login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 5, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 999;
+            background: rgba(5, 5, 5, 0.98);
+            z-index: 9999;
             display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.5s;
+            transition: opacity 0.3s;
+            overflow-y: auto;
         }
         .login-box {
             background: var(--glass-bg);
             padding: 3rem;
             border: 1px solid var(--accent-cyan);
-            width: 100%; max-width: 400px;
+            width: 90%; max-width: 450px;
             text-align: center;
             box-shadow: 0 0 50px rgba(0, 240, 255, 0.1);
-            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+            position: relative;
         }
         .divider {
             display: flex; align-items: center; margin: 20px 0; color: #666; font-size: 0.8rem; font-family: 'JetBrains Mono';
@@ -60,8 +60,7 @@
         h1, h2, h3, h4 { margin: 0; text-transform: uppercase; letter-spacing: 0.05em; }
         
         /* LAYOUT */
-        .container { max-width: 1200px; margin: 0 auto; display: none; animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .container { max-width: 1200px; margin: 0 auto; display: none; }
 
         header {
             display: flex; justify-content: space-between; align-items: center;
@@ -93,7 +92,8 @@
         }
 
         .section { display: none; }
-        .section.active { display: block; }
+        .section.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         /* FORMS & GRID */
         .form-group { margin-bottom: 20px; }
@@ -101,21 +101,15 @@
         
         input, select {
             width: 100%; padding: 12px 15px;
-            background: #0f0f0f; /* Dark background for inputs */
+            background: #0f0f0f;
             border: 1px solid #333;
             color: #fff;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.9rem;
             transition: 0.3s;
         }
-        select { background-color: #0f0f0f; color: #fff; }
         select option { background-color: #0f0f0f; color: #fff; padding: 10px; }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-cyan);
-            background: #1a1a1a;
-        }
+        input:focus, select:focus { outline: none; border-color: var(--accent-cyan); background: #1a1a1a; }
 
         .track-grid {
             display: grid;
@@ -234,6 +228,10 @@
         .race-input-row:nth-child(even) { background: #141414; }
         .driver-name-label { width: 200px; font-weight: bold; color: #ddd; }
         .race-points-input { width: 80px; text-align: center; border-color: #444; }
+        
+        /* HELPER TOGGLE */
+        .help-toggle { color: #666; font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 15px; display: inline-block; }
+        .help-content { display: none; text-align: left; background: #111; padding: 15px; border: 1px solid #333; font-size: 0.85rem; color: #ccc; margin-top: 10px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -256,7 +254,18 @@
             </div>
             
             <button class="action-btn" style="margin-top:0;" onclick="checkLogin()">AUTHENTICATE</button>
-            <div id="login-msg" style="color:var(--accent-red); margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem;"></div>
+            
+            <div id="login-msg" style="margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem; word-break: break-word;"></div>
+            
+            <span class="help-toggle" onclick="document.getElementById('help-box').style.display = document.getElementById('help-box').style.display === 'none' ? 'block' : 'none'">Need configuration help?</span>
+            <div id="help-box" class="help-content">
+                <strong>1. Google Login Issues?</strong><br>
+                If you get "UNAUTHORIZED DOMAIN", copy the link provided in the error and add it to <em>Firebase Console -> Authentication -> Settings -> Authorized Domains</em>.<br><br>
+                <strong>2. "Provider Disabled"?</strong><br>
+                Go to <em>Firebase Console -> Authentication -> Sign-in method</em> and enable "Google".<br><br>
+                <strong>3. "Unauthorized Account"?</strong><br>
+                Your email must be in the `AUTHORIZED_ADMINS` list in the code to access this panel.
+            </div>
         </div>
     </div>
 
@@ -473,14 +482,18 @@
         const db = getFirestore(app);
         
         // --- AUTHORIZED ADMIN EMAILS (WHITELIST) ---
+        // REPLACE WITH YOUR REAL GMAIL ADDRESSES!
         const AUTHORIZED_ADMINS = [
-            "your_email@gmail.com",
+            "your_email@gmail.com", 
             "admin2@gmail.com"
         ];
 
         let currentSeason = "season_1"; 
         let unsubscribe = null; 
-        let knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1'];
+        let knownSeasons = [];
+        try {
+            knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1'];
+        } catch(e) { knownSeasons = ['season_1']; }
 
         // --- CONSTANTS ---
         const TRACKS = [
@@ -507,8 +520,49 @@
             signInWithEmailAndPassword(auth, email, pass).catch(e => document.getElementById("login-msg").innerText = "ACCESS DENIED: " + e.message);
         };
 
-        window.loginWithGoogle = () => {
-            signInWithPopup(auth, new GoogleAuthProvider()).catch(e => document.getElementById("login-msg").innerText = "AUTH FAILED: " + e.message);
+        window.loginWithGoogle = async () => {
+            const statusMsg = document.getElementById("login-msg");
+            statusMsg.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CONTACTING GOOGLE...';
+            statusMsg.style.color = "#ccc";
+            
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+                // Auth listener handles the rest
+            } catch (error) {
+                console.error("Google Sign In Error:", error);
+                statusMsg.style.color = "var(--accent-red)";
+                
+                let msg = "LOGIN FAILED";
+                let tip = "";
+
+                if (error.code === 'auth/popup-closed-by-user') {
+                    msg = "LOGIN CANCELLED";
+                    tip = "You closed the Google popup before finishing.";
+                } else if (error.code === 'auth/configuration-not-found') {
+                    msg = "CONFIG ERROR";
+                    tip = "Google Sign-In is not enabled in Firebase Console.";
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    msg = "PROVIDER DISABLED";
+                    tip = "Go to Firebase Console > Authentication > Sign-in method > Enable Google.";
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    // HELP THE USER FIX IT
+                    const currentDomain = window.location.hostname;
+                    msg = "DOMAIN ERROR";
+                    tip = `
+                        Firebase blocked this domain.<br>
+                        1. Copy this: <code style="background:#333; padding:2px; color:#fff; user-select:all;">${currentDomain}</code><br>
+                        2. Go to Firebase Console -> Authentication -> Settings -> Authorized Domains<br>
+                        3. Add the domain there.<br>
+                        4. Refresh page.
+                    `;
+                } else {
+                    msg = "ERROR: " + error.code;
+                    tip = error.message;
+                }
+                
+                statusMsg.innerHTML = `<strong>${msg}</strong><br><span style="color:#aaa;">${tip}</span>`;
+            }
         };
 
         window.logout = () => signOut(auth).then(() => window.location.reload());
@@ -528,6 +582,7 @@
                     changeSeason(); 
                 } else {
                     document.getElementById("login-msg").innerText = `UNAUTHORIZED ACCOUNT: ${user.email}`;
+                    document.getElementById("login-msg").style.color = "var(--accent-red)";
                     signOut(auth);
                 }
             } else {
