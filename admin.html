@@ -7,10 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ... existing styles ... */
         :root {
             --bg-deep: #030305;
-            --panel-bg: rgba(20, 20, 25, 0.7);
+            --panel-bg: rgba(20, 20, 25, 0.95);
             --neon-cyan: #00f3ff;
             --neon-red: #ff003c;
             --neon-green: #00ff9d;
@@ -51,333 +50,138 @@
             z-index: 0;
         }
 
-        /* --- LOGIN OVERLAY (TERMINAL STYLE) --- */
-        #login-overlay {
-            position: fixed; inset: 0; z-index: 9999;
-            background-image: 
-                linear-gradient(rgba(3, 3, 5, 0.6), rgba(3, 3, 5, 0.9)),
-                url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/1-w-GettyImages-2048270135.webp');
-            background-size: cover;
-            background-position: center;
-            backdrop-filter: blur(3px);
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.4s ease;
+        /* --- CUSTOM MODAL & TOAST --- */
+        .custom-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 10000;
         }
-
-        .login-box {
-            width: 100%; max-width: 420px;
-            background: rgba(10, 10, 15, 0.9);
-            border: 1px solid var(--neon-cyan);
-            padding: 3rem 2rem;
-            position: relative;
-            box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
-            clip-path: polygon(
-                20px 0, 100% 0, 
-                100% calc(100% - 20px), calc(100% - 20px) 100%, 
-                0 100%, 0 20px
-            );
-        }
-
-        .login-box::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-            animation: scanline 2s linear infinite;
-        }
-
-        @keyframes scanline { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-        .login-logo { height: 60px; display: block; margin: 0 auto 1.5rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
-
-        .login-title {
-            text-align: center; font-size: 1.5rem; letter-spacing: 0.2em; 
-            color: var(--neon-cyan); margin-bottom: 2rem; font-weight: 700;
-        }
-
-        .login-input-group { margin-bottom: 1.5rem; position: relative; }
-        .login-input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--neon-cyan); font-size: 0.8rem; }
-        
-        .login-input {
-            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #333;
-            color: #fff; padding: 12px 15px 12px 40px; font-family: var(--mono-font);
-            font-size: 0.9rem; transition: all 0.3s;
-        }
-        .login-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
-
-        .btn-main {
-            width: 100%; padding: 12px; background: var(--neon-cyan); color: #000;
-            border: none; font-family: var(--tech-font); font-weight: 800;
-            font-size: 1.1rem; letter-spacing: 0.1em; cursor: pointer;
-            transition: all 0.3s; text-transform: uppercase;
+        .custom-modal-box {
+            background: #111; border: 1px solid var(--neon-cyan); padding: 25px;
+            max-width: 400px; width: 90%; text-align: center;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
             clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
-        .btn-main:hover { background: #fff; box-shadow: 0 0 20px var(--neon-cyan); }
-
-        .btn-google {
-            background: #fff; color: #000; margin-bottom: 1.5rem; display: flex; 
-            align-items: center; justify-content: center; gap: 10px;
-        }
-        .btn-google:hover { background: #eee; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
-
-        .divider { display: flex; align-items: center; color: #555; font-size: 0.7rem; margin: 1.5rem 0; font-family: var(--mono-font); }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #333; }
-        .divider span { padding: 0 10px; }
-
-        /* --- MAIN INTERFACE --- */
-        .container {
-            max-width: 1400px; margin: 0 auto; display: none; padding-bottom: 50px;
-            position: relative; z-index: 1;
-            animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        /* Header "HUD" Style */
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        .header-logo { height: 40px; }
-        .header-title { 
-            font-size: 1.8rem; font-weight: 800; line-height: 1;
-            color: #fff; text-transform: uppercase; letter-spacing: 0.05em;
-        }
-        .header-subtitle { color: var(--neon-cyan); font-size: 0.9rem; letter-spacing: 0.2em; }
-
-        .system-status {
-            display: flex; gap: 20px; font-family: var(--mono-font); font-size: 0.75rem; color: var(--text-dim);
-            border: 1px solid rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; background: rgba(0,0,0,0.3);
-        }
-        .status-dot { width: 8px; height: 8px; background: var(--neon-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--neon-cyan); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
-        /* Season Selector Bar */
-        .control-bar {
-            background: linear-gradient(90deg, rgba(255,0,60,0.1), transparent);
-            border-left: 4px solid var(--neon-red);
-            padding: 1rem; margin-bottom: 2rem;
-            display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        .control-label { color: var(--neon-red); font-weight: 700; letter-spacing: 0.1em; font-size: 0.9rem; }
+        .modal-msg { font-size: 1.1rem; margin-bottom: 20px; color: #fff; }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
         
-        .flat-input {
-            background: transparent; border: none; border-bottom: 1px solid #555;
-            color: #fff; font-family: var(--mono-font); font-size: 1rem; padding: 5px;
-            min-width: 200px; transition: 0.3s;
+        .toast-notification {
+            position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.9);
+            border-left: 4px solid var(--neon-cyan); color: #fff; padding: 15px 25px;
+            font-family: var(--mono-font); font-size: 0.9rem; z-index: 10001;
+            transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .flat-input:focus { border-color: var(--neon-red); }
+        .toast-visible { transform: translateY(0); opacity: 1; }
 
-        .btn-small {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
-            color: #ccc; padding: 6px 15px; font-size: 0.8rem; cursor: pointer;
-            font-family: var(--mono-font); text-transform: uppercase; transition: 0.2s;
+        /* --- LOGIN --- */
+        #login-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background-image: linear-gradient(rgba(3, 3, 5, 0.6), rgba(3, 3, 5, 0.9)), url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/1-w-GettyImages-2048270135.webp');
+            background-size: cover; background-position: center;
+            display: flex; justify-content: center; align-items: center; transition: opacity 0.4s ease;
         }
+        .login-box {
+            width: 100%; max-width: 420px; background: rgba(10, 10, 15, 0.9); border: 1px solid var(--neon-cyan);
+            padding: 3rem 2rem; position: relative; box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+        }
+        .login-logo { height: 60px; display: block; margin: 0 auto 1.5rem; }
+        .login-title { text-align: center; font-size: 1.5rem; letter-spacing: 0.2em; color: var(--neon-cyan); margin-bottom: 2rem; font-weight: 700; }
+        .login-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; padding: 12px; margin-bottom: 15px; font-family: var(--mono-font); }
+        .btn-main { width: 100%; padding: 12px; background: var(--neon-cyan); color: #000; border: none; font-family: var(--tech-font); font-weight: 800; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+        .btn-main:hover { background: #fff; }
+        .btn-google { background: #fff; color: #000; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* --- MAIN UI --- */
+        .container { max-width: 1400px; margin: 0 auto; display: none; padding: 20px; animation: fadeIn 0.5s; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem; }
+        .header-logo { height: 40px; margin-right: 15px; }
+        .header-title { font-size: 1.8rem; font-weight: 800; color: #fff; }
+        
+        .control-bar { background: rgba(255,0,60,0.05); border-left: 4px solid var(--neon-red); padding: 1rem; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+        .flat-input { background: transparent; border: none; border-bottom: 1px solid #555; color: #fff; font-family: var(--mono-font); padding: 5px; }
+        .btn-small { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #ccc; padding: 6px 15px; cursor: pointer; font-family: var(--mono-font); text-transform: uppercase; }
         .btn-small:hover { background: #fff; color: #000; }
         .btn-accent { border-color: var(--neon-red); color: var(--neon-red); }
         .btn-accent:hover { background: var(--neon-red); color: #fff; }
-        
-        .btn-upload { background: rgba(0,255,157,0.1); border-color: var(--neon-green); color: var(--neon-green); }
+        .btn-upload { border-color: var(--neon-green); color: var(--neon-green); }
         .btn-upload:hover { background: var(--neon-green); color: #000; }
 
-        /* Nav Tabs - "Mode Switch" Style */
-        .nav-container { 
-            display: flex; gap: 2px; background: rgba(255,255,255,0.03); 
-            padding: 5px; border-radius: 4px; margin-bottom: 30px;
-            overflow-x: auto;
-        }
-        .tab-btn {
-            flex: 1; padding: 12px; background: transparent; border: none; color: #666;
-            font-family: var(--tech-font); font-weight: 700; font-size: 1rem;
-            text-transform: uppercase; cursor: pointer; transition: 0.3s;
-            border-radius: 2px; white-space: nowrap;
-        }
-        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .tab-btn.active { 
-            background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px rgba(0,243,255,0.3);
-        }
+        .nav-container { display: flex; gap: 2px; overflow-x: auto; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 12px; background: rgba(255,255,255,0.03); border: none; color: #666; font-family: var(--tech-font); font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .tab-btn.active { background: var(--neon-cyan); color: #000; }
 
-        /* Content Area */
-        .section { display: none; animation: slideUp 0.4s ease-out; }
-        .section.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .section { display: none; }
+        .section.active { display: block; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .panel-card {
-            background: var(--panel-bg); border: var(--glass-border);
-            padding: 20px; backdrop-filter: blur(10px); position: relative;
-        }
-        .panel-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;
-        }
-        .panel-title { color: var(--neon-cyan); font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .panel-card { background: var(--panel-bg); border: var(--glass-border); padding: 20px; margin-bottom: 20px; }
+        .panel-title { color: var(--neon-cyan); font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
 
-        /* --- CUSTOM FORM ELEMENTS (DROPDOWNS) --- */
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: var(--neon-cyan); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--mono-font); }
-        
-        select {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid #444;
-            color: #fff;
-            font-family: var(--mono-font);
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300f3ff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px top 50%;
-            background-size: 10px auto;
-            border-radius: 0;
-            cursor: pointer;
-        }
-        
-        select option {
-            background-color: #050505;
-            color: #fff;
-            padding: 10px;
-        }
-        
-        select:focus {
-            outline: none;
-            border-color: var(--neon-cyan);
-            background-color: rgba(0, 243, 255, 0.05);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
-        }
+        /* Inputs & Tables */
+        .input-module { background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 10px; margin-bottom: 10px; }
+        .input-module label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 5px; font-family: var(--mono-font); }
+        .data-input, select { width: 100%; background: transparent; border: 1px solid #444; color: #fff; padding: 8px; font-family: var(--mono-font); }
+        .data-input:focus, select:focus { border-color: var(--neon-cyan); outline: none; }
+        select option { background: #000; }
 
-        input {
-            width: 100%; padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #444;
-            color: #fff;
-            font-family: var(--mono-font);
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-        input:focus { outline: none; border-color: var(--neon-cyan); background: rgba(0,0,0,0.8); }
+        .track-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .stat-box { border: 1px solid #333; padding: 15px; text-align: center; }
+        .stat-num { font-size: 2rem; font-weight: 800; color: #fff; }
 
-        /* Track Grid & Inputs */
-        .track-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;
-        }
-        .input-module {
-            background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 15px;
-            transition: 0.3s; position: relative; overflow: hidden;
-        }
-        .input-module:focus-within { border-color: var(--neon-cyan); }
-        .input-module label { 
-            display: block; font-size: 0.75rem; color: #888; margin-bottom: 8px; 
-            font-family: var(--mono-font); letter-spacing: 1px;
-        }
-        
-        .data-input {
-            width: 100%; background: transparent; border: none; border-bottom: 1px solid #444;
-            color: #fff; font-family: var(--mono-font); font-size: 1rem; padding: 5px 0;
-        }
-        .data-input:focus { border-color: var(--neon-cyan); }
-        
-        /* Stats Dashboard */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
-        @media(max-width: 900px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
-        
-        .stat-box {
-            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 100%);
-            border: 1px solid rgba(255,255,255,0.1); padding: 20px; text-align: center;
-        }
-        .stat-num { font-size: 3rem; font-weight: 800; line-height: 1; color: #fff; }
-        .stat-desc { font-size: 0.8rem; color: var(--neon-cyan); letter-spacing: 0.1em; margin-top: 5px; }
-
-        /* Tables */
         .tech-table { width: 100%; border-collapse: collapse; font-family: var(--mono-font); font-size: 0.85rem; }
-        .tech-table th { 
-            text-align: left; padding: 12px; color: #666; font-weight: 400; 
-            border-bottom: 1px solid #333; 
-        }
-        .tech-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ccc; }
-        .tech-table tr:hover td { background: rgba(255,255,255,0.02); color: #fff; }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+        .tech-table th { text-align: left; padding: 10px; color: #666; border-bottom: 1px solid #333; }
+        .tech-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ccc; }
 
-        /* --- RACE DIRECTOR --- */
-        .race-header-row {
-            display: flex; justify-content: space-between; align-items: center;
-            color: var(--neon-cyan); font-size: 0.75rem; letter-spacing: 1px;
-            padding: 10px 15px; border-bottom: 1px solid #333; margin-bottom: 5px;
-            font-family: var(--mono-font);
-        }
-        .race-input-row { 
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 15px; border-bottom: 1px solid #222; 
-            background: rgba(255,255,255,0.02); transition: 0.2s;
-        }
-        .race-input-row:hover { background: rgba(255,255,255,0.05); }
-        .driver-name-label { font-weight: bold; color: #ddd; font-size: 0.95rem; }
-        .race-points-input { width: 80px; text-align: center; border-color: #444; background: #000; padding: 8px; color: var(--neon-cyan); font-weight: bold; }
-        .race-points-input:focus { border-color: var(--neon-cyan); }
-
-        /* --- TRACK CONFIG LIST --- */
-        .track-list-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #333;
-            margin-bottom: 10px; font-family: var(--mono-font);
-        }
+        /* List Items */
+        .track-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.02); margin-bottom: 5px; border: 1px solid transparent; }
         .track-list-item:hover { border-color: var(--neon-cyan); }
-        .track-code { color: var(--neon-red); font-weight: bold; margin-right: 15px; width: 60px; }
+        
+        .driver-row { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.02); border-bottom: 1px solid #222; }
+        .driver-row:hover { background: rgba(255,255,255,0.05); }
 
-        /* Validation Colors */
-        .status-valid { color: var(--neon-green); font-weight: bold; }
-        .status-invalid { color: var(--neon-red); font-weight: bold; }
+        /* Validation Status */
+        .status-valid { color: var(--neon-green); }
+        .status-invalid { color: var(--neon-red); }
         .invalid-row { background: rgba(255, 0, 60, 0.1); }
 
-        /* Mobile */
-        @media (max-width: 768px) {
-            .header-title { font-size: 1.2rem; }
-            .system-status { display: none; }
-            .login-box { padding: 2rem; width: 95%; }
-            .nav-container { flex-direction: column; gap: 5px; }
-        }
+        /* Date Picker Reset */
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
+    <!-- CUSTOM CONFIRMATION MODAL -->
+    <div id="confirmModal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <div id="modalTitle" style="color:var(--neon-red); font-weight:bold; margin-bottom:10px;">CONFIRM ACTION</div>
+            <div id="modalMessage" class="modal-msg">Are you sure?</div>
+            <div class="modal-btns">
+                <button id="btnConfirmYes" class="btn-main" style="width:100px; background:var(--neon-red); color:#fff;">YES</button>
+                <button onclick="closeModal()" class="btn-main" style="width:100px; background:#333; color:#fff;">NO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast-notification">Notification</div>
+
+    <!-- LOGIN -->
     <div id="login-overlay">
         <div class="login-box">
             <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="login-logo" alt="TTRL">
             <div class="login-title">SYSTEM ACCESS</div>
-            
-            <button class="btn-main btn-google" onclick="loginWithGoogle()">
-                <i class="fab fa-google"></i> Login with Google
-            </button>
-
+            <button class="btn-main btn-google" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Login with Google</button>
             <div class="divider"><span>OR MANUAL ENTRY</span></div>
-
-            <div class="login-input-group">
-                <i class="fas fa-user"></i>
-                <input type="email" id="loginEmail" class="login-input" placeholder="OPERATOR ID">
-            </div>
-            <div class="login-input-group">
-                <i class="fas fa-key"></i>
-                <input type="password" id="loginPass" class="login-input" placeholder="SECURITY KEY">
-            </div>
-            
+            <input type="email" id="loginEmail" class="login-input" placeholder="OPERATOR ID">
+            <input type="password" id="loginPass" class="login-input" placeholder="SECURITY KEY">
             <button class="btn-main" onclick="checkLogin()">INITIATE LINK</button>
-            
-            <div id="login-msg" style="margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem; color:var(--neon-red); text-align: center; min-height: 1.2em;"></div>
+            <div id="login-msg" style="margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem; color:var(--neon-red); text-align: center;"></div>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD -->
+    <!-- DASHBOARD -->
     <div class="container" id="main-interface">
-        
-        <!-- HEADER HUD -->
         <header>
             <div class="header-left">
                 <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="header-logo" alt="TTRL">
@@ -386,151 +190,75 @@
                     <div class="header-subtitle">ADMINISTRATION CONSOLE</div>
                 </div>
             </div>
-            
-            <div style="display:flex; align-items:center; gap:20px;">
-                <div class="system-status">
-                    <div class="status-dot"></div> SYSTEM ONLINE
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:0.8rem; color:#888;">OPERATOR</div>
-                    <div id="userName" style="color:#fff; font-weight:700;">UNKNOWN</div>
-                </div>
-                <button class="btn-small" onclick="logout()" style="border-color:var(--neon-red); color:var(--neon-red);">EXIT</button>
+            <div style="text-align:right;">
+                <div style="font-size:0.8rem; color:#888;">OPERATOR</div>
+                <div id="userName" style="color:#fff; font-weight:700;">UNKNOWN</div>
+                <button class="btn-small" onclick="logout()" style="margin-top:5px; border-color:var(--neon-red); color:var(--neon-red);">EXIT</button>
             </div>
         </header>
 
-        <!-- SEASON CONTROL BAR -->
         <div class="control-bar">
             <span class="control-label">DATA STREAM:</span>
             <input type="text" id="seasonInput" class="flat-input" value="season_1" placeholder="SEASON ID">
             <button class="btn-small btn-accent" onclick="changeSeason()"><i class="fas fa-sync"></i> SYNC</button>
-            
-            <!-- NEW: Import Button -->
             <button class="btn-small btn-upload" onclick="triggerImport()" style="margin-left: 20px;"><i class="fas fa-file-csv"></i> IMPORT DATA</button>
             <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFileSelect(this)">
-
             <button class="btn-small" onclick="exportData()" style="margin-left:auto;"><i class="fas fa-download"></i> EXPORT JSON</button>
         </div>
         <div id="knownSeasonsList" style="margin-bottom:20px; padding-left:10px; font-size:0.8rem; color:#666; font-family:var(--mono-font);"></div>
 
-        <!-- NAVIGATION -->
         <div class="nav-container">
-            <button class="tab-btn active" onclick="switchTab('season-setup')"><i class="fas fa-tools"></i> Season Setup</button>
-            <button class="tab-btn" onclick="switchTab('manage-drivers')"><i class="fas fa-users-cog"></i> Manage Grid</button>
-            <button class="tab-btn" onclick="switchTab('race-director')"><i class="fas fa-flag-checkered"></i> Race Director</button>
-            <button class="tab-btn" onclick="switchTab('driver-editor')"><i class="fas fa-user-edit"></i> Edit Driver</button>
-            <button class="tab-btn" onclick="switchTab('live-view')"><i class="fas fa-chart-line"></i> Live Data</button>
-            <button class="tab-btn" onclick="switchTab('driver-stats')"><i class="fas fa-chart-pie"></i> Statistics</button>
+            <button class="tab-btn active" onclick="switchTab('season-setup')">Season Setup</button>
+            <button class="tab-btn" onclick="switchTab('manage-drivers')">Manage Grid</button>
+            <button class="tab-btn" onclick="switchTab('race-director')">Race Director</button>
+            <button class="tab-btn" onclick="switchTab('driver-editor')">Edit Driver</button>
+            <button class="tab-btn" onclick="switchTab('live-view')">Live Data</button>
+            <button class="tab-btn" onclick="switchTab('driver-stats')">Statistics</button>
         </div>
 
-        <!-- NEW SECTION: IMPORT PREVIEW (Hidden until file selected) -->
-        <div id="import-preview" class="section">
-            <div class="panel-card">
-                <div class="panel-header">
-                    <div class="panel-title" style="color:var(--neon-green)">DATA VALIDATION</div>
-                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">REVIEW BEFORE IMPORTING</div>
-                </div>
-
-                <div class="form-group" style="background:rgba(255,255,255,0.05); padding:15px; border:1px solid #333;">
-                    <label>TARGET SEASON</label>
-                    <div style="font-size:0.8rem; color:#888; margin-bottom:5px;">Data will be imported into:</div>
-                    <input type="text" id="importTargetSeason" class="flat-input" readonly style="color:var(--neon-cyan); font-weight:bold; border-color:var(--neon-cyan);">
-                </div>
-
-                <div style="margin-bottom:15px;">
-                    <label>TRACKS DETECTED IN CSV:</label>
-                    <div id="detectedTracksList" style="font-family:var(--mono-font); color:var(--neon-green); font-size:0.9rem; padding:10px; border:1px solid rgba(0,255,157,0.3); background:rgba(0,0,0,0.3);">
-                        <!-- JS populated -->
-                    </div>
-                    <div style="font-size:0.75rem; color:#888; margin-top:5px;">* These tracks will be automatically added to the season configuration.</div>
-                </div>
-
-                <div style="max-height:500px; overflow-y:auto; margin-bottom:20px; border:1px solid #333;">
-                    <table class="tech-table">
-                        <thead>
-                            <tr>
-                                <th>DRIVER NAME</th>
-                                <th>TEAM</th>
-                                <th>POINTS (CALC)</th>
-                                <th>STATUS</th>
-                            </tr>
-                        </thead>
-                        <tbody id="importTableBody">
-                            <!-- JS Generated -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-main" onclick="commitImport()" style="background:var(--neon-green);">CONFIRM IMPORT</button>
-                    <button class="btn-main" onclick="cancelImport()" style="background:#333; color:#fff;">CANCEL</button>
-                </div>
-                <div id="import-status" style="margin-top:10px; font-family:var(--mono-font); color:var(--neon-cyan);"></div>
-            </div>
-        </div>
-
-
-        <!-- 0. SEASON SETUP (TRACK CONFIG) -->
+        <!-- 0. SEASON SETUP -->
         <div id="season-setup" class="section active">
             <div class="panel-card">
-                <div class="panel-header">
-                    <div class="panel-title">TRACK CONFIGURATION</div>
-                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">DEFINE SEASON SCHEDULE</div>
+                <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    TRACK CONFIGURATION
+                    <div>
+                        <button class="btn-small" onclick="toggleTrackSelectAll()">SELECT ALL</button>
+                        <button class="btn-small" onclick="deleteSelectedTracks()" style="border-color:var(--neon-red); color:var(--neon-red);">DELETE SELECTED</button>
+                    </div>
                 </div>
-
                 <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:15px; margin-bottom:20px; align-items:end;">
-                    <div class="input-module" style="grid-column: span 1;">
-                        <label>SELECT OFFICIAL TRACK</label>
-                        <select id="trackSelector" class="data-input" style="background:transparent; border-bottom:1px solid #444; padding:5px 0;">
-                            <option value="">-- CHOOSE CIRCUIT --</option>
-                            <!-- Populated via JS -->
-                        </select>
+                    <div class="input-module">
+                        <label>SELECT TRACK</label>
+                        <select id="trackSelector"><option value="">-- CHOOSE --</option></select>
                     </div>
                     <div class="input-module">
-                        <label>RACE DATE</label>
-                        <input type="date" class="data-input" id="newTrackDate" style="color-scheme:dark;">
+                        <label>DATE</label>
+                        <input type="date" class="data-input" id="newTrackDate">
                     </div>
-                    <button class="btn-main" onclick="addTrackConfig()" style="height:54px; width:auto; padding:0 30px;"><i class="fas fa-plus"></i> ADD</button>
+                    <button class="btn-main" onclick="addTrackConfig()" style="height:42px; width:auto; padding:0 30px;"><i class="fas fa-plus"></i></button>
                 </div>
-
-                <div id="trackConfigList" style="max-height:400px; overflow-y:auto; border-top:1px solid #333; padding-top:10px;">
-                    <div style="text-align:center; color:#666; padding:20px;">NO TRACKS CONFIGURED FOR THIS SEASON</div>
-                </div>
+                <div id="trackConfigList" style="max-height:400px; overflow-y:auto; border-top:1px solid #333; padding-top:10px;"></div>
             </div>
         </div>
 
-        <!-- 1. MANAGE DRIVERS (GRID) -->
+        <!-- 1. MANAGE GRID -->
         <div id="manage-drivers" class="section">
             <div class="panel-card">
-                <div class="panel-header"><div class="panel-title">ADD NEW DRIVER</div></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
-                    <div class="input-module">
-                        <label>DRIVER NAME</label>
-                        <input type="text" class="data-input" id="newDriverName" placeholder="ENTER NAME">
-                    </div>
-                    <div class="input-module">
-                        <label>CONTRACT</label>
-                        <select id="newDriverTeam" class="data-input" style="background:transparent; border-bottom:1px solid #444; padding:5px 0;">
-                            <option value="red-bull-racing">Red Bull Racing</option>
-                            <option value="ferrari">Ferrari</option>
-                            <option value="mercedes">Mercedes</option>
-                            <option value="mclaren">McLaren</option>
-                            <option value="aston-martin">Aston Martin</option>
-                            <option value="alpine">Alpine</option>
-                            <option value="williams">Williams</option>
-                            <option value="racing-bulls">Racing Bulls</option>
-                            <option value="kick-sauber">Kick Sauber</option>
-                            <option value="haas">Haas</option>
-                            <option value="reserve">Reserve / Free Agent</option>
-                        </select>
+                <div class="panel-title">ADD DRIVER</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                    <input type="text" class="data-input" id="newDriverName" placeholder="DRIVER NAME">
+                    <select id="newDriverTeam" class="data-input"></select>
+                </div>
+                <button class="btn-main" onclick="registerDriver()" style="margin-top:15px;">ADD ENTRY</button>
+            </div>
+            <div class="panel-card">
+                <div class="panel-title" style="display:flex; justify-content:space-between;">
+                    ACTIVE GRID
+                    <div>
+                        <button class="btn-small" onclick="toggleSelectAll()">SELECT ALL</button>
+                        <button class="btn-small" onclick="deleteSelectedDrivers()" style="border-color:var(--neon-red); color:var(--neon-red);">DELETE SELECTED</button>
                     </div>
                 </div>
-                <button class="btn-main" onclick="registerDriver()">CONFIRM ENTRY</button>
-                <div id="register-status" style="text-align:center; margin-top:10px; color:var(--neon-cyan); font-family:var(--mono-font);"></div>
-            </div>
-
-            <div class="panel-card" style="margin-top:20px;">
-                <div class="panel-header"><div class="panel-title">ACTIVE GRID</div></div>
                 <div id="driverList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
             </div>
         </div>
@@ -538,52 +266,29 @@
         <!-- 2. RACE DIRECTOR -->
         <div id="race-director" class="section">
             <div class="panel-card">
-                <div class="panel-header">
-                    <div class="panel-title">RACE RESULT ENTRY</div>
-                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">BULK UPDATE MODE</div>
-                </div>
-                
-                <div class="form-group">
-                    <label>SELECT EVENT</label>
-                    <select id="raceDirectorTrackSelect" onchange="loadRaceGrid()" style="background:rgba(0,0,0,0.5);">
-                        <option value="">-- AWAITING SEASON CONFIG --</option>
-                    </select>
-                </div>
-
-                <div id="raceDirectorGrid" style="display:none; animation: fadeIn 0.5s;">
-                    <div class="race-header-row">
-                        <span>DRIVER</span>
-                        <span>POINTS</span>
-                    </div>
-                    <div id="raceInputsContainer" style="max-height:500px; overflow-y:auto; border:1px solid #333; margin-bottom:20px; background:#050505;">
-                        <!-- JS Generated -->
-                    </div>
+                <div class="panel-title">RACE RESULTS</div>
+                <select id="raceDirectorTrackSelect" onchange="loadRaceGrid()" style="margin-bottom:15px; background:rgba(0,0,0,0.5);"><option>Loading...</option></select>
+                <div id="raceDirectorGrid" style="display:none;">
+                    <div class="race-header-row"><span>DRIVER</span><span>POINTS</span></div>
+                    <div id="raceInputsContainer" style="max-height:500px; overflow-y:auto; background:#050505; border:1px solid #333; margin-bottom:15px;"></div>
                     <button class="btn-main" onclick="saveRaceResults()">COMMIT RESULTS</button>
-                    <div id="race-director-status" style="text-align:center; margin-top:15px; font-family:var(--mono-font); color:var(--neon-cyan);"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 3. DRIVER EDITOR -->
+        <!-- 3. EDIT DRIVER -->
         <div id="driver-editor" class="section">
             <div class="panel-card">
-                <div class="panel-header">
-                    <div class="panel-title">INDIVIDUAL ADJUSTMENT</div>
-                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">RESERVE POINTS & CORRECTIONS</div>
-                </div>
-                
-                <select id="editorDriverSelect" onchange="loadDriverData()" style="margin-bottom:20px;">
-                    <option value="">-- SELECT DRIVER --</option>
-                </select>
-
+                <div class="panel-title">INDIVIDUAL ADJUSTMENT</div>
+                <select id="editorDriverSelect" onchange="loadDriverData()" style="margin-bottom:20px;"></select>
                 <div id="editor-area" style="display:none;">
-                    <div class="track-grid" id="trackGrid"></div>
-                    <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center; background:rgba(0,243,255,0.05); padding:20px; border:1px solid var(--neon-cyan);">
-                        <span style="color:var(--neon-cyan); letter-spacing:1px;">CALCULATED TOTAL</span>
-                        <span class="total-value" id="calculatedTotal">0</span>
+                    <div class="input-module" style="margin-bottom:20px;">
+                        <label>CURRENT MAIN CONTRACT</label>
+                        <select id="editorMainTeam" class="data-input" onchange="updateMainTeam()"></select>
                     </div>
-                    <button class="btn-main" onclick="saveAllChanges()" style="margin-top:20px;">UPDATE DATABASE</button>
-                    <div id="editor-status" style="text-align:center; margin-top:10px; font-family:var(--mono-font);"></div>
+                    <div class="track-grid" id="trackGrid"></div>
+                    <div style="margin-top:20px; text-align:right; font-size:1.2rem; color:var(--neon-cyan);">TOTAL: <span id="calculatedTotal">0</span></div>
+                    <button class="btn-main" onclick="saveAllChanges()" style="margin-top:20px;">SAVE CHANGES</button>
                 </div>
             </div>
         </div>
@@ -592,26 +297,12 @@
         <div id="live-view" class="section">
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap:20px;">
                 <div class="panel-card">
-                    <div class="panel-header">
-                        <div class="panel-title" style="color:var(--neon-cyan)">DRIVERS STANDINGS</div>
-                    </div>
-                    <div style="max-height:600px; overflow-y:auto;">
-                        <table class="tech-table">
-                            <thead><tr><th>#</th><th>DRIVER / TEAM</th><th style="text-align:right">PTS</th></tr></thead>
-                            <tbody id="liveDriversBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="panel-title" style="color:var(--neon-cyan)">DRIVERS STANDINGS</div>
+                    <div style="max-height:600px; overflow-y:auto;"><table class="tech-table"><tbody id="liveDriversBody"></tbody></table></div>
                 </div>
                 <div class="panel-card">
-                    <div class="panel-header">
-                        <div class="panel-title" style="color:var(--neon-red)">CONSTRUCTORS</div>
-                    </div>
-                    <div style="max-height:600px; overflow-y:auto;">
-                        <table class="tech-table">
-                            <thead><tr><th>#</th><th>TEAM</th><th style="text-align:right">PTS</th></tr></thead>
-                            <tbody id="liveConstructorsBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="panel-title" style="color:var(--neon-red)">CONSTRUCTORS</div>
+                    <div style="max-height:600px; overflow-y:auto;"><table class="tech-table"><tbody id="liveConstructorsBody"></tbody></table></div>
                 </div>
             </div>
         </div>
@@ -619,39 +310,45 @@
         <!-- 5. STATS -->
         <div id="driver-stats" class="section">
             <div class="panel-card">
-                <select id="statsDriverSelect" onchange="viewDriverStats()" style="margin-bottom:20px;">
-                    <option value="">-- ANALYZE DRIVER --</option>
-                </select>
-
+                <select id="statsDriverSelect" onchange="viewDriverStats()" style="margin-bottom:20px;"></select>
                 <div id="statsDisplay" style="display:none;">
-                    <h2 id="statsDriverName" style="font-size:2.5rem; margin-bottom:0;">NAME</h2>
-                    <div id="statsTeamName" style="color:var(--neon-red); font-family:var(--mono-font); margin-bottom:20px;">TEAM</div>
-
+                    <h2 id="statsDriverName" style="font-size:2.5rem; margin:0;">NAME</h2>
+                    <div id="statsTeamName" style="color:var(--neon-red); margin-bottom:20px;">TEAM</div>
                     <div class="stats-grid">
-                        <div class="stat-box"><div class="stat-num" id="statPoints">0</div><div class="stat-desc">TOTAL POINTS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statWins" style="color:var(--neon-cyan)">0</div><div class="stat-desc">WINS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statPodiums">0</div><div class="stat-desc">PODIUMS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statAvg">0</div><div class="stat-desc">AVG / RACE</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statPoints">0</div><div>PTS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statWins" style="color:var(--neon-cyan)">0</div><div>WINS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statPodiums">0</div><div>PODIUMS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statAvg">0</div><div>AVG</div></div>
                     </div>
+                    <div class="panel-title" style="margin-top:20px;">HISTORY</div>
+                    <table class="tech-table"><tbody id="statsHistoryBody"></tbody></table>
+                </div>
+            </div>
+        </div>
 
-                    <div class="panel-header"><div class="panel-title">RACE LOG</div></div>
-                    <table class="tech-table">
-                        <thead><tr><th>TRACK</th><th>TEAM</th><th style="text-align:right">PTS</th></tr></thead>
-                        <tbody id="statsHistoryBody"></tbody>
-                    </table>
+        <!-- IMPORT PREVIEW -->
+        <div id="import-preview" class="section">
+            <div class="panel-card">
+                <div class="panel-title" style="color:var(--neon-green)">IMPORT REVIEW</div>
+                <div style="margin-bottom:15px; font-size:0.9rem; color:#888;">Detected Tracks: <span id="detectedTracksList" style="color:var(--neon-green)"></span></div>
+                <div style="max-height:500px; overflow-y:auto; border:1px solid #333; margin-bottom:15px;">
+                    <table class="tech-table"><thead><tr><th>DRIVER</th><th>TEAM</th><th>PTS</th><th>STATUS</th></tr></thead><tbody id="importTableBody"></tbody></table>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-main" onclick="commitImport()" style="background:var(--neon-green);">CONFIRM</button>
+                    <button class="btn-main" onclick="cancelImport()" style="background:#333; color:#fff;">CANCEL</button>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDoc, setDoc, query, orderBy, onSnapshot, writeBatch, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDoc, setDoc, query, orderBy, onSnapshot, writeBatch, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyApUD33ao9DfFa8IAfA2qby3IFKhLtcNFU",
             authDomain: "ttrl-9f3ef.firebaseapp.com",
@@ -678,32 +375,15 @@
             {id:'haas', name:'Haas'}, {id:'reserve', name:'Reserve'}
         ];
 
-        // --- PREDEFINED TRACKS (Master List) ---
         const MASTER_TRACK_LIST = [
-            { id: "bahrain", name: "Bahrain GP" },
-            { id: "saudi_arabia", name: "Saudi Arabian GP" },
-            { id: "australia", name: "Australian GP" },
-            { id: "japan", name: "Japanese GP" },
-            { id: "china", name: "Chinese GP" },
-            { id: "miami", name: "Miami GP" },
-            { id: "emilia_romagna", name: "Emilia Romagna GP" },
-            { id: "monaco", name: "Monaco GP" },
-            { id: "canada", name: "Canadian GP" },
-            { id: "spain", name: "Spanish GP" },
-            { id: "austria", name: "Austrian GP" },
-            { id: "uk", name: "British GP" },
-            { id: "hungary", name: "Hungarian GP" },
-            { id: "belgium", name: "Belgian GP" },
-            { id: "netherlands", name: "Dutch GP" },
-            { id: "italy", name: "Italian GP" },
-            { id: "azerbaijan", name: "Azerbaijan GP" },
-            { id: "singapore", name: "Singapore GP" },
-            { id: "usa", name: "United States GP" },
-            { id: "mexico", name: "Mexico City GP" },
-            { id: "brazil", name: "São Paulo GP" },
-            { id: "las_vegas", name: "Las Vegas GP" },
-            { id: "qatar", name: "Qatar GP" },
-            { id: "abu_dhabi", name: "Abu Dhabi GP" }
+            { id: "bahrain", name: "Bahrain GP" }, { id: "saudi_arabia", name: "Saudi Arabian GP" }, { id: "australia", name: "Australian GP" },
+            { id: "japan", name: "Japanese GP" }, { id: "china", name: "Chinese GP" }, { id: "miami", name: "Miami GP" },
+            { id: "emilia_romagna", name: "Emilia Romagna GP" }, { id: "monaco", name: "Monaco GP" }, { id: "canada", name: "Canadian GP" },
+            { id: "spain", name: "Spanish GP" }, { id: "austria", name: "Austrian GP" }, { id: "uk", name: "British GP" },
+            { id: "hungary", name: "Hungarian GP" }, { id: "belgium", name: "Belgian GP" }, { id: "netherlands", name: "Dutch GP" },
+            { id: "italy", name: "Italian GP" }, { id: "azerbaijan", name: "Azerbaijan GP" }, { id: "singapore", name: "Singapore GP" },
+            { id: "usa", name: "United States GP" }, { id: "mexico", name: "Mexico City GP" }, { id: "brazil", name: "São Paulo GP" },
+            { id: "las_vegas", name: "Las Vegas GP" }, { id: "qatar", name: "Qatar GP" }, { id: "abu_dhabi", name: "Abu Dhabi GP" }
         ];
 
         let driversCache = {};
@@ -711,27 +391,32 @@
         let pendingImportData = [];
         let pendingImportTracks = new Set();
 
-        // AUTHENTICATION
+        // --- CUSTOM UI HELPERS ---
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('toast-visible');
+            setTimeout(() => t.classList.remove('toast-visible'), 3000);
+        };
+
+        window.customConfirm = (msg, onYes) => {
+            const m = document.getElementById('confirmModal');
+            document.getElementById('modalMessage').innerText = msg;
+            m.style.display = 'flex';
+            document.getElementById('btnConfirmYes').onclick = () => {
+                m.style.display = 'none';
+                onYes();
+            };
+        };
+        window.closeModal = () => document.getElementById('confirmModal').style.display = 'none';
+
+        // --- AUTH ---
         window.checkLogin = () => {
             const email = document.getElementById("loginEmail").value;
             const pass = document.getElementById("loginPass").value;
             signInWithEmailAndPassword(auth, email, pass).catch(e => document.getElementById("login-msg").innerText = "LOGIN FAILED");
         };
-
-        window.loginWithGoogle = async () => {
-            const statusMsg = document.getElementById("login-msg");
-            statusMsg.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CONTACTING GOOGLE...';
-            statusMsg.style.color = "#ccc";
-            
-            try {
-                await signInWithPopup(auth, new GoogleAuthProvider());
-            } catch (error) {
-                console.error("Google Sign In Error:", error);
-                statusMsg.style.color = "var(--neon-red)";
-                statusMsg.innerText = "LOGIN FAILED";
-            }
-        };
-
+        window.loginWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => console.error(e));
         window.logout = () => signOut(auth).then(() => window.location.reload());
 
         onAuthStateChanged(auth, (user) => {
@@ -739,343 +424,42 @@
                 document.getElementById("login-overlay").style.display = "none";
                 document.getElementById("main-interface").style.display = "block";
                 document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
-                renderKnownSeasons();
-                changeSeason(); 
+                initApp();
             } else {
                 document.getElementById("login-overlay").style.display = "flex";
                 document.getElementById("main-interface").style.display = "none";
             }
         });
 
-        // UI HELPERS
+        // --- INIT ---
+        function initApp() {
+            renderKnownSeasons();
+            populateDropdowns();
+            changeSeason();
+        }
+
+        function populateDropdowns() {
+            const ts = document.getElementById("trackSelector");
+            ts.innerHTML = '<option value="">-- CHOOSE CIRCUIT --</option>';
+            MASTER_TRACK_LIST.forEach(t => ts.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`);
+
+            const teamOptions = TEAMS.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            document.getElementById("newDriverTeam").innerHTML = teamOptions;
+            document.getElementById("editorMainTeam").innerHTML = teamOptions;
+        }
+
+        // --- NAVIGATION ---
         window.switchTab = (id) => {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             
-            // Handle import tab manually since it doesn't have a nav button
-            const section = document.getElementById(id);
-            if(section) {
-                section.classList.add('active');
-            }
-            // highlight btn if exists
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
+            
             const btn = document.querySelector(`.tab-btn[onclick="switchTab('${id}')"]`);
             if(btn) btn.classList.add('active');
         };
 
-        function populateTrackSelector() {
-            const selector = document.getElementById("trackSelector");
-            selector.innerHTML = '<option value="">-- CHOOSE CIRCUIT --</option>';
-            MASTER_TRACK_LIST.forEach(t => {
-                selector.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`;
-            });
-        }
-        populateTrackSelector();
-
-        function renderKnownSeasons() {
-            const container = document.getElementById("knownSeasonsList");
-            container.innerHTML = "HISTORY: " + knownSeasons.map(s => `<span class="season-tag" style="cursor:pointer; border-bottom:1px solid #666; margin-right:10px;" onclick="selectSeason('${s}')">${s}</span>`).join(' ');
-        }
-
-        window.selectSeason = (sid) => {
-            document.getElementById("seasonInput").value = sid;
-            changeSeason();
-        };
-
-        // --- CSV IMPORT LOGIC ---
-        window.triggerImport = () => document.getElementById('csvFile').click();
-
-        window.handleFileSelect = (input) => {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                parseCSV(text);
-            };
-            reader.readAsText(file);
-        };
-
-        function fuzzyMatchTrack(header) {
-            const h = header.toLowerCase();
-            if (h.includes('bahrain')) return 'bahrain';
-            if (h.includes('australian')) return 'australia';
-            if (h.includes('imola') || h.includes('emilia')) return 'emilia_romagna';
-            if (h.includes('spain') || h.includes('spanish')) return 'spain';
-            if (h.includes('britain') || h.includes('silverstone') || h.includes('uk')) return 'uk';
-            if (h.includes('vegas')) return 'las_vegas';
-            if (h.includes('belgium') || h.includes('spa')) return 'belgium';
-            if (h.includes('austria')) return 'austria';
-            if (h.includes('brazil') || h.includes('paulo')) return 'brazil';
-            if (h.includes('abu dhabi')) return 'abu_dhabi';
-            return null;
-        }
-
-        function parseCSV(text) {
-            const lines = text.split('\n');
-            const data = [];
-            pendingImportTracks.clear();
-            
-            // 1. Parse Headers to find Track Columns
-            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-            const trackColIndices = {}; 
-
-            headers.forEach((h, idx) => {
-                const matchedId = fuzzyMatchTrack(h);
-                if (matchedId) {
-                    trackColIndices[idx] = matchedId;
-                    pendingImportTracks.add(matchedId);
-                }
-            });
-
-            // 2. Parse Rows
-            lines.forEach((line, index) => {
-                if(!line.trim() || index === 0) return; 
-                
-                const parts = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-                
-                if(parts.length >= 2) {
-                    const name = parts[0];
-                    const rawTeam = parts[1];
-                    let teamId = "reserve";
-                    let valid = false;
-
-                    const cleanTeam = rawTeam.toLowerCase().replace(/\s+/g, '-'); 
-                    const teamObj = TEAMS.find(t => 
-                        t.id === cleanTeam || 
-                        t.name.toLowerCase() === rawTeam.toLowerCase() ||
-                        t.id.replace(/-/g, ' ') === rawTeam.toLowerCase()
-                    );
-                    
-                    if(teamObj) {
-                        teamId = teamObj.id;
-                        valid = true;
-                    }
-
-                    let results = {};
-                    let totalCalc = 0;
-
-                    Object.keys(trackColIndices).forEach(colIdx => {
-                        const trackId = trackColIndices[colIdx];
-                        const valStr = parts[colIdx];
-                        const val = parseInt(valStr);
-                        
-                        if (!isNaN(val) && val > 0) {
-                            results[trackId] = { points: val, team: teamId };
-                            totalCalc += val;
-                        }
-                    });
-
-                    data.push({ name, team: rawTeam, teamId, results, totalPoints: totalCalc, valid });
-                }
-            });
-
-            pendingImportData = data;
-            showImportPreview();
-        }
-
-        function showImportPreview() {
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.getElementById('import-preview').classList.add('active');
-            document.getElementById('importTargetSeason').value = currentSeason;
-
-            // Show Detected Tracks
-            const tracksDiv = document.getElementById('detectedTracksList');
-            if (pendingImportTracks.size > 0) {
-                tracksDiv.innerText = Array.from(pendingImportTracks).join(', ').toUpperCase();
-            } else {
-                tracksDiv.innerText = "NONE DETECTED";
-            }
-
-            const tbody = document.getElementById('importTableBody');
-            tbody.innerHTML = "";
-
-            if(pendingImportData.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center'>NO VALID DATA FOUND IN CSV</td></tr>";
-                return;
-            }
-
-            pendingImportData.forEach((row, idx) => {
-                const tr = document.createElement('tr');
-                if(!row.valid) tr.classList.add('invalid-row');
-                
-                let teamSelect = `<select onchange="updateImportRow(${idx}, this.value)" style="padding:5px;">`;
-                TEAMS.forEach(t => {
-                    const sel = t.id === row.teamId ? 'selected' : '';
-                    teamSelect += `<option value="${t.id}" ${sel}>${t.name}</option>`;
-                });
-                teamSelect += `</select>`;
-
-                tr.innerHTML = `
-                    <td><input type="text" value="${row.name}" class="data-input" onchange="pendingImportData[${idx}].name = this.value"></td>
-                    <td>${teamSelect}</td>
-                    <td style="color:var(--neon-cyan); font-weight:bold;">${row.totalPoints}</td>
-                    <td>${row.valid ? '<span class="status-valid">OK</span>' : '<span class="status-invalid">CHECK TEAM</span>'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        window.updateImportRow = (idx, newTeamId) => {
-            pendingImportData[idx].teamId = newTeamId;
-            const res = pendingImportData[idx].results;
-            Object.keys(res).forEach(k => {
-                if (res[k].team === pendingImportData[idx].teamId) { 
-                     res[k].team = newTeamId;
-                }
-            });
-            pendingImportData[idx].valid = true;
-            
-            const rows = document.getElementById('importTableBody').rows;
-            rows[idx].classList.remove('invalid-row');
-            rows[idx].cells[3].innerHTML = '<span class="status-valid">OK (MANUAL)</span>';
-        };
-
-        window.cancelImport = () => {
-            document.getElementById('csvFile').value = "";
-            pendingImportData = [];
-            pendingImportTracks.clear();
-            switchTab('manage-drivers');
-        };
-
-        window.commitImport = async () => {
-            const status = document.getElementById("import-status");
-            status.innerText = "IMPORTING TRACKS & DRIVERS...";
-            
-            // 1. UPDATE TRACK CONFIG (AUTO-CALENDAR)
-            try {
-                const seasonRef = doc(db, "seasons", currentSeason);
-                const seasonSnap = await getDoc(seasonRef);
-                let currentTracks = [];
-                if (seasonSnap.exists() && seasonSnap.data().trackConfig) {
-                    currentTracks = seasonSnap.data().trackConfig;
-                }
-
-                const newTracksToAdd = [];
-                pendingImportTracks.forEach(trackId => {
-                    if (!currentTracks.some(t => t.id === trackId)) {
-                        // Find pretty name
-                        const masterObj = MASTER_TRACK_LIST.find(m => m.id === trackId);
-                        newTracksToAdd.push({
-                            id: trackId,
-                            name: masterObj ? masterObj.name : trackId.toUpperCase(),
-                            date: "" // CSV doesn't have dates, leaves empty
-                        });
-                    }
-                });
-
-                if (newTracksToAdd.length > 0) {
-                    if (!seasonSnap.exists()) {
-                        await setDoc(seasonRef, { trackConfig: newTracksToAdd });
-                    } else {
-                        await updateDoc(seasonRef, {
-                            trackConfig: arrayUnion(...newTracksToAdd)
-                        });
-                    }
-                }
-            } catch (err) {
-                console.error("Track Config Update Failed:", err);
-                status.innerText = "TRACK UPDATE FAILED: " + err.message;
-                return;
-            }
-
-            // 2. IMPORT DRIVERS
-            const batch = writeBatch(db);
-            let count = 0;
-
-            pendingImportData.forEach(d => {
-                if(d.name && d.teamId) {
-                    const docRef = doc(collection(db, "seasons", currentSeason, "drivers"));
-                    batch.set(docRef, {
-                        name: d.name,
-                        team: d.teamId,
-                        totalPoints: d.totalPoints,
-                        results: d.results
-                    });
-                    count++;
-                }
-            });
-
-            try {
-                await batch.commit();
-                status.innerText = `SUCCESS! CONFIG UPDATED & ${count} DRIVERS IMPORTED.`;
-                
-                // Refresh local views
-                await loadTrackConfig();
-                
-                setTimeout(() => {
-                    cancelImport(); 
-                }, 1500);
-            } catch(e) {
-                status.innerText = "ERROR: " + e.message;
-            }
-        };
-
-        // ... existing track functions ...
-        async function loadTrackConfig() {
-            const trackListEl = document.getElementById("trackConfigList");
-            const docRef = doc(db, "seasons", currentSeason);
-            try {
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists() && docSnap.data().trackConfig) {
-                    activeTracks = docSnap.data().trackConfig;
-                    activeTracks.sort((a, b) => new Date(a.date) - new Date(b.date));
-                } else { activeTracks = []; }
-            } catch (error) { activeTracks = []; }
-
-            if(activeTracks.length === 0) {
-                trackListEl.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">NO TRACKS CONFIGURED FOR THIS SEASON</div>`;
-            } else {
-                trackListEl.innerHTML = activeTracks.map(t => `
-                    <div class="track-list-item">
-                        <div style="display:flex; gap:15px; align-items:center;">
-                            <span class="track-code">${t.id.toUpperCase()}</span>
-                            <div><div style="color:#fff; font-weight:bold;">${t.name}</div><div style="color:#666; font-size:0.8rem;">${t.date || 'NO DATE'}</div></div>
-                        </div>
-                        <button class="btn-small" onclick="removeTrackConfig('${t.id}')" style="border-color:var(--neon-red); color:var(--neon-red);">REMOVE</button>
-                    </div>`).join('');
-            }
-
-            const raceSelect = document.getElementById("raceDirectorTrackSelect");
-            if(raceSelect) {
-                raceSelect.innerHTML = '<option value="">-- SELECT TRACK TO ENTER RESULTS --</option>';
-                if(activeTracks.length === 0) { raceSelect.innerHTML = '<option value="">-- NO TRACKS FOUND --</option>'; } 
-                else { activeTracks.forEach(t => raceSelect.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`); }
-            }
-        }
-        
-        window.removeTrackConfig = async (trackId) => {
-            if(!confirm(`Remove track ${trackId}? Existing data for this track will persist but be hidden.`)) return;
-            const seasonRef = doc(db, "seasons", currentSeason);
-            try {
-                const snap = await getDoc(seasonRef);
-                if(snap.exists()) {
-                    const currentTracks = snap.data().trackConfig || [];
-                    const newTracks = currentTracks.filter(t => t.id !== trackId);
-                    await updateDoc(seasonRef, { trackConfig: newTracks });
-                    loadTrackConfig(); loadDriverData(); 
-                }
-            } catch(e) { console.error(e); }
-        };
-
-        window.addTrackConfig = async () => {
-            const trackId = document.getElementById("trackSelector").value;
-            const date = document.getElementById("newTrackDate").value;
-            if(!trackId || !date) { alert("Please Select a Track and Date"); return; }
-            if(activeTracks.some(t => t.id === trackId)) { alert("Track already exists in this season"); return; }
-            const trackObj = MASTER_TRACK_LIST.find(t => t.id === trackId);
-            if(!trackObj) return;
-            const newTrack = { id: trackId, name: trackObj.name, date };
-            const seasonRef = doc(db, "seasons", currentSeason);
-            const seasonSnap = await getDoc(seasonRef);
-            if(!seasonSnap.exists()) { await setDoc(seasonRef, { trackConfig: [newTrack] }); } 
-            else { await updateDoc(seasonRef, { trackConfig: arrayUnion(newTrack) }); }
-            document.getElementById("trackSelector").value = "";
-            document.getElementById("newTrackDate").value = "";
-            loadTrackConfig(); alert("Track Added");
-        };
-
-        // DATA LOGIC
         window.changeSeason = async () => {
             const inputVal = document.getElementById("seasonInput").value.trim().toLowerCase().replace(/\s+/g, '_');
             if(!inputVal) return;
@@ -1089,229 +473,158 @@
             initListener(); 
         };
 
-        function initListener() {
-            if(unsubscribe) unsubscribe(); 
-            const q = query(collection(db, "seasons", currentSeason, "drivers"), orderBy("totalPoints", "desc"));
-
-            unsubscribe = onSnapshot(q, (snap) => {
-                const select = document.getElementById("editorDriverSelect");
-                const statsSelect = document.getElementById("statsDriverSelect");
-                const list = document.getElementById("driverList");
-                
-                select.innerHTML = '<option value="">-- SELECT DRIVER --</option>';
-                statsSelect.innerHTML = '<option value="">-- ANALYZE DRIVER --</option>';
-                list.innerHTML = "";
-                allDrivers = [];
-
-                if(snap.empty) list.innerHTML = `<div style="color:#666; padding:10px;">NO DATA</div>`;
-
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    data.id = doc.id;
-                    driversCache[doc.id] = data;
-                    allDrivers.push(data);
-
-                    const optText = `${data.name.toUpperCase()}`;
-                    select.innerHTML += `<option value="${doc.id}">${optText}</option>`;
-                    statsSelect.innerHTML += `<option value="${doc.id}">${optText}</option>`;
-
-                    const div = document.createElement("div");
-                    div.style.cssText = "background:rgba(255,255,255,0.05); padding:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #333;";
-                    div.innerHTML = `<div><div style="font-weight:bold; color:#fff;">${data.name}</div><small style="color:var(--neon-cyan); letter-spacing:1px; text-transform:uppercase;">${data.team}</small></div><button onclick="deleteDriver('${doc.id}', '${data.name}')" style="background:transparent; border:1px solid var(--neon-red); color:var(--neon-red); padding:5px 10px; cursor:pointer;">DEL</button>`;
-                    list.appendChild(div);
-                });
-
-                updateLiveTables();
-                const currentStatId = document.getElementById("statsDriverSelect").value;
-                if(currentStatId) viewDriverStats();
-                const currentRaceTrack = document.getElementById("raceDirectorTrackSelect").value;
-                if(currentRaceTrack) loadRaceGrid();
-                const currentEditorId = document.getElementById("editorDriverSelect").value;
-                if(currentEditorId) loadDriverData();
-            });
+        function renderKnownSeasons() {
+            const c = document.getElementById("knownSeasonsList");
+            c.innerHTML = "HISTORY: " + knownSeasons.map(s => `<span class="season-tag" style="cursor:pointer; border-bottom:1px solid #666; margin-right:10px;" onclick="document.getElementById('seasonInput').value='${s}';changeSeason()">${s}</span>`).join(' ');
         }
 
-        window.exportData = () => {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allDrivers));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href",     dataStr);
-            downloadAnchorNode.setAttribute("download", `${currentSeason}_backup.json`);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        };
-
-        window.loadRaceGrid = () => {
-            const trackId = document.getElementById("raceDirectorTrackSelect").value;
-            const container = document.getElementById("raceInputsContainer");
-            const wrapper = document.getElementById("raceDirectorGrid");
-            if(!trackId) { wrapper.style.display = "none"; return; }
-            wrapper.style.display = "block";
-            container.innerHTML = "";
-            const sorted = [...allDrivers].sort((a,b) => a.name.localeCompare(b.name));
-            sorted.forEach(d => {
-                const results = d.results || {};
-                let currentPoints = 0;
-                if(results[trackId]) { currentPoints = typeof results[trackId] === 'object' ? results[trackId].points : results[trackId]; }
-                const div = document.createElement("div");
-                div.className = "race-input-row";
-                div.innerHTML = `
-                    <div class="driver-name-label">${d.name} <span style="color:#666; font-size:0.8rem">(${d.team})</span></div>
-                    <input type="number" class="race-points-input" data-driverid="${d.id}" value="${currentPoints}" style="width:70px; background:#000; border:1px solid #444; color:var(--neon-cyan); padding:5px; text-align:center;">`;
-                container.appendChild(div);
-            });
-        };
-
-        window.saveRaceResults = async () => {
-            const trackId = document.getElementById("raceDirectorTrackSelect").value;
-            const inputs = document.querySelectorAll(".race-points-input");
-            const status = document.getElementById("race-director-status");
-            if(!trackId) return;
-            status.innerText = "PROCESSING...";
-            const batch = writeBatch(db);
-            let updateCount = 0;
-            inputs.forEach(input => {
-                const driverId = input.dataset.driverid;
-                const newPoints = Number(input.value);
-                const driverData = driversCache[driverId];
-                let currentTotal = driverData.totalPoints || 0;
-                let oldTrackPoints = 0;
-                if(driverData.results && driverData.results[trackId]) {
-                    oldTrackPoints = typeof driverData.results[trackId] === 'object' ? driverData.results[trackId].points : driverData.results[trackId];
-                }
-                if(oldTrackPoints !== newPoints) {
-                    const newTotal = currentTotal - oldTrackPoints + newPoints;
-                    const resultsUpdate = { ...driverData.results };
-                    let teamForRace = driverData.team;
-                    if(driverData.results && driverData.results[trackId] && typeof driverData.results[trackId] === 'object') {
-                        teamForRace = driverData.results[trackId].team;
-                    }
-                    if(newPoints > 0) { resultsUpdate[trackId] = { points: newPoints, team: teamForRace }; } else { delete resultsUpdate[trackId]; }
-                    batch.update(doc(db, "seasons", currentSeason, "drivers", driverId), { results: resultsUpdate, totalPoints: newTotal });
-                    updateCount++;
-                }
-            });
-            if(updateCount === 0) { status.innerText = "NO CHANGES"; return; }
+        // --- TRACK CONFIG ---
+        async function loadTrackConfig() {
+            const list = document.getElementById("trackConfigList");
+            const docRef = doc(db, "seasons", currentSeason);
             try {
-                await batch.commit();
-                status.innerText = `UPDATED ${updateCount} ENTRIES`;
-                setTimeout(() => status.innerText = "", 3000);
-            } catch(e) { status.innerText = "ERROR: " + e.message; }
-        };
+                const snap = await getDoc(docRef);
+                activeTracks = (snap.exists() && snap.data().trackConfig) ? snap.data().trackConfig : [];
+                activeTracks.sort((a, b) => new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31'));
+            } catch (e) { activeTracks = []; }
 
-        window.loadDriverData = () => {
-            const id = document.getElementById("editorDriverSelect").value;
-            const grid = document.getElementById("trackGrid");
-            const area = document.getElementById("editor-area");
-            if(!id) { area.style.display = "none"; return; }
-            area.style.display = "block";
-            grid.innerHTML = "";
-            const data = driversCache[id];
-            const results = data.results || {};
-            if(activeTracks.length === 0) {
-                grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; color:#666;'>NO TRACKS CONFIGURED FOR THIS SEASON.<br>GO TO 'SEASON SETUP' TAB.</div>";
-                return;
+            if(activeTracks.length === 0) list.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">NO TRACKS</div>`;
+            else {
+                list.innerHTML = activeTracks.map(t => `
+                    <div class="track-list-item">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" class="track-checkbox" value="${t.id}">
+                            <div>
+                                <span class="track-code">${t.id.toUpperCase()}</span>
+                                <span style="font-weight:bold; color:#fff;">${t.name}</span>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="date" value="${t.date || ''}" onchange="updateTrackDate('${t.id}', this.value)" style="background:transparent; border:1px solid #444; color:#fff; font-family:var(--mono-font); font-size:0.8rem; padding:4px;">
+                            <button class="btn-small" onclick="removeTrackConfig('${t.id}')" style="border-color:var(--neon-red); color:var(--neon-red);">X</button>
+                        </div>
+                    </div>`).join('');
             }
-            activeTracks.forEach(t => {
-                let pts = 0;
-                let team = data.team; 
-                if(results[t.id]) {
-                    if(typeof results[t.id] === 'object') { pts = results[t.id].points || 0; team = results[t.id].team || data.team; } else { pts = results[t.id]; }
+            
+            // Sync Race Director Dropdown
+            const rs = document.getElementById("raceDirectorTrackSelect");
+            rs.innerHTML = '<option value="">-- SELECT EVENT --</option>';
+            activeTracks.forEach(t => rs.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`);
+        }
+
+        window.addTrackConfig = async () => {
+            const id = document.getElementById("trackSelector").value;
+            const date = document.getElementById("newTrackDate").value;
+            if(!id || !date) { showToast("Select Track & Date"); return; }
+            if(activeTracks.some(t => t.id === id)) { showToast("Track already exists"); return; }
+            
+            const obj = MASTER_TRACK_LIST.find(t => t.id === id);
+            const newTrack = { id, name: obj.name, date };
+            
+            const ref = doc(db, "seasons", currentSeason);
+            const snap = await getDoc(ref);
+            if(!snap.exists()) await setDoc(ref, { trackConfig: [newTrack] });
+            else await updateDoc(ref, { trackConfig: arrayUnion(newTrack) });
+            
+            loadTrackConfig(); showToast("Track Added");
+        };
+
+        window.updateTrackDate = async (trackId, newDate) => {
+            const ref = doc(db, "seasons", currentSeason);
+            const snap = await getDoc(ref);
+            if(snap.exists()) {
+                let tracks = snap.data().trackConfig || [];
+                const idx = tracks.findIndex(t => t.id === trackId);
+                if(idx !== -1) {
+                    tracks[idx].date = newDate;
+                    await updateDoc(ref, { trackConfig: tracks });
+                    showToast("Date Updated");
                 }
-                let teamOpts = TEAMS.map(tm => `<option value="${tm.id}" ${tm.id === team ? 'selected':''}>${tm.name}</option>`).join('');
-                const div = document.createElement("div");
-                div.className = "input-module";
-                div.innerHTML = `
-                    <label>${t.name.toUpperCase()}</label>
-                    <div style="display:flex; gap:5px;">
-                        <input type="number" class="points-input data-input" style="width:60px; text-align:center; color:var(--neon-cyan); font-weight:bold;" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
-                        <select class="team-input data-input" id="team-${t.id}" title="Select Team for this Race (Reserve Logic)">${teamOpts}</select>
-                    </div>`;
-                grid.appendChild(div);
-            });
-            calcTotal();
+            }
         };
 
-        window.calcTotal = () => {
-            let sum = 0;
-            document.querySelectorAll(".points-input").forEach(i => sum += Number(i.value) || 0);
-            document.getElementById("calculatedTotal").innerText = sum;
-        };
-
-        window.saveAllChanges = async () => {
-            const id = document.getElementById("editorDriverSelect").value;
-            const status = document.getElementById("editor-status");
-            const pointsInputs = document.querySelectorAll(".points-input");
-            const teamInputs = document.querySelectorAll(".team-input");
-            status.innerText = "SAVING..."; 
-            let newResults = {};
-            let newTotal = 0;
-            pointsInputs.forEach((input, idx) => {
-                const val = Number(input.value);
-                const track = input.dataset.track;
-                const team = teamInputs[idx].value; 
-                if(val > 0) { newResults[track] = { points: val, team: team }; newTotal += val; }
-            });
-            try {
-                await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { results: newResults, totalPoints: newTotal });
-                status.innerText = "SAVED"; setTimeout(() => status.innerText = "", 2000);
-            } catch(e) { status.innerText = "ERROR: " + e.message; }
-        };
-
-        window.viewDriverStats = () => {
-            const id = document.getElementById("statsDriverSelect").value;
-            const display = document.getElementById("statsDisplay");
-            if(!id) { display.style.display = "none"; return; }
-            display.style.display = "block";
-            const data = driversCache[id];
-            const results = data.results || {};
-            document.getElementById("statsDriverName").innerText = data.name.toUpperCase();
-            document.getElementById("statsTeamName").innerText = TEAMS.find(t => t.id === data.team)?.name.toUpperCase() || data.team;
-            document.getElementById("statPoints").innerText = data.totalPoints;
-            let wins = 0, podiums = 0, races = 0, tableHTML = "";
-            activeTracks.forEach(track => {
-                const res = results[track.id];
-                if(res) {
-                    const pts = typeof res === 'object' ? res.points : res;
-                    const tmId = typeof res === 'object' ? res.team : data.team;
-                    if(pts > 0) {
-                        races++;
-                        if(pts >= 25) wins++;
-                        if(pts >= 15) podiums++;
-                        tableHTML += `<tr><td>${track.name.toUpperCase()}</td><td style="color:#888;">${TEAMS.find(t => t.id === tmId)?.name || tmId}</td><td style="text-align:right; font-weight:bold; color:var(--neon-cyan);">${pts}</td></tr>`;
-                    }
+        window.removeTrackConfig = (id) => {
+            customConfirm("Remove this track?", async () => {
+                const ref = doc(db, "seasons", currentSeason);
+                const snap = await getDoc(ref);
+                if(snap.exists()) {
+                    const tracks = snap.data().trackConfig.filter(t => t.id !== id);
+                    await updateDoc(ref, { trackConfig: tracks });
+                    loadTrackConfig(); showToast("Track Removed");
                 }
             });
-            document.getElementById("statWins").innerText = wins;
-            document.getElementById("statPodiums").innerText = podiums;
-            document.getElementById("statAvg").innerText = races > 0 ? (data.totalPoints / races).toFixed(1) : "0.0";
-            document.getElementById("statsHistoryBody").innerHTML = tableHTML || `<tr><td colspan="3" style="text-align:center; color:#666;">NO DATA</td></tr>`;
         };
 
-        function updateLiveTables() {
-            const dTable = document.getElementById("liveDriversBody");
-            dTable.innerHTML = "";
-            const sortedDrivers = [...allDrivers].sort((a, b) => {
-                if (a.team === 'reserve' && b.team !== 'reserve') return 1;
-                if (a.team !== 'reserve' && b.team === 'reserve') return -1;
-                return b.totalPoints - a.totalPoints;
+        // NEW: Batch Delete Tracks
+        window.toggleTrackSelectAll = () => {
+            const cbs = document.querySelectorAll('.track-checkbox');
+            const all = Array.from(cbs).every(c => c.checked);
+            cbs.forEach(c => c.checked = !all);
+        };
+
+        window.deleteSelectedTracks = () => {
+            const cbs = document.querySelectorAll('.track-checkbox:checked');
+            if(cbs.length === 0) return;
+            customConfirm(`Delete ${cbs.length} tracks?`, async () => {
+                const idsToRemove = Array.from(cbs).map(c => c.value);
+                const ref = doc(db, "seasons", currentSeason);
+                const snap = await getDoc(ref);
+                if(snap.exists()) {
+                    const currentTracks = snap.data().trackConfig || [];
+                    const newTracks = currentTracks.filter(t => !idsToRemove.includes(t.id));
+                    await updateDoc(ref, { trackConfig: newTracks });
+                    loadTrackConfig();
+                    showToast("Tracks Deleted");
+                }
             });
-            sortedDrivers.forEach((d, i) => {
-                dTable.innerHTML += `<tr><td style="color:#666">${String(i+1).padStart(2,'0')}</td><td><div style="font-weight:bold; color:#fff;">${d.name}</div><div style="font-size:0.75rem; color:var(--neon-cyan); text-transform:uppercase;">${d.team === 'reserve' ? 'RESERVE' : TEAMS.find(t => t.id === d.team)?.name}</div></td><td style="text-align:right; font-weight:bold; font-size:1.1rem; color:var(--neon-cyan)">${d.totalPoints}</td></tr>`;
-            });
-            const teamPoints = {};
-            allDrivers.forEach(d => {
-                const results = d.results || {};
-                Object.values(results).forEach(r => {
-                    let p = 0, t = d.team; 
-                    if(typeof r === 'object') { p = r.points || 0; t = r.team || d.team; } else { p = r; }
-                    if(t !== 'reserve') { if(!teamPoints[t]) teamPoints[t] = 0; teamPoints[t] += p; }
+        };
+
+        // --- DRIVER DATA ---
+        function initListener() {
+            if(unsubscribe) unsubscribe();
+            const q = query(collection(db, "seasons", currentSeason, "drivers"), orderBy("totalPoints", "desc"));
+            
+            unsubscribe = onSnapshot(q, (snap) => {
+                const list = document.getElementById("driverList");
+                const editSel = document.getElementById("editorDriverSelect");
+                const statSel = document.getElementById("statsDriverSelect");
+                
+                list.innerHTML = "";
+                editSel.innerHTML = '<option value="">-- SELECT DRIVER --</option>';
+                statSel.innerHTML = '<option value="">-- SELECT DRIVER --</option>';
+                allDrivers = [];
+
+                if(snap.empty) list.innerHTML = `<div style="padding:20px; text-align:center; color:#666;">GRID EMPTY</div>`;
+
+                snap.forEach(d => {
+                    const data = d.data();
+                    data.id = d.id;
+                    driversCache[d.id] = data;
+                    allDrivers.push(data);
+
+                    // Dropdowns
+                    const label = data.name.toUpperCase();
+                    editSel.innerHTML += `<option value="${d.id}">${label}</option>`;
+                    statSel.innerHTML += `<option value="${d.id}">${label}</option>`;
+
+                    // Grid List
+                    const row = document.createElement("div");
+                    row.className = "driver-row";
+                    row.innerHTML = `
+                        <input type="checkbox" class="driver-checkbox" value="${d.id}">
+                        <div style="flex-grow:1;">
+                            <div style="font-weight:bold; color:#fff;">${data.name}</div>
+                            <div style="font-size:0.75rem; color:var(--neon-cyan); text-transform:uppercase;">${data.team}</div>
+                        </div>
+                        <button onclick="deleteDriver('${d.id}')" style="background:transparent; border:1px solid var(--neon-red); color:var(--neon-red); padding:5px 10px; cursor:pointer;">DEL</button>
+                    `;
+                    list.appendChild(row);
                 });
-            });
-            const cTable = document.getElementById("liveConstructorsBody");
-            cTable.innerHTML = "";
-            Object.keys(teamPoints).map(k => ({name: k, pts: teamPoints[k]})).sort((a,b) => b.pts - a.pts).forEach((tm, i) => {
-                cTable.innerHTML += `<tr><td style="color:#666">${String(i+1).padStart(2,'0')}</td><td style="text-transform:uppercase; font-weight:bold; color:#fff;">${TEAMS.find(t => t.id === tm.name)?.name}</td><td style="text-align:right; font-weight:bold; color:var(--neon-red)">${tm.pts}</td></tr>`;
+                
+                updateLiveTables();
+                if(document.getElementById("raceDirectorGrid").style.display === "block") loadRaceGrid();
+                if(document.getElementById("editor-area").style.display === "block") loadDriverData();
+                if(document.getElementById("statsDisplay").style.display === "block") viewDriverStats();
             });
         }
 
@@ -1322,13 +635,377 @@
             try {
                 await addDoc(collection(db, "seasons", currentSeason, "drivers"), { name, team, totalPoints: 0, results: {} });
                 document.getElementById("newDriverName").value = "";
-                document.getElementById("register-status").innerText = "CONFIRMED"; setTimeout(() => document.getElementById("register-status").innerText = "", 2000);
+                showToast("Driver Added");
             } catch(e) { console.error(e); }
         };
 
-        window.deleteDriver = async (id, name) => {
-            if(confirm(`DELETE ${name}?`)) await deleteDoc(doc(db, "seasons", currentSeason, "drivers", id));
+        window.deleteDriver = (id) => {
+            const d = driversCache[id];
+            customConfirm(`Delete ${d ? d.name : 'driver'}?`, async () => {
+                await deleteDoc(doc(db, "seasons", currentSeason, "drivers", id));
+                showToast("Deleted");
+            });
         };
+
+        window.toggleSelectAll = () => {
+            const cbs = document.querySelectorAll('.driver-checkbox');
+            const all = Array.from(cbs).every(c => c.checked);
+            cbs.forEach(c => c.checked = !all);
+        };
+
+        window.deleteSelectedDrivers = () => {
+            const cbs = document.querySelectorAll('.driver-checkbox:checked');
+            if(cbs.length === 0) return;
+            customConfirm(`Delete ${cbs.length} drivers?`, async () => {
+                const batch = writeBatch(db);
+                cbs.forEach(c => batch.delete(doc(db, "seasons", currentSeason, "drivers", c.value)));
+                await batch.commit();
+                showToast("Batch Delete Complete");
+            });
+        };
+
+        // --- EDITOR ---
+        window.loadDriverData = () => {
+            const id = document.getElementById("editorDriverSelect").value;
+            const area = document.getElementById("editor-area");
+            if(!id) { area.style.display = "none"; return; }
+            area.style.display = "block";
+            
+            const data = driversCache[id];
+            document.getElementById("editorMainTeam").value = data.team;
+            
+            const grid = document.getElementById("trackGrid");
+            grid.innerHTML = "";
+            
+            if(activeTracks.length === 0) { grid.innerHTML = "No Tracks Configured"; return; }
+
+            const res = data.results || {};
+            
+            // Build Enhanced Dropdown with Reserve Options
+            let teamOpts = `<optgroup label="Standard Teams">`;
+            teamOpts += TEAMS.map(tm => `<option value="${tm.id}">${tm.name}</option>`).join('');
+            teamOpts += `</optgroup><optgroup label="Reserve / Sub Options">`;
+            teamOpts += TEAMS.map(tm => `<option value="${tm.id}">Reserve - ${tm.name}</option>`).join('');
+            teamOpts += `</optgroup>`;
+
+            activeTracks.forEach(t => {
+                let pts = 0;
+                let raceTeam = data.team; 
+                
+                if(res[t.id]) {
+                    if(typeof res[t.id] === 'object') {
+                        pts = res[t.id].points || 0;
+                        raceTeam = res[t.id].team || data.team;
+                    } else { pts = res[t.id]; }
+                }
+
+                const div = document.createElement("div");
+                div.className = "input-module";
+                div.innerHTML = `
+                    <label>${t.name.toUpperCase()}</label>
+                    <div style="display:flex; gap:5px;">
+                        <input type="number" class="pts-in data-input" style="width:60px; text-align:center; font-weight:bold; color:var(--neon-cyan);" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
+                        <select class="tm-in data-input" id="tm-${t.id}">
+                            ${teamOpts}
+                        </select>
+                    </div>`;
+                grid.appendChild(div);
+                
+                // Set value after HTML injection
+                document.getElementById(`tm-${t.id}`).value = raceTeam;
+            });
+            calcTotal();
+        };
+
+        window.updateMainTeam = async () => {
+            const id = document.getElementById("editorDriverSelect").value;
+            const team = document.getElementById("editorMainTeam").value;
+            await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { team });
+            showToast("Main Contract Updated");
+        };
+
+        window.calcTotal = () => {
+            let s = 0;
+            document.querySelectorAll(".pts-in").forEach(i => s += Number(i.value)||0);
+            document.getElementById("calculatedTotal").innerText = s;
+        };
+
+        window.saveAllChanges = async () => {
+            const id = document.getElementById("editorDriverSelect").value;
+            const ptsIns = document.querySelectorAll(".pts-in");
+            const tmIns = document.querySelectorAll(".tm-in");
+            
+            let newResults = {};
+            let total = 0;
+            
+            ptsIns.forEach((p, idx) => {
+                const val = Number(p.value);
+                if(val > 0) {
+                    newResults[p.dataset.track] = { points: val, team: tmIns[idx].value };
+                    total += val;
+                }
+            });
+
+            await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { results: newResults, totalPoints: total });
+            showToast("Driver Updated");
+        };
+
+        // --- IMPORT ---
+        window.triggerImport = () => document.getElementById('csvFile').click();
+        
+        window.handleFileSelect = (input) => {
+            if(input.files[0]) {
+                const r = new FileReader();
+                r.onload = (e) => parseCSV(e.target.result);
+                r.readAsText(input.files[0]);
+            }
+        };
+
+        function fuzzyMatch(h) {
+            const l = h.toLowerCase();
+            if(l.includes('bahrain')) return 'bahrain';
+            if(l.includes('saudi')) return 'saudi_arabia';
+            if(l.includes('australia')) return 'australia';
+            if(l.includes('japan')) return 'japan';
+            if(l.includes('china')) return 'china';
+            if(l.includes('miami')) return 'miami';
+            if(l.includes('imola') || l.includes('emilia')) return 'emilia_romagna';
+            if(l.includes('monaco')) return 'monaco';
+            if(l.includes('canada')) return 'canada';
+            if(l.includes('spain') || l.includes('spanish')) return 'spain';
+            if(l.includes('austria')) return 'austria';
+            if(l.includes('britain') || l.includes('uk') || l.includes('silverstone')) return 'uk';
+            if(l.includes('hungary')) return 'hungary';
+            if(l.includes('belgium')) return 'belgium';
+            if(l.includes('netherlands') || l.includes('dutch')) return 'netherlands';
+            if(l.includes('italy') || l.includes('monza')) return 'italy';
+            if(l.includes('azerbaijan') || l.includes('baku')) return 'azerbaijan';
+            if(l.includes('singapore')) return 'singapore';
+            if(l.includes('usa') || l.includes('austin')) return 'usa';
+            if(l.includes('mexico')) return 'mexico';
+            if(l.includes('brazil') || l.includes('paulo')) return 'brazil';
+            if(l.includes('vegas')) return 'las_vegas';
+            if(l.includes('qatar')) return 'qatar';
+            if(l.includes('abu')) return 'abu_dhabi';
+            return null;
+        }
+
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            pendingImportData = [];
+            pendingImportTracks.clear();
+            
+            const headers = lines[0].split(',').map(s => s.trim().replace(/^"|"$/g,''));
+            const colMap = {};
+            
+            headers.forEach((h, i) => {
+                const mid = fuzzyMatch(h);
+                if(mid) { colMap[i] = mid; pendingImportTracks.add(mid); }
+            });
+
+            lines.slice(1).forEach(line => {
+                if(!line.trim()) return;
+                const p = line.split(',').map(s => s.trim().replace(/^"|"$/g,''));
+                if(p.length < 2) return;
+
+                const name = p[0];
+                const teamRaw = p[1].toLowerCase().replace(/\s/g,'-');
+                // fuzzy team match
+                let teamId = 'reserve';
+                const tObj = TEAMS.find(t => t.id === teamRaw || t.name.toLowerCase() === p[1].toLowerCase());
+                if(tObj) teamId = tObj.id;
+
+                let res = {}, tot = 0;
+                Object.keys(colMap).forEach(idx => {
+                    const pts = parseInt(p[idx]);
+                    if(!isNaN(pts) && pts > 0) {
+                        res[colMap[idx]] = { points: pts, team: teamId };
+                        tot += pts;
+                    }
+                });
+
+                pendingImportData.push({ name, team: teamId, results: res, totalPoints: tot, valid: true });
+            });
+
+            // Show UI
+            switchTab('import-preview');
+            document.getElementById('import-preview').classList.add('active');
+            
+            const div = document.getElementById('detectedTracksList');
+            div.innerText = Array.from(pendingImportTracks).join(', ').toUpperCase() || "NONE";
+
+            const tb = document.getElementById('importTableBody');
+            tb.innerHTML = "";
+            pendingImportData.forEach((d, i) => {
+                const tr = document.createElement('tr');
+                let tOpts = TEAMS.map(t => `<option value="${t.id}" ${t.id===d.team?'selected':''}>${t.name}</option>`).join('');
+                tr.innerHTML = `
+                    <td><input value="${d.name}" class="data-input" onchange="pendingImportData[${i}].name=this.value"></td>
+                    <td><select onchange="pendingImportData[${i}].team=this.value; updateImpTeam(${i}, this.value)">${tOpts}</select></td>
+                    <td style="color:var(--neon-cyan); font-weight:bold;">${d.totalPoints}</td>
+                    <td class="status-valid">OK</td>
+                `;
+                tb.appendChild(tr);
+            });
+        }
+
+        window.updateImpTeam = (idx, nt) => {
+            const r = pendingImportData[idx].results;
+            Object.keys(r).forEach(k => r[k].team = nt);
+        };
+
+        window.cancelImport = () => {
+            document.getElementById('csvFile').value = "";
+            switchTab('manage-drivers');
+        };
+
+        window.commitImport = async () => {
+            // 1. Update Tracks
+            const sRef = doc(db, "seasons", currentSeason);
+            const snap = await getDoc(sRef);
+            let tracks = (snap.exists() && snap.data().trackConfig) ? snap.data().trackConfig : [];
+            
+            const newT = [];
+            pendingImportTracks.forEach(tid => {
+                if(!tracks.some(t => t.id === tid)) {
+                    const m = MASTER_TRACK_LIST.find(x => x.id === tid);
+                    newT.push({ id: tid, name: m ? m.name : tid.toUpperCase(), date: "" });
+                }
+            });
+
+            if(newT.length > 0) {
+                if(snap.exists()) await updateDoc(sRef, { trackConfig: arrayUnion(...newT) });
+                else await setDoc(sRef, { trackConfig: newT });
+            }
+
+            // 2. Add Drivers
+            const batch = writeBatch(db);
+            pendingImportData.forEach(d => {
+                if(d.name) {
+                    batch.set(doc(collection(db, "seasons", currentSeason, "drivers")), {
+                        name: d.name, team: d.team, totalPoints: d.totalPoints, results: d.results
+                    });
+                }
+            });
+
+            await batch.commit();
+            loadTrackConfig();
+            cancelImport();
+            showToast(`Imported ${pendingImportData.length} Drivers`);
+        };
+
+        // --- TABLES & RACE DIRECTOR ---
+        // (Similar to previous versions but cleaner)
+        function updateLiveTables() {
+            const tD = document.getElementById("liveDriversBody");
+            tD.innerHTML = "";
+            const sorted = [...allDrivers].sort((a,b) => {
+                if(a.team==='reserve' && b.team!=='reserve') return 1;
+                if(a.team!=='reserve' && b.team==='reserve') return -1;
+                return b.totalPoints - a.totalPoints;
+            });
+            sorted.forEach((d,i) => {
+                tD.innerHTML += `<tr><td style="color:#666;">${String(i+1).padStart(2,'0')}</td><td><div style="font-weight:bold; color:#fff;">${d.name}</div><div style="font-size:0.7rem; color:var(--neon-cyan);">${d.team.toUpperCase()}</div></td><td style="text-align:right; font-weight:bold; font-size:1.1rem; color:var(--neon-cyan);">${d.totalPoints}</td></tr>`;
+            });
+
+            const teamPts = {};
+            allDrivers.forEach(d => {
+                const res = d.results || {};
+                Object.values(res).forEach(r => {
+                    const p = (typeof r === 'object') ? r.points : r;
+                    const t = (typeof r === 'object') ? r.team : d.team;
+                    if(t !== 'reserve') { teamPts[t] = (teamPts[t]||0) + p; }
+                });
+            });
+            const tC = document.getElementById("liveConstructorsBody");
+            tC.innerHTML = "";
+            Object.keys(teamPts).map(k => ({id:k, p:teamPts[k]})).sort((a,b) => b.p - a.p).forEach((x,i) => {
+                const tn = TEAMS.find(t=>t.id===x.id)?.name || x.id;
+                tC.innerHTML += `<tr><td style="color:#666;">${String(i+1).padStart(2,'0')}</td><td style="font-weight:bold; color:#fff; text-transform:uppercase;">${tn}</td><td style="text-align:right; font-weight:bold; color:var(--neon-red);">${x.p}</td></tr>`;
+            });
+        }
+
+        window.loadRaceGrid = () => {
+            const tid = document.getElementById("raceDirectorTrackSelect").value;
+            const con = document.getElementById("raceInputsContainer");
+            const wrap = document.getElementById("raceDirectorGrid");
+            if(!tid) { wrap.style.display="none"; return; }
+            wrap.style.display="block";
+            con.innerHTML = "";
+            
+            [...allDrivers].sort((a,b)=>a.name.localeCompare(b.name)).forEach(d => {
+                const r = d.results || {};
+                const pts = (r[tid] && typeof r[tid]==='object') ? r[tid].points : (r[tid] || 0);
+                con.innerHTML += `<div class="race-input-row"><div class="driver-name-label">${d.name} <span style="color:#666; font-size:0.8rem;">(${d.team})</span></div><input type="number" class="race-points-input" data-did="${d.id}" value="${pts}"></div>`;
+            });
+        };
+
+        window.saveRaceResults = async () => {
+            const tid = document.getElementById("raceDirectorTrackSelect").value;
+            if(!tid) return;
+            const inps = document.querySelectorAll(".race-points-input");
+            const batch = writeBatch(db);
+            let changes = 0;
+
+            inps.forEach(inp => {
+                const did = inp.dataset.did;
+                const newP = Number(inp.value);
+                const d = driversCache[did];
+                const oldRes = d.results || {};
+                const oldP = (oldRes[tid] && typeof oldRes[tid]==='object') ? oldRes[tid].points : (oldRes[tid]||0);
+                
+                if(oldP !== newP) {
+                    const newTot = d.totalPoints - oldP + newP;
+                    const resUpd = { ...oldRes };
+                    
+                    // Maintain existing team logic for this track if present, else use current main team
+                    let tRace = d.team;
+                    if(oldRes[tid] && oldRes[tid].team) tRace = oldRes[tid].team;
+
+                    if(newP > 0) resUpd[tid] = { points: newP, team: tRace };
+                    else delete resUpd[tid];
+
+                    batch.update(doc(db, "seasons", currentSeason, "drivers", did), { results: resUpd, totalPoints: newTot });
+                    changes++;
+                }
+            });
+
+            if(changes > 0) { await batch.commit(); showToast("Results Saved"); }
+            else showToast("No Changes");
+        };
+
+        window.viewDriverStats = () => {
+            const id = document.getElementById("statsDriverSelect").value;
+            const disp = document.getElementById("statsDisplay");
+            if(!id) { disp.style.display="none"; return; }
+            disp.style.display="block";
+            
+            const d = driversCache[id];
+            document.getElementById("statsDriverName").innerText = d.name.toUpperCase();
+            document.getElementById("statsTeamName").innerText = TEAMS.find(t=>t.id===d.team)?.name.toUpperCase() || d.team;
+            document.getElementById("statPoints").innerText = d.totalPoints;
+
+            let w=0, p=0, r=0, hHTML="";
+            activeTracks.forEach(t => {
+                const res = d.results ? d.results[t.id] : null;
+                if(res) {
+                    const pt = res.points || res; // handle old format if any
+                    const tm = res.team || d.team;
+                    if(pt > 0) {
+                        r++;
+                        if(pt>=25) w++;
+                        if(pt>=15) p++;
+                        const tName = TEAMS.find(x=>x.id===tm)?.name || tm;
+                        hHTML += `<tr><td>${t.name.toUpperCase()}</td><td style="color:#888;">${tName}</td><td style="text-align:right; font-weight:bold; color:var(--neon-cyan);">${pt}</td></tr>`;
+                    }
+                }
+            });
+            document.getElementById("statWins").innerText = w;
+            document.getElementById("statPodiums").innerText = p;
+            document.getElementById("statAvg").innerText = r>0 ? (d.totalPoints/r).toFixed(1) : "0.0";
+            document.getElementById("statsHistoryBody").innerHTML = hHTML || `<tr><td colspan="3" style="text-align:center;">NO DATA</td></tr>`;
+        };
+
     </script>
 </body>
 </html>
