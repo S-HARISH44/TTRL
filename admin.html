@@ -296,17 +296,6 @@
         .tech-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ccc; }
         .tech-table tr:hover td { background: rgba(255,255,255,0.02); color: #fff; }
         
-        /* Help Toggle */
-        .help-toggle { 
-            text-align: center; color: #555; font-size: 0.75rem; margin-top: 20px; 
-            cursor: pointer; text-decoration: underline; transition: color 0.2s;
-        }
-        .help-toggle:hover { color: var(--neon-cyan); }
-        .help-content { 
-            display: none; background: #000; border: 1px solid #333; padding: 15px; 
-            font-size: 0.8rem; color: #aaa; margin-top: 10px; line-height: 1.6; text-align: left;
-        }
-
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
@@ -365,13 +354,6 @@
             <button class="btn-main" onclick="checkLogin()">INITIATE LINK</button>
             
             <div id="login-msg" style="margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem; color:var(--neon-red); text-align: center; min-height: 1.2em;"></div>
-            
-            <div class="help-toggle" onclick="document.getElementById('help-box').style.display = document.getElementById('help-box').style.display === 'none' ? 'block' : 'none'">Connection Trouble?</div>
-            <div id="help-box" class="help-content">
-                <strong>TROUBLESHOOTING:</strong><br>
-                1. "DOMAIN NOT AUTHORIZED": Copy the link shown in error & add to Firebase Console > Auth > Settings.<br>
-                2. "PROVIDER DISABLED": Enable Google Auth in Firebase Console.<br>
-            </div>
         </div>
     </div>
 
@@ -609,7 +591,7 @@
         window.checkLogin = () => {
             const email = document.getElementById("loginEmail").value;
             const pass = document.getElementById("loginPass").value;
-            signInWithEmailAndPassword(auth, email, pass).catch(e => document.getElementById("login-msg").innerText = "ACCESS DENIED: " + e.message);
+            signInWithEmailAndPassword(auth, email, pass).catch(e => document.getElementById("login-msg").innerText = "LOGIN FAILED");
         };
 
         window.loginWithGoogle = async () => {
@@ -622,13 +604,7 @@
             } catch (error) {
                 console.error("Google Sign In Error:", error);
                 statusMsg.style.color = "var(--neon-red)";
-                
-                if (error.code === 'auth/unauthorized-domain') {
-                    const currentDomain = window.location.hostname;
-                    statusMsg.innerHTML = `DOMAIN NOT AUTHORIZED. ADD TO FIREBASE: ${currentDomain}`;
-                } else {
-                    statusMsg.innerText = "LOGIN FAILED";
-                }
+                statusMsg.innerText = "LOGIN FAILED";
             }
         };
 
