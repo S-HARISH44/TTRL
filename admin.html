@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ... existing styles ... */
         :root {
             --bg-deep: #030305;
             --panel-bg: rgba(20, 20, 25, 0.7);
@@ -53,7 +54,6 @@
         /* --- LOGIN OVERLAY (TERMINAL STYLE) --- */
         #login-overlay {
             position: fixed; inset: 0; z-index: 9999;
-            /* Background Image Restored */
             background-image: 
                 linear-gradient(rgba(3, 3, 5, 0.6), rgba(3, 3, 5, 0.9)),
                 url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/1-w-GettyImages-2048270135.webp');
@@ -71,7 +71,6 @@
             padding: 3rem 2rem;
             position: relative;
             box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
-            /* Sci-Fi Corners */
             clip-path: polygon(
                 20px 0, 100% 0, 
                 100% calc(100% - 20px), calc(100% - 20px) 100%, 
@@ -177,6 +176,9 @@
         .btn-small:hover { background: #fff; color: #000; }
         .btn-accent { border-color: var(--neon-red); color: var(--neon-red); }
         .btn-accent:hover { background: var(--neon-red); color: #fff; }
+        
+        .btn-upload { background: rgba(0,255,157,0.1); border-color: var(--neon-green); color: var(--neon-green); }
+        .btn-upload:hover { background: var(--neon-green); color: #000; }
 
         /* Nav Tabs - "Mode Switch" Style */
         .nav-container { 
@@ -329,6 +331,11 @@
         .track-list-item:hover { border-color: var(--neon-cyan); }
         .track-code { color: var(--neon-red); font-weight: bold; margin-right: 15px; width: 60px; }
 
+        /* Validation Colors */
+        .status-valid { color: var(--neon-green); font-weight: bold; }
+        .status-invalid { color: var(--neon-red); font-weight: bold; }
+        .invalid-row { background: rgba(255, 0, 60, 0.1); }
+
         /* Mobile */
         @media (max-width: 768px) {
             .header-title { font-size: 1.2rem; }
@@ -397,6 +404,11 @@
             <span class="control-label">DATA STREAM:</span>
             <input type="text" id="seasonInput" class="flat-input" value="season_1" placeholder="SEASON ID">
             <button class="btn-small btn-accent" onclick="changeSeason()"><i class="fas fa-sync"></i> SYNC</button>
+            
+            <!-- NEW: Import Button -->
+            <button class="btn-small btn-upload" onclick="triggerImport()" style="margin-left: 20px;"><i class="fas fa-file-csv"></i> IMPORT DATA</button>
+            <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFileSelect(this)">
+
             <button class="btn-small" onclick="exportData()" style="margin-left:auto;"><i class="fas fa-download"></i> EXPORT JSON</button>
         </div>
         <div id="knownSeasonsList" style="margin-bottom:20px; padding-left:10px; font-size:0.8rem; color:#666; font-family:var(--mono-font);"></div>
@@ -411,6 +423,53 @@
             <button class="tab-btn" onclick="switchTab('driver-stats')"><i class="fas fa-chart-pie"></i> Statistics</button>
         </div>
 
+        <!-- NEW SECTION: IMPORT PREVIEW (Hidden until file selected) -->
+        <div id="import-preview" class="section">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-title" style="color:var(--neon-green)">DATA VALIDATION</div>
+                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">REVIEW BEFORE IMPORTING</div>
+                </div>
+
+                <div class="form-group" style="background:rgba(255,255,255,0.05); padding:15px; border:1px solid #333;">
+                    <label>TARGET SEASON</label>
+                    <div style="font-size:0.8rem; color:#888; margin-bottom:5px;">Data will be imported into:</div>
+                    <input type="text" id="importTargetSeason" class="flat-input" readonly style="color:var(--neon-cyan); font-weight:bold; border-color:var(--neon-cyan);">
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label>TRACKS DETECTED IN CSV:</label>
+                    <div id="detectedTracksList" style="font-family:var(--mono-font); color:var(--neon-green); font-size:0.9rem; padding:10px; border:1px solid rgba(0,255,157,0.3); background:rgba(0,0,0,0.3);">
+                        <!-- JS populated -->
+                    </div>
+                    <div style="font-size:0.75rem; color:#888; margin-top:5px;">* These tracks will be automatically added to the season configuration.</div>
+                </div>
+
+                <div style="max-height:500px; overflow-y:auto; margin-bottom:20px; border:1px solid #333;">
+                    <table class="tech-table">
+                        <thead>
+                            <tr>
+                                <th>DRIVER NAME</th>
+                                <th>TEAM</th>
+                                <th>POINTS (CALC)</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="importTableBody">
+                            <!-- JS Generated -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-main" onclick="commitImport()" style="background:var(--neon-green);">CONFIRM IMPORT</button>
+                    <button class="btn-main" onclick="cancelImport()" style="background:#333; color:#fff;">CANCEL</button>
+                </div>
+                <div id="import-status" style="margin-top:10px; font-family:var(--mono-font); color:var(--neon-cyan);"></div>
+            </div>
+        </div>
+
+
         <!-- 0. SEASON SETUP (TRACK CONFIG) -->
         <div id="season-setup" class="section active">
             <div class="panel-card">
@@ -420,13 +479,16 @@
                 </div>
 
                 <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:15px; margin-bottom:20px; align-items:end;">
-                    <div class="input-module">
-                        <label>TRACK NAME (e.g. Bahrain Grand Prix)</label>
-                        <input type="text" class="data-input" id="newTrackName" placeholder="ENTER TRACK NAME">
+                    <div class="input-module" style="grid-column: span 1;">
+                        <label>SELECT OFFICIAL TRACK</label>
+                        <select id="trackSelector" class="data-input" style="background:transparent; border-bottom:1px solid #444; padding:5px 0;">
+                            <option value="">-- CHOOSE CIRCUIT --</option>
+                            <!-- Populated via JS -->
+                        </select>
                     </div>
                     <div class="input-module">
-                        <label>TRACK ID (e.g. bahrain)</label>
-                        <input type="text" class="data-input" id="newTrackId" placeholder="UNIQUE ID">
+                        <label>RACE DATE</label>
+                        <input type="date" class="data-input" id="newTrackDate" style="color-scheme:dark;">
                     </div>
                     <button class="btn-main" onclick="addTrackConfig()" style="height:54px; width:auto; padding:0 30px;"><i class="fas fa-plus"></i> ADD</button>
                 </div>
@@ -606,7 +668,7 @@
         let currentSeason = "season_1"; 
         let unsubscribe = null; 
         let knownSeasons = [];
-        let activeTracks = []; // Stores the manually entered tracks
+        let activeTracks = []; 
         try { knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1']; } catch(e) { knownSeasons = ['season_1']; }
 
         const TEAMS = [
@@ -616,8 +678,38 @@
             {id:'haas', name:'Haas'}, {id:'reserve', name:'Reserve'}
         ];
 
+        // --- PREDEFINED TRACKS (Master List) ---
+        const MASTER_TRACK_LIST = [
+            { id: "bahrain", name: "Bahrain GP" },
+            { id: "saudi_arabia", name: "Saudi Arabian GP" },
+            { id: "australia", name: "Australian GP" },
+            { id: "japan", name: "Japanese GP" },
+            { id: "china", name: "Chinese GP" },
+            { id: "miami", name: "Miami GP" },
+            { id: "emilia_romagna", name: "Emilia Romagna GP" },
+            { id: "monaco", name: "Monaco GP" },
+            { id: "canada", name: "Canadian GP" },
+            { id: "spain", name: "Spanish GP" },
+            { id: "austria", name: "Austrian GP" },
+            { id: "uk", name: "British GP" },
+            { id: "hungary", name: "Hungarian GP" },
+            { id: "belgium", name: "Belgian GP" },
+            { id: "netherlands", name: "Dutch GP" },
+            { id: "italy", name: "Italian GP" },
+            { id: "azerbaijan", name: "Azerbaijan GP" },
+            { id: "singapore", name: "Singapore GP" },
+            { id: "usa", name: "United States GP" },
+            { id: "mexico", name: "Mexico City GP" },
+            { id: "brazil", name: "São Paulo GP" },
+            { id: "las_vegas", name: "Las Vegas GP" },
+            { id: "qatar", name: "Qatar GP" },
+            { id: "abu_dhabi", name: "Abu Dhabi GP" }
+        ];
+
         let driversCache = {};
         let allDrivers = [];
+        let pendingImportData = [];
+        let pendingImportTracks = new Set();
 
         // AUTHENTICATION
         window.checkLogin = () => {
@@ -659,9 +751,25 @@
         window.switchTab = (id) => {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.target.classList.add('active');
+            
+            // Handle import tab manually since it doesn't have a nav button
+            const section = document.getElementById(id);
+            if(section) {
+                section.classList.add('active');
+            }
+            // highlight btn if exists
+            const btn = document.querySelector(`.tab-btn[onclick="switchTab('${id}')"]`);
+            if(btn) btn.classList.add('active');
         };
+
+        function populateTrackSelector() {
+            const selector = document.getElementById("trackSelector");
+            selector.innerHTML = '<option value="">-- CHOOSE CIRCUIT --</option>';
+            MASTER_TRACK_LIST.forEach(t => {
+                selector.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`;
+            });
+        }
+        populateTrackSelector();
 
         function renderKnownSeasons() {
             const container = document.getElementById("knownSeasonsList");
@@ -673,89 +781,298 @@
             changeSeason();
         };
 
-        // TRACK CONFIGURATION (MANUAL ENTRY)
+        // --- CSV IMPORT LOGIC ---
+        window.triggerImport = () => document.getElementById('csvFile').click();
+
+        window.handleFileSelect = (input) => {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                parseCSV(text);
+            };
+            reader.readAsText(file);
+        };
+
+        function fuzzyMatchTrack(header) {
+            const h = header.toLowerCase();
+            if (h.includes('bahrain')) return 'bahrain';
+            if (h.includes('australian')) return 'australia';
+            if (h.includes('imola') || h.includes('emilia')) return 'emilia_romagna';
+            if (h.includes('spain') || h.includes('spanish')) return 'spain';
+            if (h.includes('britain') || h.includes('silverstone') || h.includes('uk')) return 'uk';
+            if (h.includes('vegas')) return 'las_vegas';
+            if (h.includes('belgium') || h.includes('spa')) return 'belgium';
+            if (h.includes('austria')) return 'austria';
+            if (h.includes('brazil') || h.includes('paulo')) return 'brazil';
+            if (h.includes('abu dhabi')) return 'abu_dhabi';
+            return null;
+        }
+
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            const data = [];
+            pendingImportTracks.clear();
+            
+            // 1. Parse Headers to find Track Columns
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            const trackColIndices = {}; 
+
+            headers.forEach((h, idx) => {
+                const matchedId = fuzzyMatchTrack(h);
+                if (matchedId) {
+                    trackColIndices[idx] = matchedId;
+                    pendingImportTracks.add(matchedId);
+                }
+            });
+
+            // 2. Parse Rows
+            lines.forEach((line, index) => {
+                if(!line.trim() || index === 0) return; 
+                
+                const parts = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+                
+                if(parts.length >= 2) {
+                    const name = parts[0];
+                    const rawTeam = parts[1];
+                    let teamId = "reserve";
+                    let valid = false;
+
+                    const cleanTeam = rawTeam.toLowerCase().replace(/\s+/g, '-'); 
+                    const teamObj = TEAMS.find(t => 
+                        t.id === cleanTeam || 
+                        t.name.toLowerCase() === rawTeam.toLowerCase() ||
+                        t.id.replace(/-/g, ' ') === rawTeam.toLowerCase()
+                    );
+                    
+                    if(teamObj) {
+                        teamId = teamObj.id;
+                        valid = true;
+                    }
+
+                    let results = {};
+                    let totalCalc = 0;
+
+                    Object.keys(trackColIndices).forEach(colIdx => {
+                        const trackId = trackColIndices[colIdx];
+                        const valStr = parts[colIdx];
+                        const val = parseInt(valStr);
+                        
+                        if (!isNaN(val) && val > 0) {
+                            results[trackId] = { points: val, team: teamId };
+                            totalCalc += val;
+                        }
+                    });
+
+                    data.push({ name, team: rawTeam, teamId, results, totalPoints: totalCalc, valid });
+                }
+            });
+
+            pendingImportData = data;
+            showImportPreview();
+        }
+
+        function showImportPreview() {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById('import-preview').classList.add('active');
+            document.getElementById('importTargetSeason').value = currentSeason;
+
+            // Show Detected Tracks
+            const tracksDiv = document.getElementById('detectedTracksList');
+            if (pendingImportTracks.size > 0) {
+                tracksDiv.innerText = Array.from(pendingImportTracks).join(', ').toUpperCase();
+            } else {
+                tracksDiv.innerText = "NONE DETECTED";
+            }
+
+            const tbody = document.getElementById('importTableBody');
+            tbody.innerHTML = "";
+
+            if(pendingImportData.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center'>NO VALID DATA FOUND IN CSV</td></tr>";
+                return;
+            }
+
+            pendingImportData.forEach((row, idx) => {
+                const tr = document.createElement('tr');
+                if(!row.valid) tr.classList.add('invalid-row');
+                
+                let teamSelect = `<select onchange="updateImportRow(${idx}, this.value)" style="padding:5px;">`;
+                TEAMS.forEach(t => {
+                    const sel = t.id === row.teamId ? 'selected' : '';
+                    teamSelect += `<option value="${t.id}" ${sel}>${t.name}</option>`;
+                });
+                teamSelect += `</select>`;
+
+                tr.innerHTML = `
+                    <td><input type="text" value="${row.name}" class="data-input" onchange="pendingImportData[${idx}].name = this.value"></td>
+                    <td>${teamSelect}</td>
+                    <td style="color:var(--neon-cyan); font-weight:bold;">${row.totalPoints}</td>
+                    <td>${row.valid ? '<span class="status-valid">OK</span>' : '<span class="status-invalid">CHECK TEAM</span>'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.updateImportRow = (idx, newTeamId) => {
+            pendingImportData[idx].teamId = newTeamId;
+            const res = pendingImportData[idx].results;
+            Object.keys(res).forEach(k => {
+                if (res[k].team === pendingImportData[idx].teamId) { 
+                     res[k].team = newTeamId;
+                }
+            });
+            pendingImportData[idx].valid = true;
+            
+            const rows = document.getElementById('importTableBody').rows;
+            rows[idx].classList.remove('invalid-row');
+            rows[idx].cells[3].innerHTML = '<span class="status-valid">OK (MANUAL)</span>';
+        };
+
+        window.cancelImport = () => {
+            document.getElementById('csvFile').value = "";
+            pendingImportData = [];
+            pendingImportTracks.clear();
+            switchTab('manage-drivers');
+        };
+
+        window.commitImport = async () => {
+            const status = document.getElementById("import-status");
+            status.innerText = "IMPORTING TRACKS & DRIVERS...";
+            
+            // 1. UPDATE TRACK CONFIG (AUTO-CALENDAR)
+            try {
+                const seasonRef = doc(db, "seasons", currentSeason);
+                const seasonSnap = await getDoc(seasonRef);
+                let currentTracks = [];
+                if (seasonSnap.exists() && seasonSnap.data().trackConfig) {
+                    currentTracks = seasonSnap.data().trackConfig;
+                }
+
+                const newTracksToAdd = [];
+                pendingImportTracks.forEach(trackId => {
+                    if (!currentTracks.some(t => t.id === trackId)) {
+                        // Find pretty name
+                        const masterObj = MASTER_TRACK_LIST.find(m => m.id === trackId);
+                        newTracksToAdd.push({
+                            id: trackId,
+                            name: masterObj ? masterObj.name : trackId.toUpperCase(),
+                            date: "" // CSV doesn't have dates, leaves empty
+                        });
+                    }
+                });
+
+                if (newTracksToAdd.length > 0) {
+                    if (!seasonSnap.exists()) {
+                        await setDoc(seasonRef, { trackConfig: newTracksToAdd });
+                    } else {
+                        await updateDoc(seasonRef, {
+                            trackConfig: arrayUnion(...newTracksToAdd)
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Track Config Update Failed:", err);
+                status.innerText = "TRACK UPDATE FAILED: " + err.message;
+                return;
+            }
+
+            // 2. IMPORT DRIVERS
+            const batch = writeBatch(db);
+            let count = 0;
+
+            pendingImportData.forEach(d => {
+                if(d.name && d.teamId) {
+                    const docRef = doc(collection(db, "seasons", currentSeason, "drivers"));
+                    batch.set(docRef, {
+                        name: d.name,
+                        team: d.teamId,
+                        totalPoints: d.totalPoints,
+                        results: d.results
+                    });
+                    count++;
+                }
+            });
+
+            try {
+                await batch.commit();
+                status.innerText = `SUCCESS! CONFIG UPDATED & ${count} DRIVERS IMPORTED.`;
+                
+                // Refresh local views
+                await loadTrackConfig();
+                
+                setTimeout(() => {
+                    cancelImport(); 
+                }, 1500);
+            } catch(e) {
+                status.innerText = "ERROR: " + e.message;
+            }
+        };
+
+        // ... existing track functions ...
         async function loadTrackConfig() {
             const trackListEl = document.getElementById("trackConfigList");
             const docRef = doc(db, "seasons", currentSeason);
-            
             try {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().trackConfig) {
                     activeTracks = docSnap.data().trackConfig;
-                } else {
-                    activeTracks = [];
-                }
-            } catch (error) {
-                console.error("Error loading track config:", error);
-                activeTracks = [];
-            }
+                    activeTracks.sort((a, b) => new Date(a.date) - new Date(b.date));
+                } else { activeTracks = []; }
+            } catch (error) { activeTracks = []; }
 
-            // Render List
             if(activeTracks.length === 0) {
                 trackListEl.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">NO TRACKS CONFIGURED FOR THIS SEASON</div>`;
             } else {
                 trackListEl.innerHTML = activeTracks.map(t => `
                     <div class="track-list-item">
-                        <div>
+                        <div style="display:flex; gap:15px; align-items:center;">
                             <span class="track-code">${t.id.toUpperCase()}</span>
-                            <span style="color:#fff;">${t.name}</span>
+                            <div><div style="color:#fff; font-weight:bold;">${t.name}</div><div style="color:#666; font-size:0.8rem;">${t.date || 'NO DATE'}</div></div>
                         </div>
                         <button class="btn-small" onclick="removeTrackConfig('${t.id}')" style="border-color:var(--neon-red); color:var(--neon-red);">REMOVE</button>
-                    </div>
-                `).join('');
+                    </div>`).join('');
             }
 
-            // Update Race Director Dropdown
             const raceSelect = document.getElementById("raceDirectorTrackSelect");
             if(raceSelect) {
                 raceSelect.innerHTML = '<option value="">-- SELECT TRACK TO ENTER RESULTS --</option>';
-                if(activeTracks.length === 0) {
-                    raceSelect.innerHTML = '<option value="">-- NO TRACKS FOUND --</option>';
-                } else {
-                    activeTracks.forEach(t => raceSelect.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`);
-                }
+                if(activeTracks.length === 0) { raceSelect.innerHTML = '<option value="">-- NO TRACKS FOUND --</option>'; } 
+                else { activeTracks.forEach(t => raceSelect.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`); }
             }
         }
         
         window.removeTrackConfig = async (trackId) => {
             if(!confirm(`Remove track ${trackId}? Existing data for this track will persist but be hidden.`)) return;
-            const trackToRemove = activeTracks.find(t => t.id === trackId);
-            if(trackToRemove) {
-                await updateDoc(doc(db, "seasons", currentSeason), {
-                    trackConfig: arrayRemove(trackToRemove)
-                });
-                loadTrackConfig(); // Reload
-                // Also refresh driver editor to remove that input field
-                loadDriverData(); 
-            }
+            const seasonRef = doc(db, "seasons", currentSeason);
+            try {
+                const snap = await getDoc(seasonRef);
+                if(snap.exists()) {
+                    const currentTracks = snap.data().trackConfig || [];
+                    const newTracks = currentTracks.filter(t => t.id !== trackId);
+                    await updateDoc(seasonRef, { trackConfig: newTracks });
+                    loadTrackConfig(); loadDriverData(); 
+                }
+            } catch(e) { console.error(e); }
         };
 
         window.addTrackConfig = async () => {
-            const name = document.getElementById("newTrackName").value.trim();
-            const id = document.getElementById("newTrackId").value.trim().toLowerCase();
-            
-            if(!name || !id) { alert("Please enter both Name and ID"); return; }
-            if(activeTracks.some(t => t.id === id)) { alert("Track ID already exists"); return; }
-
-            const newTrack = { id, name };
-            
-            // Ensure season doc exists, then update
+            const trackId = document.getElementById("trackSelector").value;
+            const date = document.getElementById("newTrackDate").value;
+            if(!trackId || !date) { alert("Please Select a Track and Date"); return; }
+            if(activeTracks.some(t => t.id === trackId)) { alert("Track already exists in this season"); return; }
+            const trackObj = MASTER_TRACK_LIST.find(t => t.id === trackId);
+            if(!trackObj) return;
+            const newTrack = { id: trackId, name: trackObj.name, date };
             const seasonRef = doc(db, "seasons", currentSeason);
             const seasonSnap = await getDoc(seasonRef);
-            
-            if(!seasonSnap.exists()) {
-                await setDoc(seasonRef, { trackConfig: [newTrack] });
-            } else {
-                await updateDoc(seasonRef, {
-                    trackConfig: arrayUnion(newTrack)
-                });
-            }
-            
-            document.getElementById("newTrackName").value = "";
-            document.getElementById("newTrackId").value = "";
-            
-            loadTrackConfig();
-            alert("Track Added");
+            if(!seasonSnap.exists()) { await setDoc(seasonRef, { trackConfig: [newTrack] }); } 
+            else { await updateDoc(seasonRef, { trackConfig: arrayUnion(newTrack) }); }
+            document.getElementById("trackSelector").value = "";
+            document.getElementById("newTrackDate").value = "";
+            loadTrackConfig(); alert("Track Added");
         };
 
         // DATA LOGIC
@@ -768,11 +1085,7 @@
                 localStorage.setItem('ttrl_seasons', JSON.stringify(knownSeasons));
                 renderKnownSeasons();
             }
-            
-            // 1. Load Tracks FIRST
             await loadTrackConfig();
-
-            // 2. Then Load Drivers
             initListener(); 
         };
 
@@ -832,26 +1145,19 @@
             const trackId = document.getElementById("raceDirectorTrackSelect").value;
             const container = document.getElementById("raceInputsContainer");
             const wrapper = document.getElementById("raceDirectorGrid");
-            
             if(!trackId) { wrapper.style.display = "none"; return; }
             wrapper.style.display = "block";
             container.innerHTML = "";
-
             const sorted = [...allDrivers].sort((a,b) => a.name.localeCompare(b.name));
-
             sorted.forEach(d => {
                 const results = d.results || {};
                 let currentPoints = 0;
-                if(results[trackId]) {
-                    currentPoints = typeof results[trackId] === 'object' ? results[trackId].points : results[trackId];
-                }
-
+                if(results[trackId]) { currentPoints = typeof results[trackId] === 'object' ? results[trackId].points : results[trackId]; }
                 const div = document.createElement("div");
                 div.className = "race-input-row";
                 div.innerHTML = `
                     <div class="driver-name-label">${d.name} <span style="color:#666; font-size:0.8rem">(${d.team})</span></div>
-                    <input type="number" class="race-points-input" data-driverid="${d.id}" value="${currentPoints}" style="width:70px; background:#000; border:1px solid #444; color:var(--neon-cyan); padding:5px; text-align:center;">
-                `;
+                    <input type="number" class="race-points-input" data-driverid="${d.id}" value="${currentPoints}" style="width:70px; background:#000; border:1px solid #444; color:var(--neon-cyan); padding:5px; text-align:center;">`;
                 container.appendChild(div);
             });
         };
@@ -860,47 +1166,32 @@
             const trackId = document.getElementById("raceDirectorTrackSelect").value;
             const inputs = document.querySelectorAll(".race-points-input");
             const status = document.getElementById("race-director-status");
-            
             if(!trackId) return;
             status.innerText = "PROCESSING...";
-            
             const batch = writeBatch(db);
             let updateCount = 0;
-
             inputs.forEach(input => {
                 const driverId = input.dataset.driverid;
                 const newPoints = Number(input.value);
                 const driverData = driversCache[driverId];
-                
                 let currentTotal = driverData.totalPoints || 0;
                 let oldTrackPoints = 0;
-                
                 if(driverData.results && driverData.results[trackId]) {
                     oldTrackPoints = typeof driverData.results[trackId] === 'object' ? driverData.results[trackId].points : driverData.results[trackId];
                 }
-                
                 if(oldTrackPoints !== newPoints) {
                     const newTotal = currentTotal - oldTrackPoints + newPoints;
                     const resultsUpdate = { ...driverData.results };
                     let teamForRace = driverData.team;
-                    // Preserve existing team override if just updating points
                     if(driverData.results && driverData.results[trackId] && typeof driverData.results[trackId] === 'object') {
                         teamForRace = driverData.results[trackId].team;
                     }
-
-                    if(newPoints > 0) {
-                        resultsUpdate[trackId] = { points: newPoints, team: teamForRace };
-                    } else {
-                        delete resultsUpdate[trackId]; 
-                    }
-
+                    if(newPoints > 0) { resultsUpdate[trackId] = { points: newPoints, team: teamForRace }; } else { delete resultsUpdate[trackId]; }
                     batch.update(doc(db, "seasons", currentSeason, "drivers", driverId), { results: resultsUpdate, totalPoints: newTotal });
                     updateCount++;
                 }
             });
-
             if(updateCount === 0) { status.innerText = "NO CHANGES"; return; }
-
             try {
                 await batch.commit();
                 status.innerText = `UPDATED ${updateCount} ENTRIES`;
@@ -912,43 +1203,30 @@
             const id = document.getElementById("editorDriverSelect").value;
             const grid = document.getElementById("trackGrid");
             const area = document.getElementById("editor-area");
-            
             if(!id) { area.style.display = "none"; return; }
             area.style.display = "block";
             grid.innerHTML = "";
-
             const data = driversCache[id];
             const results = data.results || {};
-
             if(activeTracks.length === 0) {
                 grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; color:#666;'>NO TRACKS CONFIGURED FOR THIS SEASON.<br>GO TO 'SEASON SETUP' TAB.</div>";
                 return;
             }
-
             activeTracks.forEach(t => {
                 let pts = 0;
                 let team = data.team; 
                 if(results[t.id]) {
-                    if(typeof results[t.id] === 'object') {
-                        pts = results[t.id].points || 0;
-                        team = results[t.id].team || data.team;
-                    } else {
-                        pts = results[t.id]; 
-                    }
+                    if(typeof results[t.id] === 'object') { pts = results[t.id].points || 0; team = results[t.id].team || data.team; } else { pts = results[t.id]; }
                 }
-                
                 let teamOpts = TEAMS.map(tm => `<option value="${tm.id}" ${tm.id === team ? 'selected':''}>${tm.name}</option>`).join('');
-                
                 const div = document.createElement("div");
                 div.className = "input-module";
-                // Reserve Logic: Dropdown allows selecting a different team for this specific race
                 div.innerHTML = `
                     <label>${t.name.toUpperCase()}</label>
                     <div style="display:flex; gap:5px;">
                         <input type="number" class="points-input data-input" style="width:60px; text-align:center; color:var(--neon-cyan); font-weight:bold;" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
                         <select class="team-input data-input" id="team-${t.id}" title="Select Team for this Race (Reserve Logic)">${teamOpts}</select>
-                    </div>
-                `;
+                    </div>`;
                 grid.appendChild(div);
             });
             calcTotal();
@@ -965,21 +1243,15 @@
             const status = document.getElementById("editor-status");
             const pointsInputs = document.querySelectorAll(".points-input");
             const teamInputs = document.querySelectorAll(".team-input");
-            
             status.innerText = "SAVING..."; 
             let newResults = {};
             let newTotal = 0;
-
             pointsInputs.forEach((input, idx) => {
                 const val = Number(input.value);
                 const track = input.dataset.track;
-                const team = teamInputs[idx].value; // Captures team override (Reserve logic)
-                if(val > 0) {
-                    newResults[track] = { points: val, team: team };
-                    newTotal += val;
-                }
+                const team = teamInputs[idx].value; 
+                if(val > 0) { newResults[track] = { points: val, team: team }; newTotal += val; }
             });
-
             try {
                 await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { results: newResults, totalPoints: newTotal });
                 status.innerText = "SAVED"; setTimeout(() => status.innerText = "", 2000);
@@ -991,17 +1263,12 @@
             const display = document.getElementById("statsDisplay");
             if(!id) { display.style.display = "none"; return; }
             display.style.display = "block";
-
             const data = driversCache[id];
             const results = data.results || {};
-            
             document.getElementById("statsDriverName").innerText = data.name.toUpperCase();
             document.getElementById("statsTeamName").innerText = TEAMS.find(t => t.id === data.team)?.name.toUpperCase() || data.team;
             document.getElementById("statPoints").innerText = data.totalPoints;
-
             let wins = 0, podiums = 0, races = 0, tableHTML = "";
-            
-            // Iterate over ACTIVE TRACKS to preserve order
             activeTracks.forEach(track => {
                 const res = results[track.id];
                 if(res) {
@@ -1015,7 +1282,6 @@
                     }
                 }
             });
-
             document.getElementById("statWins").innerText = wins;
             document.getElementById("statPodiums").innerText = podiums;
             document.getElementById("statAvg").innerText = races > 0 ? (data.totalPoints / races).toFixed(1) : "0.0";
@@ -1026,28 +1292,20 @@
             const dTable = document.getElementById("liveDriversBody");
             dTable.innerHTML = "";
             const sortedDrivers = [...allDrivers].sort((a, b) => {
-                // Reserves at bottom
                 if (a.team === 'reserve' && b.team !== 'reserve') return 1;
                 if (a.team !== 'reserve' && b.team === 'reserve') return -1;
                 return b.totalPoints - a.totalPoints;
             });
-
             sortedDrivers.forEach((d, i) => {
                 dTable.innerHTML += `<tr><td style="color:#666">${String(i+1).padStart(2,'0')}</td><td><div style="font-weight:bold; color:#fff;">${d.name}</div><div style="font-size:0.75rem; color:var(--neon-cyan); text-transform:uppercase;">${d.team === 'reserve' ? 'RESERVE' : TEAMS.find(t => t.id === d.team)?.name}</div></td><td style="text-align:right; font-weight:bold; font-size:1.1rem; color:var(--neon-cyan)">${d.totalPoints}</td></tr>`;
             });
-
             const teamPoints = {};
             allDrivers.forEach(d => {
                 const results = d.results || {};
                 Object.values(results).forEach(r => {
                     let p = 0, t = d.team; 
                     if(typeof r === 'object') { p = r.points || 0; t = r.team || d.team; } else { p = r; }
-                    
-                    // Reserve logic: Points count towards the team they drove for
-                    if(t !== 'reserve') { 
-                        if(!teamPoints[t]) teamPoints[t] = 0; 
-                        teamPoints[t] += p; 
-                    }
+                    if(t !== 'reserve') { if(!teamPoints[t]) teamPoints[t] = 0; teamPoints[t] += p; }
                 });
             });
             const cTable = document.getElementById("liveConstructorsBody");
