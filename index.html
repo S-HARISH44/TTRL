@@ -517,29 +517,30 @@
         .sticky-top { position: sticky; top: 0; z-index: 20; background: #000; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sticky-corner { position: sticky; left: 0; top: 0; z-index: 30; background: #000; border-right: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
 
-        /* --- SEASON AWARDS (BENTO GRID) - UPDATED SIZE --- */
+        /* --- SEASON AWARDS (BENTO GRID - COMPACT) --- */
         .awards-grid {
             display: grid;
-            /* Reduced minimum width for smaller cards */
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            /* Reduced height for smaller rows */
-            grid-auto-rows: 180px; 
-            /* Smaller gap */
-            gap: 1rem;
+            grid-template-columns: repeat(4, 1fr); /* Fixed 4 columns for tighter packing on desktop */
+            gap: 1rem; /* Smaller gap */
             padding: 1rem;
             grid-auto-flow: dense; 
-            max-width: 1200px;
+            max-width: 1000px; /* Reduced max-width for more compact look */
             margin: 0 auto;
         }
         
+        /* Fallback for smaller screens */
+        @media (max-width: 1024px) { .awards-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .awards-grid { grid-template-columns: 1fr; } }
+        
         .award-card {
             background: #111; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px; overflow: hidden; position: relative;
+            border-radius: 6px; overflow: hidden; position: relative;
             transition: transform 0.3s;
             display: flex; flex-direction: column;
             cursor: pointer;
+            height: 180px; /* Fixed base height for cards */
         }
-        .award-card:hover { transform: scale(1.02); border-color: var(--accent-cyan); z-index: 5; }
+        .award-card:hover { transform: scale(1.03); border-color: var(--accent-cyan); z-index: 5; }
         
         .award-img { 
             width: 100%; height: 100%; object-fit: cover; 
@@ -549,20 +550,17 @@
         
         .award-info {
             position: absolute; bottom: 0; left: 0; width: 100%;
-            padding: 0.8rem; /* Reduced padding slightly */
+            padding: 0.8rem; 
             background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
             z-index: 2;
         }
-        /* Smaller font sizes */
-        .award-title { color: var(--accent-cyan); font-family: 'Rajdhani'; font-weight: 700; text-transform: uppercase; font-size: 1rem; margin-bottom: 0.1rem; text-shadow: 0 2px 4px #000; }
+        .award-title { color: var(--accent-cyan); font-family: 'Rajdhani'; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 0.1rem; text-shadow: 0 2px 4px #000; }
         .award-winner { color: #fff; font-family: 'JetBrains Mono'; font-size: 0.8rem; font-weight: 700; text-shadow: 0 2px 4px #000; }
         
-        /* Grid Spans for Variety */
-        .span-2-row { grid-row: span 2; }
+        /* Grid Spans for Bento Layout */
+        .span-2-row { grid-row: span 2; height: 376px; } /* 180*2 + 16(gap) */
         .span-2-col { grid-column: span 2; }
-        .span-2-both { grid-column: span 2; grid-row: span 2; }
-        
-        /* Last item fill */
+        .span-2-both { grid-column: span 2; grid-row: span 2; height: 376px; }
         .span-full { grid-column: 1 / -1; }
 
         /* --- IMAGE MODAL (LIGHTBOX) --- */
@@ -1299,18 +1297,27 @@
 
         // --- NEW: SEASON 1 AWARDS RENDERER ---
         function renderSeasonAwards() {
+            // Configuration for a perfect 20-cell bento grid (4 cols x 5 rows)
+            // 0: Champion (2x2=4) | 1: Season Driver (2x1=2) | 2: Team Champ (1x2=2)
+            // 3: Team Season (1)  | 4: Cleanest (1)         | 5: Super Sub (2x1=2)
+            // 6: Rain Master (1)  | 7: Underdog (1)         | 8: Consistent (2x1=2) -> FIXES GAP
+            // 9: Emerging (4x1=4)
+            const gridConfig = [
+                "span-2-both", // 0: Driver Champion
+                "span-2-col",  // 1: Driver of the Season
+                "span-2-row",  // 2: Team Champions
+                "",            // 3: Team of the Season
+                "",            // 4: Cleanest Driver
+                "span-2-col",  // 5: The Super Sub
+                "",            // 6: Rain Master
+                "",            // 7: The Underdog
+                "span-2-col",  // 8: Most Consistent Driver (Apex Entropy) - Span 2 to fill gap
+                "span-full"    // 9: Emerging Driver
+            ];
+
             document.getElementById('season-awards-grid').innerHTML = SEASON_AWARDS.map((a, index) => {
-                let cardClass = "";
-                // Randomly assign grid spans to create "Bento" look, but prioritize first 2
-                if (index === 0) cardClass = "span-2-both"; // Big Square for Champion
-                else if (index === 1) cardClass = "span-2-col"; // Wide for Season Driver
-                else if (index === 2) cardClass = "span-2-row"; // Tall
-                else if (index === 5) cardClass = "span-2-col"; // Wide later
-                
-                // --- MODIFICATION: Make last card fill the remaining space ---
-                if (index === SEASON_AWARDS.length - 1) {
-                     cardClass += " span-full";
-                }
+                // Use config or fallback to standard 1x1
+                let cardClass = gridConfig[index] || "";
                 
                 return `
                     <div class="award-card hover-target ${cardClass}" onclick="openImageModal('${a.img}', '${a.title}', '${a.winner}')">
@@ -1382,6 +1389,7 @@
                         
                         // Trigger specific render functions if needed on tab switch
                         if(targetTab === 'constructors') {
+                             // constructor animations
                              gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
                         } else if (targetTab === 'dotd' || targetTab === 'archive-dotd') {
                              gsap.fromTo('.dotd-panel', { width: "10%", opacity: 0 }, { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" });
