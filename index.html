@@ -33,7 +33,6 @@
         }
 
         /* --- UPDATED CUSTOM CURSOR --- */
-        /* Follower hidden as requested */
         #cursor-follower { display: none; }
 
         #cursor, #cursor-follower {
@@ -44,7 +43,6 @@
         #cursor {
             width: 12px; height: 12px; 
             background: var(--accent-cyan);
-            /* Diamond shape for a sharper look */
             transform: translate(-50%, -50%) rotate(45deg); 
             transition: width 0.2s, height 0.2s, background 0.2s;
             box-shadow: 0 0 15px var(--accent-cyan);
@@ -383,79 +381,39 @@
         .team-cell { display: flex; align-items: center; gap: 0.8rem; }
         .team-logo-mini { height: 20px; width: auto; max-width: 30px; object-fit: contain; }
 
-        /* --- UPDATED GARAGE GRID (ALIGNMENT FIXES) --- */
+        /* --- GARAGE GRID --- */
         .garage-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            grid-auto-rows: 1fr; /* Ensures equal height rows */
-            gap: 1.5rem; 
-            height: 100%; 
-            overflow-y: auto; 
-            padding: 0.5rem 1rem 2rem 1rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem; height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem;
             scrollbar-width: none;
         }
         .garage-grid::-webkit-scrollbar { display: none; }
         
         @media (min-width: 1200px) { .garage-grid { grid-template-columns: repeat(5, 1fr); } }
 
-        /* --- UPDATED CONSTRUCTOR CARD (TEAM COLOR & ALIGNMENT) --- */
         .constructor-card {
-            /* Better background */
             background: linear-gradient(145deg, rgba(30,30,30,0.8) 0%, rgba(10,10,10,0.95) 100%);
             border: 1px solid var(--glass-border);
-            /* Bottom border for constant team color presence */
             border-bottom: 4px solid var(--team-color, #444);
             border-radius: 12px; padding: 1.2rem;
             display: flex; flex-direction: column; position: relative;
-            transform-style: preserve-3d; 
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            height: 100%; 
-            justify-content: space-between;
-            min-height: 220px; /* Enforce min height for alignment */
+            transform-style: preserve-3d; transition: transform 0.2s ease, box-shadow 0.3s ease;
+            height: 100%; justify-content: space-between; min-height: 220px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        
-        /* Strong Team Color Glow on Hover */
         .constructor-card:hover { 
             border-color: rgba(255,255,255,0.3);
             border-bottom-color: var(--team-color);
             box-shadow: 0 10px 40px var(--team-color, rgba(255,255,255,0.1)); 
-            transform: translateY(-5px);
-            z-index: 2;
+            transform: translateY(-5px); z-index: 2;
         }
         
-        .cc-bg-rank { 
-            position: absolute; top: -0.5rem; right: 0.5rem; 
-            font-size: 4rem; font-family: 'Rajdhani'; font-weight: 800; 
-            color: rgba(255,255,255,0.03); pointer-events: none; 
-        }
-        
-        .cc-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 0.5rem; z-index: 2; transform: translateZ(30px); 
-        }
+        .cc-bg-rank { position: absolute; top: -0.5rem; right: 0.5rem; font-size: 4rem; font-family: 'Rajdhani'; font-weight: 800; color: rgba(255,255,255,0.03); pointer-events: none; }
+        .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; z-index: 2; transform: translateZ(30px); }
         .cc-name { font-family: 'Rajdhani'; font-weight: 700; font-size: 1rem; }
-        .cc-points { 
-            color: var(--team-color); 
-            font-family: 'JetBrains Mono'; font-weight: 700; 
-            background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px; 
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        /* Fixed height for image container to align content properly */
-        .cc-img-container { 
-            flex-grow: 1; 
-            display: flex; align-items: center; justify-content: center; 
-            transform: translateZ(50px); 
-            height: 80px; /* Fixed height constraint */
-            margin-top: auto;
-            margin-bottom: auto;
-        }
-        .cc-car-img { 
-            max-width: 100%; max-height: 100%; 
-            object-fit: contain; 
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
-        }
+        .cc-points { color: var(--team-color); font-family: 'JetBrains Mono'; font-weight: 700; background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); }
+        .cc-img-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; transform: translateZ(50px); height: 80px; margin-top: auto; margin-bottom: auto; }
+        .cc-car-img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
 
         /* --- DOTD (Accordion) --- */
         .dotd-accordion-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 0; overflow: hidden; }
@@ -507,19 +465,14 @@
             justify-content: center; 
         }
         .cal-item {
-            /* Glossy Effect */
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             padding: 1.5rem; text-align: center;
             transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             display: flex; flex-direction: column; justify-content: space-between;
-            flex: 1 1 220px; 
-            max-width: 280px; 
-            min-height: 180px; 
-            border-radius: 12px;
-            position: relative; overflow: hidden;
+            flex: 1 1 220px; max-width: 280px; min-height: 180px; 
+            border-radius: 12px; position: relative; overflow: hidden;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
         .cal-item::before {
@@ -528,17 +481,14 @@
             transform-origin: left;
         }
         .cal-item:hover { 
-            transform: translateY(-5px); 
-            border-color: rgba(255,255,255,0.4); 
+            transform: translateY(-5px); border-color: rgba(255,255,255,0.4); 
             box-shadow: 0 10px 40px rgba(0, 240, 255, 0.15);
         }
         .cal-item:hover::before { transform: scaleX(1); }
         .cal-item.future-race { opacity: 0.7; }
         .cal-item.next-race { 
-            opacity: 1; 
-            border: 1px solid var(--accent-cyan); 
-            background: rgba(0, 240, 255, 0.05); 
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1); 
+            opacity: 1; border: 1px solid var(--accent-cyan); 
+            background: rgba(0, 240, 255, 0.05); box-shadow: 0 0 30px rgba(0, 240, 255, 0.1); 
         }
         .cal-item.next-race .gp { color: var(--accent-cyan); text-shadow: 0 0 10px var(--accent-cyan); }
         .round { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent-red); display: block; margin-bottom: 0.5rem; letter-spacing: 0.1em; font-weight: 700; }
@@ -561,10 +511,48 @@
             display: flex; gap: 10px; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap;
         }
 
-        /* Sticky Headers for Archive */
+        /* Sticky Headers for Archive - FIXED OVERLAP */
         .sticky-left { position: sticky; left: 0; z-index: 15; background: #050505; border-right: 1px solid rgba(255,255,255,0.1); }
         .sticky-top { position: sticky; top: 0; z-index: 20; background: #000; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sticky-corner { position: sticky; left: 0; top: 0; z-index: 30; background: #000; border-right: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+        /* --- SEASON AWARDS (BENTO GRID) --- */
+        .awards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-auto-rows: 280px; /* Fixed base height for logic */
+            gap: 1.5rem;
+            padding: 1rem;
+            grid-auto-flow: dense; /* Crucial for filling gaps */
+        }
+        
+        .award-card {
+            background: #111; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; overflow: hidden; position: relative;
+            transition: transform 0.3s;
+            display: flex; flex-direction: column;
+        }
+        .award-card:hover { transform: scale(1.02); border-color: var(--accent-cyan); z-index: 5; }
+        
+        .award-img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            transition: opacity 0.3s; opacity: 0.7;
+        }
+        .award-card:hover .award-img { opacity: 1; }
+        
+        .award-info {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            padding: 1rem; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+            z-index: 2;
+        }
+        .award-title { color: var(--accent-cyan); font-family: 'Rajdhani'; font-weight: 700; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 0.2rem; text-shadow: 0 2px 4px #000; }
+        .award-winner { color: #fff; font-family: 'JetBrains Mono'; font-size: 0.9rem; font-weight: 700; text-shadow: 0 2px 4px #000; }
+        
+        /* Grid Spans for Variety */
+        .span-2-row { grid-row: span 2; }
+        .span-2-col { grid-column: span 2; }
+        .span-2-both { grid-column: span 2; grid-row: span 2; }
+
 
         /* Other UI */
         .btn-tech {
@@ -667,14 +655,11 @@
     </div>
 
     <div class="slides-wrapper">
-        <!-- SLIDE 0: HERO (UPDATED WITH NEW DESIGN) -->
+        <!-- SLIDE 0: HERO -->
         <section class="slide active" id="slide-0">
-            <!-- Background Image -->
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/a63c5b81b6a861f85d3efb76fe0c9bb2590de507/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg'); opacity:0.8;"></div>
 
             <div class="slide-content home-design-container">
-                
-                <!-- TITLE GROUP -->
                 <div class="home-title-group">
                     <div class="home-title-main">
                         <span class="text-fill">TURBO</span>
@@ -686,7 +671,6 @@
                     </div>
                 </div>
 
-                <!-- COUNTDOWN -->
                 <div class="home-countdown">
                     <div class="cd-box"><span class="cd-number" id="cd-days">00</span><span class="cd-label">DAYS</span></div>
                     <div class="cd-box"><span class="cd-number" id="cd-hours">00</span><span class="cd-label">HRS</span></div>
@@ -694,14 +678,11 @@
                     <div class="cd-box"><span class="cd-number" id="cd-secs">00</span><span class="cd-label">SEC</span></div>
                 </div>
                 
-                <!-- NEXT RACE INFO -->
                 <div id="next-race-info" class="next-race-display">
                     SEASON COMPLETED // WAITING FOR SEASON 2
                 </div>
 
-                <!-- CARDS -->
                 <div class="home-cards-container">
-                    <!-- Left Card: Season 2 -->
                     <div class="home-card hover-target" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/e892dbee23fd4d1b55f5e04b6ba2bf00f54126e3/RESOURCES/card/button_2.png');">
                         <div class="hc-content">
                             <span class="hc-tag">SEASON 2</span>
@@ -711,17 +692,14 @@
                         </div>
                     </div>
 
-                    <!-- Right Card: Special Events -->
                     <div class="home-card hover-target" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/e892dbee23fd4d1b55f5e04b6ba2bf00f54126e3/RESOURCES/card/button_4.png');">
                         <div class="hc-content">
                             <span class="hc-tag">SPECIAL EVENTS</span>
-                            <!-- <span class="hc-sub">UPCOMING</span> -->
                             <span class="hc-title" style="margin-top:1.5rem;">SOCIAL RACE</span>
                             <a href="https://discord.com/channels/1345718934174957590/1345721726188912671" target="_blank" class="hc-btn hc-btn-grey hover-target">JOIN NOW</a>
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
 
@@ -735,7 +713,7 @@
             </div>
         </section>
 
-        <!-- SLIDE 2: STANDINGS (FIREBASE CONNECTED) -->
+        <!-- SLIDE 2: STANDINGS -->
         <section class="slide" id="slide-2">
             <div class="slide-bg" style="background-image: url('https://f1chronicle.com/wp-content/uploads/2024/01/SI202412010400-1920x1080.jpg')"></div>
             <div class="slide-content">
@@ -744,10 +722,8 @@
                 <div class="standings-tabs">
                     <button class="tab-btn active hover-target" data-tab="drivers">DRIVERS</button>
                     <button class="tab-btn hover-target" data-tab="constructors">TEAMS</button>
-                    <!-- REMOVED DOTD FROM HERE -->
                 </div>
                 <div class="standings-wrapper">
-                    <!-- DRIVERS -->
                     <div class="standings-view active-view" id="view-drivers">
                          <div class="table-scroll">
                             <table class="standings-table">
@@ -756,13 +732,11 @@
                             </table>
                         </div>
                     </div>
-                    <!-- CONSTRUCTORS -->
                     <div class="standings-view" id="view-constructors">
                         <div class="garage-grid" id="garage-grid">
                             <div class="archive-loading">CALCULATING POINTS...</div>
                         </div>
                     </div>
-                    <!-- DOTD REMOVED FROM HERE -->
                 </div>
             </div>
         </section>
@@ -777,7 +751,7 @@
             </div>
         </section>
 
-         <!-- SLIDE 4: PADDOCK (ADDED EMAIL) -->
+         <!-- SLIDE 4: PADDOCK -->
         <section class="slide" id="slide-4">
             <div class="slide-bg" id="vanta-bg"></div>
             <div class="slide-content">
@@ -791,14 +765,13 @@
             </div>
         </section>
 
-        <!-- SLIDE 5: ARCHIVES (SEASON SELECTOR + TABS) -->
+        <!-- SLIDE 5: ARCHIVES -->
         <section class="slide" id="slide-5">
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/a63c5b81b6a861f85d3efb76fe0c9bb2590de507/RESOURCES/001-EA-Sports-F1-2023-Video-Game-Review.jpg'); filter: brightness(0.2);"></div>
             <div class="slide-content">
                 <div class="slide-tag">06 // DATA VAULT</div>
                 <h2 class="slide-title tech-font">SEASON <span class="text-outline">ARCHIVES</span></h2>
                 
-                <!-- Season Selector -->
                 <div class="archive-controls">
                     <div class="season-btn-group">
                         <button class="tab-btn active" onclick="setSeason('season_1')">SEASON 1</button>
@@ -806,11 +779,12 @@
                     </div>
                 </div>
 
-                <!-- Tabs for Driver/Team/Awards -->
+                <!-- UPDATED TABS -->
                 <div class="standings-tabs" style="justify-content: center;">
                     <button class="tab-btn active hover-target" data-tab="archive-drivers">DRIVERS</button>
                     <button class="tab-btn hover-target" data-tab="archive-teams">TEAMS</button>
-                    <button class="tab-btn hover-target" data-tab="archive-dotd">AWARDS</button>
+                    <button class="tab-btn hover-target" data-tab="archive-dotd">DOTD</button>
+                    <button class="tab-btn hover-target" data-tab="archive-season-awards">SEASON AWARDS</button>
                 </div>
 
                 <div class="standings-wrapper" style="height: 55vh;">
@@ -831,6 +805,13 @@
                     <!-- DOTD ARCHIVE -->
                     <div class="standings-view" id="view-archive-dotd">
                         <div class="dotd-accordion-container" id="dotd-container"></div>
+                    </div>
+
+                    <!-- NEW: SEASON AWARDS ARCHIVE (BENTO GRID) -->
+                    <div class="standings-view" id="view-archive-season-awards">
+                        <div class="table-scroll">
+                            <div class="awards-grid" id="season-awards-grid"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -918,6 +899,20 @@
             { gp: "Austrian Grand Prix", driver: "Wi7ard", team: "WILLIAMS", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Wizard.png", desc: "Magical performance at the Red Bull Ring." },
             { gp: "São Paulo Grand Prix", driver: "TheGodfather", team: "ALPINE", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Godfather.png", desc: "An offer Interlagos couldn't refuse." },
             { gp: "Abu Dhabi Grand Prix", driver: "Wi7ard", team: "WILLIAMS", image: "https://github.com/S-HARISH44/TTRL/blob/ef6d28c8baa4a8e9c15f64a76f854e80a95fadbc/RESOURCES/DOTD/Lime_Green_and_Black_Dynamic_Match_Instagram_Post_4.png?raw=true", desc: "Dominant performance to end the season." }
+        ];
+        
+        // REORDERED AWARDS: Champions First
+        const SEASON_AWARDS = [
+            { title: "Driver Champion", winner: "Wi7ard", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/winner.png" },
+            { title: "Driver of the Season", winner: "Simman", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/season%20driver.png" },
+            { title: "Team Champions", winner: "Williams", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/team%20winner.png" },
+            { title: "Team of the Season", winner: "Alpine", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/2nd%20runner.png" },
+            { title: "Cleanest Driver", winner: "The Godfather", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/cleanest%20driver.png" },
+            { title: "The Super Sub", winner: "Sandeep", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/the%20super%20sub.png" },
+            { title: "Rain Master", winner: "Harish", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/rain%20master.png" },
+            { title: "The Underdog", winner: "Kentucky", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/underdog%20(1).png" },
+            { title: "Most Consistent Driver", winner: "Apex Entropy", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/consistent%20driver.png" },
+            { title: "Emerging Driver", winner: "Vibin", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/emerging%20driver.png" }
         ];
 
         const f125SetupData = {
@@ -1225,6 +1220,28 @@
             }).join('');
         }
 
+        // --- NEW: SEASON 1 AWARDS RENDERER ---
+        function renderSeasonAwards() {
+            document.getElementById('season-awards-grid').innerHTML = SEASON_AWARDS.map((a, index) => {
+                let cardClass = "";
+                // Randomly assign grid spans to create "Bento" look, but prioritize first 2
+                if (index === 0) cardClass = "span-2-both"; // Big Square for Champion
+                else if (index === 1) cardClass = "span-2-col"; // Wide for Season Driver
+                else if (index === 2) cardClass = "span-2-row"; // Tall
+                else if (index === 5) cardClass = "span-2-col"; // Wide later
+                
+                return `
+                    <div class="award-card hover-target ${cardClass}">
+                        <img src="${a.img}" class="award-img" alt="${a.title}">
+                        <div class="award-info">
+                            <div class="award-title">${a.title}</div>
+                            <div class="award-winner">${a.winner}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         // --- ANIMATIONS ---
         const slides = document.querySelectorAll('.slide');
         let currentIndex = 0;
@@ -1283,10 +1300,11 @@
                         
                         // Trigger specific render functions if needed on tab switch
                         if(targetTab === 'constructors') {
-                             // constructor animations
                              gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
                         } else if (targetTab === 'dotd' || targetTab === 'archive-dotd') {
                              gsap.fromTo('.dotd-panel', { width: "10%", opacity: 0 }, { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" });
+                        } else if (targetTab === 'archive-season-awards') {
+                            gsap.fromTo('.award-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
                         } else if (targetTab === 'archive-teams') {
                              renderArchiveTeams(); // Ensure updated
                         }
@@ -1363,6 +1381,7 @@
                 initArchiveSync(null); 
                 renderCalendar();
                 renderDOTD();
+                renderSeasonAwards(); // Initial render of Season Awards
                 updateCountdown(); // Start countdown
             }});
             
@@ -1370,7 +1389,6 @@
             const follower = document.getElementById('cursor-follower');
             document.addEventListener('mousemove', (e) => {
                 cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
-                // Follower logic kept for structure but element is hidden via CSS
                 if(follower) gsap.to(follower, { x: e.clientX - 20, y: e.clientY - 20, duration: 0.1 });
             });
             
