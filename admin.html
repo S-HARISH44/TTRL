@@ -3,408 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTRL Pitwall | Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>TTRL Pitwall | Mission Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-main: #050505;
-            --accent-red: #ff1f4b;
-            --accent-cyan: #00f0ff;
-            --text-primary: #ffffff;
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-bg: rgba(20, 20, 20, 0.95);
-            --card-bg: #0a0a0a;
+            --bg-deep: #030305;
+            --panel-bg: rgba(20, 20, 25, 0.7);
+            --neon-cyan: #00f3ff;
+            --neon-red: #ff003c;
+            --text-main: #e0e0e0;
+            --text-dim: #6e6e7a;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --tech-font: 'Rajdhani', sans-serif;
+            --mono-font: 'JetBrains Mono', monospace;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; outline: none; }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--tech-font);
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            min-height: 100vh;
             background-image: 
-                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+                linear-gradient(rgba(3, 3, 5, 0.9), rgba(3, 3, 5, 0.95)),
+                url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            overflow-x: hidden;
         }
-        
-        /* LOGIN OVERLAY */
-        #login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 5, 0.98);
-            z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.3s;
-            overflow-y: auto;
-        }
-        .login-box {
-            background: var(--glass-bg);
-            padding: 3rem;
-            border: 1px solid var(--accent-cyan);
-            width: 90%; max-width: 450px;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(0, 240, 255, 0.1);
-            position: relative;
-        }
-        .divider {
-            display: flex; align-items: center; margin: 20px 0; color: #666; font-size: 0.8rem; font-family: 'JetBrains Mono';
-        }
-        .divider::before, .divider::after {
-            content: ''; flex: 1; height: 1px; background: #333;
-        }
-        .divider span { padding: 0 10px; }
-        
-        h1, h2, h3, h4 { margin: 0; text-transform: uppercase; letter-spacing: 0.05em; }
-        
-        /* LAYOUT */
-        .container { max-width: 1200px; margin: 0 auto; display: none; }
 
+        /* --- DECORATIVE BACKGROUND GRID --- */
+        body::before {
+            content: "";
+            position: fixed; inset: 0; pointer-events: none;
+            background-image: 
+                linear-gradient(var(--glass-border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* --- LOGIN OVERLAY (TERMINAL STYLE) --- */
+        #login-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            /* Background Image Restored */
+            background-image: 
+                linear-gradient(rgba(3, 3, 5, 0.6), rgba(3, 3, 5, 0.9)),
+                url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/1-w-GettyImages-2048270135.webp');
+            background-size: cover;
+            background-position: center;
+            backdrop-filter: blur(3px);
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.4s ease;
+        }
+
+        .login-box {
+            width: 100%; max-width: 420px;
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid var(--neon-cyan);
+            padding: 3rem 2rem;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
+            /* Sci-Fi Corners */
+            clip-path: polygon(
+                20px 0, 100% 0, 
+                100% calc(100% - 20px), calc(100% - 20px) 100%, 
+                0 100%, 0 20px
+            );
+        }
+
+        .login-box::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: scanline 2s linear infinite;
+        }
+
+        @keyframes scanline { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        .login-logo { height: 60px; display: block; margin: 0 auto 1.5rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
+
+        .login-title {
+            text-align: center; font-size: 1.5rem; letter-spacing: 0.2em; 
+            color: var(--neon-cyan); margin-bottom: 2rem; font-weight: 700;
+        }
+
+        .login-input-group { margin-bottom: 1.5rem; position: relative; }
+        .login-input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--neon-cyan); font-size: 0.8rem; }
+        
+        .login-input {
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #333;
+            color: #fff; padding: 12px 15px 12px 40px; font-family: var(--mono-font);
+            font-size: 0.9rem; transition: all 0.3s;
+        }
+        .login-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
+
+        .btn-main {
+            width: 100%; padding: 12px; background: var(--neon-cyan); color: #000;
+            border: none; font-family: var(--tech-font); font-weight: 800;
+            font-size: 1.1rem; letter-spacing: 0.1em; cursor: pointer;
+            transition: all 0.3s; text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        .btn-main:hover { background: #fff; box-shadow: 0 0 20px var(--neon-cyan); }
+
+        .btn-google {
+            background: #fff; color: #000; margin-bottom: 1.5rem; display: flex; 
+            align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-google:hover { background: #eee; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+
+        .divider { display: flex; align-items: center; color: #555; font-size: 0.7rem; margin: 1.5rem 0; font-family: var(--mono-font); }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #333; }
+        .divider span { padding: 0 10px; }
+
+        /* --- MAIN INTERFACE --- */
+        .container {
+            max-width: 1400px; margin: 0 auto; display: none; padding-bottom: 50px;
+            position: relative; z-index: 1;
+            animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Header "HUD" Style */
         header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 20px; margin-bottom: 30px;
-        }
-        
-        /* TABS */
-        .nav-tabs { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 1px solid #333; overflow-x: auto; }
-        .tab-btn {
-            padding: 12px 25px;
-            background: transparent;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: #666;
-            cursor: pointer;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            transition: 0.3s;
-            white-space: nowrap;
-        }
-        .tab-btn:hover { color: #fff; }
-        .tab-btn.active {
-            color: var(--accent-cyan);
-            border-bottom-color: var(--accent-cyan);
-            background: linear-gradient(to top, rgba(0, 240, 255, 0.1), transparent);
+            padding: 1.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
         }
 
-        .section { display: none; }
-        .section.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .header-logo { height: 40px; }
+        .header-title { 
+            font-size: 1.8rem; font-weight: 800; line-height: 1;
+            color: #fff; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .header-subtitle { color: var(--neon-cyan); font-size: 0.9rem; letter-spacing: 0.2em; }
+
+        .system-status {
+            display: flex; gap: 20px; font-family: var(--mono-font); font-size: 0.75rem; color: var(--text-dim);
+            border: 1px solid rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; background: rgba(0,0,0,0.3);
+        }
+        .status-dot { width: 8px; height: 8px; background: var(--neon-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--neon-cyan); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* Season Selector Bar */
+        .control-bar {
+            background: linear-gradient(90deg, rgba(255,0,60,0.1), transparent);
+            border-left: 4px solid var(--neon-red);
+            padding: 1rem; margin-bottom: 2rem;
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .control-label { color: var(--neon-red); font-weight: 700; letter-spacing: 0.1em; font-size: 0.9rem; }
         
-        /* FORMS & GRID */
+        .flat-input {
+            background: transparent; border: none; border-bottom: 1px solid #555;
+            color: #fff; font-family: var(--mono-font); font-size: 1rem; padding: 5px;
+            min-width: 200px; transition: 0.3s;
+        }
+        .flat-input:focus { border-color: var(--neon-red); }
+
+        .btn-small {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+            color: #ccc; padding: 6px 15px; font-size: 0.8rem; cursor: pointer;
+            font-family: var(--mono-font); text-transform: uppercase; transition: 0.2s;
+        }
+        .btn-small:hover { background: #fff; color: #000; }
+        .btn-accent { border-color: var(--neon-red); color: var(--neon-red); }
+        .btn-accent:hover { background: var(--neon-red); color: #fff; }
+
+        /* Nav Tabs - "Mode Switch" Style */
+        .nav-container { 
+            display: flex; gap: 2px; background: rgba(255,255,255,0.03); 
+            padding: 5px; border-radius: 4px; margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            flex: 1; padding: 12px; background: transparent; border: none; color: #666;
+            font-family: var(--tech-font); font-weight: 700; font-size: 1rem;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+            border-radius: 2px; white-space: nowrap;
+        }
+        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .tab-btn.active { 
+            background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px rgba(0,243,255,0.3);
+        }
+
+        /* Content Area */
+        .section { display: none; animation: slideUp 0.4s ease-out; }
+        .section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .panel-card {
+            background: var(--panel-bg); border: var(--glass-border);
+            padding: 20px; backdrop-filter: blur(10px); position: relative;
+        }
+        .panel-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;
+        }
+        .panel-title { color: var(--neon-cyan); font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+
+        /* --- CUSTOM FORM ELEMENTS (DROPDOWNS) --- */
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: var(--accent-cyan); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+        label { display: block; margin-bottom: 8px; color: var(--neon-cyan); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--mono-font); }
         
-        input, select {
-            width: 100%; padding: 12px 15px;
-            background: #0f0f0f;
-            border: 1px solid #333;
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
             color: #fff;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--mono-font);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300f3ff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px top 50%;
+            background-size: 10px auto;
+            border-radius: 0;
+            cursor: pointer;
+        }
+        
+        select option {
+            background-color: #050505;
+            color: #fff;
+            padding: 10px;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            background-color: rgba(0, 243, 255, 0.05);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+        }
+
+        input {
+            width: 100%; padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
+            color: #fff;
+            font-family: var(--mono-font);
             font-size: 0.9rem;
             transition: 0.3s;
         }
-        select option { background-color: #0f0f0f; color: #fff; padding: 10px; }
-        input:focus, select:focus { outline: none; border-color: var(--accent-cyan); background: #1a1a1a; }
+        input:focus { outline: none; border-color: var(--neon-cyan); background: rgba(0,0,0,0.8); }
 
+        /* Track Grid & Inputs */
         .track-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;
         }
-        .track-input {
-            background: var(--card-bg);
-            padding: 15px;
-            border: 1px solid #333;
-            border-left: 3px solid #333;
-            transition: border-color 0.3s;
+        .input-module {
+            background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 15px;
+            transition: 0.3s; position: relative; overflow: hidden;
         }
-        .track-input:focus-within { border-left-color: var(--accent-cyan); }
-        .track-input label { color: #888; font-size: 0.75rem; margin-bottom: 5px; }
+        .input-module:focus-within { border-color: var(--neon-cyan); }
+        .input-module label { 
+            display: block; font-size: 0.75rem; color: #888; margin-bottom: 8px; 
+            font-family: var(--mono-font); letter-spacing: 1px;
+        }
         
-        .row-inputs { display: flex; gap: 10px; }
-        .points-input { width: 80px; text-align: center; color: var(--accent-cyan); font-weight: 700; }
-        .team-input { flex-grow: 1; font-size: 0.8rem; color: #ccc; }
+        .data-input {
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid #444;
+            color: #fff; font-family: var(--mono-font); font-size: 1rem; padding: 5px 0;
+        }
+        .data-input:focus { border-color: var(--neon-cyan); }
+        
+        /* Stats Dashboard */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
+        @media(max-width: 900px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+        
+        .stat-box {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            border: 1px solid rgba(255,255,255,0.1); padding: 20px; text-align: center;
+        }
+        .stat-num { font-size: 3rem; font-weight: 800; line-height: 1; color: #fff; }
+        .stat-desc { font-size: 0.8rem; color: var(--neon-cyan); letter-spacing: 0.1em; margin-top: 5px; }
 
-        /* TOTALS */
-        .total-box {
-            margin-top: 30px; padding: 20px;
-            background: rgba(0, 240, 255, 0.05);
-            border: 1px solid var(--accent-cyan);
-            display: flex; justify-content: space-between; align-items: center;
+        /* Tables */
+        .tech-table { width: 100%; border-collapse: collapse; font-family: var(--mono-font); font-size: 0.85rem; }
+        .tech-table th { 
+            text-align: left; padding: 12px; color: #666; font-weight: 400; 
+            border-bottom: 1px solid #333; 
         }
-        .total-value { font-size: 2.5rem; font-weight: 800; color: #fff; font-family: 'Rajdhani'; }
+        .tech-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ccc; }
+        .tech-table tr:hover td { background: rgba(255,255,255,0.02); color: #fff; }
+        
+        /* Help Toggle */
+        .help-toggle { 
+            text-align: center; color: #555; font-size: 0.75rem; margin-top: 20px; 
+            cursor: pointer; text-decoration: underline; transition: color 0.2s;
+        }
+        .help-toggle:hover { color: var(--neon-cyan); }
+        .help-content { 
+            display: none; background: #000; border: 1px solid #333; padding: 15px; 
+            font-size: 0.8rem; color: #aaa; margin-top: 10px; line-height: 1.6; text-align: left;
+        }
 
-        button.action-btn {
-            width: 100%; padding: 15px;
-            background: var(--accent-cyan);
-            color: #000;
-            border: none;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-top: 10px;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-            transition: 0.3s;
-        }
-        button.action-btn:hover { background: #fff; box-shadow: 0 0 20px var(--accent-cyan); }
-        
-        button.google-btn { background: #fff; color: #333; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        button.google-btn:hover { background: #eee; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-
-        button.delete-btn {
-            background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red);
-            padding: 5px 12px; cursor: pointer; font-size: 0.7rem; font-weight: 700; transition: 0.3s;
-        }
-        button.delete-btn:hover { background: var(--accent-red); color: #fff; }
-
-        button.utility-btn {
-            background: rgba(255,255,255,0.1); border: 1px solid #555; color: #ccc;
-            padding: 8px 15px; cursor: pointer; font-family: 'JetBrains Mono'; font-size: 0.8rem;
-            transition: 0.3s;
-        }
-        button.utility-btn:hover { border-color: var(--accent-cyan); color: #fff; }
-
-        /* LIVE TABLES */
-        .view-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; font-family: 'JetBrains Mono'; }
-        .view-table th {
-            text-align: left; padding: 10px; background: #111; color: #888;
-            font-family: 'Rajdhani'; font-weight: 700; border-bottom: 2px solid #333;
-        }
-        .view-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .view-table tr:hover td { background: rgba(255,255,255,0.02); }
-        
-        .driver-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #111; padding: 12px; margin-bottom: 8px;
-            border-left: 3px solid #333; transition: all 0.2s;
-        }
-        .driver-item:hover { border-left-color: var(--accent-cyan); background: #161616; transform: translateX(5px); }
-        
-        /* SEASON SELECTOR */
-        .season-selector-container {
-            background: linear-gradient(90deg, rgba(255, 31, 75, 0.1), transparent);
-            padding: 15px; border-left: 4px solid var(--accent-red);
-            margin-bottom: 30px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;
-        }
-        .season-input { flex-grow: 1; border-color: var(--accent-red); min-width: 200px; }
-        .season-btn {
-            background: var(--accent-red); color: #fff; border: none; padding: 12px 25px; 
-            font-weight: bold; cursor: pointer; text-transform: uppercase; 
-            font-family: 'Rajdhani'; letter-spacing: 0.1em;
-        }
-        .season-btn:hover { background: #fff; color: var(--accent-red); }
-        
-        #knownSeasonsList { display: flex; gap: 10px; margin-top: 5px; font-size: 0.8rem; color: #666; margin-bottom: 20px; }
-        .season-tag { cursor: pointer; border: 1px solid #333; padding: 2px 8px; font-family: 'JetBrains Mono'; transition: 0.2s; }
-        .season-tag:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.1); }
-        
-        .user-badge { display: flex; align-items: center; gap: 15px; font-size: 0.9rem; color: #aaa; }
-        .secure-badge { color: var(--accent-cyan); border: 1px solid var(--accent-cyan); padding: 2px 6px; font-size: 0.7rem; letter-spacing: 0.1em; }
-
-        /* --- STATS DASHBOARD --- */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card {
-            background: var(--card-bg); border: 1px solid var(--glass-border); padding: 20px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-bottom: 3px solid var(--accent-cyan);
-        }
-        .stat-val { font-size: 2.5rem; font-weight: 800; color: #fff; font-family: 'Rajdhani'; line-height: 1; }
-        .stat-label { color: #888; font-size: 0.8rem; letter-spacing: 0.1em; margin-top: 5px; text-transform: uppercase; }
-        .stats-history-container { background: var(--glass-bg); padding: 20px; border: 1px solid #333; }
-        
-        .stat-bar-container { width: 100%; height: 4px; background: #333; margin-top: 10px; border-radius: 2px; }
-        .stat-bar-fill { height: 100%; background: var(--accent-cyan); border-radius: 2px; transition: width 1s ease-out; }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
 
         /* --- RACE DIRECTOR --- */
-        .race-input-row { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #333; background: #0f0f0f; }
-        .race-input-row:nth-child(even) { background: #141414; }
-        .driver-name-label { width: 200px; font-weight: bold; color: #ddd; }
-        .race-points-input { width: 80px; text-align: center; border-color: #444; }
+        .race-header-row {
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--neon-cyan); font-size: 0.75rem; letter-spacing: 1px;
+            padding: 10px 15px; border-bottom: 1px solid #333; margin-bottom: 5px;
+            font-family: var(--mono-font);
+        }
+        .race-input-row { 
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 15px; border-bottom: 1px solid #222; 
+            background: rgba(255,255,255,0.02); transition: 0.2s;
+        }
+        .race-input-row:hover { background: rgba(255,255,255,0.05); }
+        .driver-name-label { font-weight: bold; color: #ddd; font-size: 0.95rem; }
+        .race-points-input { width: 80px; text-align: center; border-color: #444; background: #000; padding: 8px; color: var(--neon-cyan); font-weight: bold; }
+        .race-points-input:focus { border-color: var(--neon-cyan); }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .header-title { font-size: 1.2rem; }
+            .system-status { display: none; }
+            .login-box { padding: 2rem; width: 95%; }
+            .nav-container { flex-direction: column; gap: 5px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN OVERLAY -->
+    <!-- LOGIN SCREEN -->
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="color:var(--accent-cyan); margin-bottom: 10px;"><i class="fas fa-fingerprint"></i> PITWALL ACCESS</h2>
-            <p style="color:#888; font-size:0.9rem; margin-bottom:30px; font-family:'JetBrains Mono';">RESTRICTED AREA // AUTH REQUIRED</p>
+            <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="login-logo" alt="TTRL">
+            <div class="login-title">SYSTEM ACCESS</div>
             
-            <button class="action-btn google-btn" onclick="loginWithGoogle()">
-                <i class="fab fa-google"></i> SIGN IN WITH GOOGLE
+            <button class="btn-main btn-google" onclick="loginWithGoogle()">
+                <i class="fab fa-google"></i> Login with Google
             </button>
 
-            <div class="divider"><span>OR MANUAL LOGIN</span></div>
+            <div class="divider"><span>OR MANUAL ENTRY</span></div>
 
-            <div class="form-group">
-                <input type="email" id="loginEmail" placeholder="OPERATOR ID" style="margin-bottom:10px;">
-                <input type="password" id="loginPass" placeholder="ACCESS KEY" style="margin-bottom:10px;">
+            <div class="login-input-group">
+                <i class="fas fa-user"></i>
+                <input type="email" id="loginEmail" class="login-input" placeholder="OPERATOR ID">
+            </div>
+            <div class="login-input-group">
+                <i class="fas fa-key"></i>
+                <input type="password" id="loginPass" class="login-input" placeholder="SECURITY KEY">
             </div>
             
-            <button class="action-btn" style="margin-top:0;" onclick="checkLogin()">AUTHENTICATE</button>
+            <button class="btn-main" onclick="checkLogin()">INITIATE LINK</button>
             
-            <div id="login-msg" style="margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem; word-break: break-word;"></div>
+            <div id="login-msg" style="margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem; color:var(--neon-red); text-align: center; min-height: 1.2em;"></div>
+            
+            <div class="help-toggle" onclick="document.getElementById('help-box').style.display = document.getElementById('help-box').style.display === 'none' ? 'block' : 'none'">Connection Trouble?</div>
+            <div id="help-box" class="help-content">
+                <strong>TROUBLESHOOTING:</strong><br>
+                1. "DOMAIN NOT AUTHORIZED": Copy the link shown in error & add to Firebase Console > Auth > Settings.<br>
+                2. "PROVIDER DISABLED": Enable Google Auth in Firebase Console.<br>
+            </div>
         </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- MAIN DASHBOARD -->
     <div class="container" id="main-interface">
+        
+        <!-- HEADER HUD -->
         <header>
-            <div style="display:flex; align-items:center; gap:20px;">
-                <h1 style="font-size:2.5rem; text-shadow:0 0 10px rgba(255,255,255,0.2);">TTRL <span style="color:var(--accent-cyan)">ADMIN</span></h1>
-                <div class="secure-badge">SECURE CONNECTION</div>
+            <div class="header-left">
+                <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="header-logo" alt="TTRL">
+                <div>
+                    <div class="header-title">PITWALL <span style="color:var(--neon-cyan)">CONTROL</span></div>
+                    <div class="header-subtitle">ADMINISTRATION CONSOLE</div>
+                </div>
             </div>
-            <div class="user-badge">
-                <span>OPERATOR: <span id="userName" style="color:#fff; font-weight:bold;">Admin</span></span>
-                <button onclick="logout()" style="background:transparent; border:1px solid #555; color:#fff; padding:5px 15px; cursor:pointer; font-family:'Rajdhani'; font-weight:bold; font-size:0.8rem;">TERMINATE</button>
+            
+            <div style="display:flex; align-items:center; gap:20px;">
+                <div class="system-status">
+                    <div class="status-dot"></div> SYSTEM ONLINE
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:0.8rem; color:#888;">OPERATOR</div>
+                    <div id="userName" style="color:#fff; font-weight:700;">UNKNOWN</div>
+                </div>
+                <button class="btn-small" onclick="logout()" style="border-color:var(--neon-red); color:var(--neon-red);">EXIT</button>
             </div>
         </header>
 
-        <!-- SEASON SELECTOR & EXPORT -->
-        <div class="season-selector-container">
-            <label style="margin:0; font-weight:bold; color:var(--accent-red); font-size:1rem;">ACTIVE SEASON ID:</label>
-            <input type="text" id="seasonInput" class="season-input" value="season_1" placeholder="ENTER SEASON IDENTIFIER...">
-            <button class="season-btn" onclick="changeSeason()">LOAD DATA</button>
-            <button class="season-btn" style="background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red);" onclick="changeSeason()"><i class="fas fa-sync-alt"></i></button>
-            
-            <div style="flex-grow:1; text-align:right;">
-                <button class="utility-btn" onclick="exportData()"><i class="fas fa-download"></i> BACKUP SEASON DATA (JSON)</button>
-            </div>
+        <!-- SEASON CONTROL BAR -->
+        <div class="control-bar">
+            <span class="control-label">DATA STREAM:</span>
+            <input type="text" id="seasonInput" class="flat-input" value="season_1" placeholder="SEASON ID">
+            <button class="btn-small btn-accent" onclick="changeSeason()"><i class="fas fa-sync"></i> SYNC</button>
+            <button class="btn-small" onclick="exportData()" style="margin-left:auto;"><i class="fas fa-download"></i> EXPORT JSON</button>
         </div>
-        <div id="knownSeasonsList">
-            <!-- JS Injected -->
+        <div id="knownSeasonsList" style="margin-bottom:20px; padding-left:10px; font-size:0.8rem; color:#666; font-family:var(--mono-font);"></div>
+
+        <!-- NAVIGATION -->
+        <div class="nav-container">
+            <button class="tab-btn active" onclick="switchTab('race-director')"><i class="fas fa-flag-checkered"></i> Race Director</button>
+            <button class="tab-btn" onclick="switchTab('driver-editor')"><i class="fas fa-user-edit"></i> Edit Driver</button>
+            <button class="tab-btn" onclick="switchTab('live-view')"><i class="fas fa-chart-line"></i> Live Data</button>
+            <button class="tab-btn" onclick="switchTab('driver-stats')"><i class="fas fa-chart-pie"></i> Statistics</button>
+            <button class="tab-btn" onclick="switchTab('manage-drivers')"><i class="fas fa-users-cog"></i> Grid Manage</button>
         </div>
 
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('race-director')">Race Director</button>
-            <button class="tab-btn" onclick="switchTab('driver-editor')">Driver Editor</button>
-            <button class="tab-btn" onclick="switchTab('live-view')">Live Telemetry</button>
-            <button class="tab-btn" onclick="switchTab('driver-stats')">Driver Statistics</button>
-            <button class="tab-btn" onclick="switchTab('manage-drivers')">Grid Management</button>
-        </div>
-
-        <!-- 1. RACE DIRECTOR (NEW) -->
+        <!-- 1. RACE DIRECTOR -->
         <div id="race-director" class="section active">
-            <h3 style="color:var(--accent-cyan); margin-bottom:10px;"><i class="fas fa-flag-checkered"></i> RACE DAY RESULTS</h3>
-            <p style="color:#666; font-family:'JetBrains Mono'; font-size:0.9rem; margin-bottom:20px;">BULK ENTRY FOR: <span class="season-display" style="color:var(--accent-red); font-weight:bold;"></span></p>
-            
-            <div class="form-group" style="background:var(--glass-bg); padding:15px; border:1px solid #333;">
-                <label>SELECT GRAND PRIX EVENT</label>
-                <select id="raceDirectorTrackSelect" onchange="loadRaceGrid()">
-                    <option value="">-- SELECT TRACK TO ENTER RESULTS --</option>
-                    <!-- Tracks populated by JS -->
-                </select>
-            </div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-title">RACE RESULT ENTRY</div>
+                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">BULK UPDATE MODE</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>SELECT EVENT</label>
+                    <select id="raceDirectorTrackSelect" onchange="loadRaceGrid()" style="background:rgba(0,0,0,0.5);">
+                        <option value="">-- AWAITING SELECTION --</option>
+                    </select>
+                </div>
 
-            <div id="raceDirectorGrid" style="display:none; animation: fadeIn 0.5s;">
-                <div style="margin-bottom:10px; display:flex; justify-content:space-between; color:#888; font-size:0.8rem; padding:0 10px;">
-                    <span>DRIVER NAME</span>
-                    <span>POINTS AWARDED</span>
+                <div id="raceDirectorGrid" style="display:none; animation: fadeIn 0.5s;">
+                    <div class="race-header-row">
+                        <span>DRIVER</span>
+                        <span>POINTS</span>
+                    </div>
+                    <div id="raceInputsContainer" style="max-height:500px; overflow-y:auto; border:1px solid #333; margin-bottom:20px; background:#050505;">
+                        <!-- JS Generated -->
+                    </div>
+                    <button class="btn-main" onclick="saveRaceResults()">COMMIT RESULTS</button>
+                    <div id="race-director-status" style="text-align:center; margin-top:15px; font-family:var(--mono-font); color:var(--neon-cyan);"></div>
                 </div>
-                <div id="raceInputsContainer" style="max-height:500px; overflow-y:auto; border:1px solid #333; margin-bottom:20px;">
-                    <!-- Rows generated here -->
-                </div>
-                <button class="action-btn" onclick="saveRaceResults()">PUBLISH RACE RESULTS</button>
-                <div id="race-director-status" style="text-align:center; margin-top:15px; font-weight:bold; font-family:'JetBrains Mono';"></div>
             </div>
         </div>
 
-        <!-- 2. DRIVER EDITOR (OLD) -->
+        <!-- 2. DRIVER EDITOR -->
         <div id="driver-editor" class="section">
-            <h3 style="color:var(--accent-cyan); margin-bottom:10px;"><i class="fas fa-pen-square"></i> INDIVIDUAL ADJUSTMENT</h3>
-            <p style="color:#666; font-family:'JetBrains Mono'; font-size:0.9rem; margin-bottom:20px;">MODIFY SINGLE DRIVER HISTORY: <span id="currentSeasonLabel" style="color:var(--accent-red); font-weight:bold;">season_1</span></p>
-            
-            <div class="form-group">
-                <select id="editorDriverSelect" onchange="loadDriverData()">
-                    <option value="">-- SELECT DRIVER TO EDIT --</option>
-                </select>
-            </div>
-
-            <div id="editor-area" style="display:none;">
-                <div class="track-grid" id="trackGrid"></div>
-                <div class="total-box">
-                    <div style="color:#888; font-family:'JetBrains Mono'; text-transform:uppercase; letter-spacing:1px;">Calculated Total Points</div>
-                    <div class="total-value" id="calculatedTotal">0</div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-title">INDIVIDUAL ADJUSTMENT</div>
                 </div>
-                <button class="action-btn" onclick="saveAllChanges()">COMMIT CHANGES TO SERVER</button>
-                <div id="editor-status" style="text-align:center; margin-top:15px; font-weight:bold; font-family:'JetBrains Mono';"></div>
+                
+                <select id="editorDriverSelect" onchange="loadDriverData()" style="margin-bottom:20px;">
+                    <option value="">-- SELECT DRIVER --</option>
+                </select>
+
+                <div id="editor-area" style="display:none;">
+                    <div class="track-grid" id="trackGrid"></div>
+                    <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center; background:rgba(0,243,255,0.05); padding:20px; border:1px solid var(--neon-cyan);">
+                        <span style="color:var(--neon-cyan); letter-spacing:1px;">CALCULATED TOTAL</span>
+                        <span class="total-value" id="calculatedTotal">0</span>
+                    </div>
+                    <button class="btn-main" onclick="saveAllChanges()" style="margin-top:20px;">UPDATE DATABASE</button>
+                    <div id="editor-status" style="text-align:center; margin-top:10px; font-family:var(--mono-font);"></div>
+                </div>
             </div>
         </div>
 
         <!-- 3. LIVE VIEW -->
         <div id="live-view" class="section">
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:30px;">
-                <div>
-                    <h4 style="color:var(--accent-cyan); border-left:3px solid var(--accent-cyan); padding-left:10px; margin-bottom:15px;">Drivers Championship (<span class="season-display"></span>)</h4>
-                    <table class="view-table">
-                        <thead><tr><th style="width:10%">#</th><th>DRIVER / TEAM</th><th style="text-align:right">PTS</th></tr></thead>
-                        <tbody id="liveDriversBody"></tbody>
-                    </table>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap:20px;">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title" style="color:var(--neon-cyan)">DRIVERS STANDINGS</div>
+                    </div>
+                    <div style="max-height:600px; overflow-y:auto;">
+                        <table class="tech-table">
+                            <thead><tr><th>#</th><th>DRIVER / TEAM</th><th style="text-align:right">PTS</th></tr></thead>
+                            <tbody id="liveDriversBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div>
-                    <h4 style="color:var(--accent-red); border-left:3px solid var(--accent-red); padding-left:10px; margin-bottom:15px;">Constructors Championship (<span class="season-display"></span>)</h4>
-                    <table class="view-table">
-                        <thead><tr><th style="width:10%">#</th><th>CONSTRUCTOR</th><th style="text-align:right">PTS</th></tr></thead>
-                        <tbody id="liveConstructorsBody"></tbody>
-                    </table>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title" style="color:var(--neon-red)">CONSTRUCTORS</div>
+                    </div>
+                    <div style="max-height:600px; overflow-y:auto;">
+                        <table class="tech-table">
+                            <thead><tr><th>#</th><th>TEAM</th><th style="text-align:right">PTS</th></tr></thead>
+                            <tbody id="liveConstructorsBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 4. DRIVER STATISTICS -->
+        <!-- 4. STATS -->
         <div id="driver-stats" class="section">
-            <h3 style="color:var(--accent-cyan); margin-bottom:10px;"><i class="fas fa-chart-bar"></i> INDIVIDUAL PERFORMANCE</h3>
-            <p style="color:#666; font-family:'JetBrains Mono'; font-size:0.9rem; margin-bottom:20px;">ANALYZE DATA FOR: <span class="season-display" style="color:var(--accent-red); font-weight:bold;"></span></p>
-            
-            <div class="form-group">
-                <select id="statsDriverSelect" onchange="viewDriverStats()">
-                    <option value="">-- SELECT DRIVER FOR ANALYSIS --</option>
+            <div class="panel-card">
+                <select id="statsDriverSelect" onchange="viewDriverStats()" style="margin-bottom:20px;">
+                    <option value="">-- ANALYZE DRIVER --</option>
                 </select>
-            </div>
 
-            <div id="statsDisplay" style="display:none; animation: fadeIn 0.5s ease-out;">
-                <h2 id="statsDriverName" style="color:#fff; margin-bottom:5px;">DRIVER NAME</h2>
-                <div id="statsTeamName" style="color:var(--accent-red); font-family:'JetBrains Mono'; margin-bottom:20px;">TEAM NAME</div>
+                <div id="statsDisplay" style="display:none;">
+                    <h2 id="statsDriverName" style="font-size:2.5rem; margin-bottom:0;">NAME</h2>
+                    <div id="statsTeamName" style="color:var(--neon-red); font-family:var(--mono-font); margin-bottom:20px;">TEAM</div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-val" id="statPoints">0</div>
-                        <div class="stat-label">TOTAL POINTS</div>
+                    <div class="stats-grid">
+                        <div class="stat-box"><div class="stat-num" id="statPoints">0</div><div class="stat-desc">TOTAL POINTS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statWins" style="color:var(--neon-cyan)">0</div><div class="stat-desc">WINS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statPodiums">0</div><div class="stat-desc">PODIUMS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statAvg">0</div><div class="stat-desc">AVG / RACE</div></div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-val" id="statWins">0</div>
-                        <div class="stat-label">RACE WINS</div>
-                        <div class="stat-bar-container"><div class="stat-bar-fill" id="barWins" style="width:0%"></div></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-val" id="statPodiums">0</div>
-                        <div class="stat-label">PODIUMS</div>
-                        <div class="stat-bar-container"><div class="stat-bar-fill" id="barPodiums" style="width:0%"></div></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-val" id="statAvg">0</div>
-                        <div class="stat-label">AVG POINTS</div>
-                    </div>
-                </div>
 
-                <div class="stats-history-container">
-                    <h4 style="color:var(--accent-cyan); margin-bottom:15px;">SEASON HISTORY</h4>
-                    <table class="view-table">
-                        <thead>
-                            <tr>
-                                <th>TRACK</th>
-                                <th>TEAM USED</th>
-                                <th style="text-align:right">POINTS</th>
-                            </tr>
-                        </thead>
+                    <div class="panel-header"><div class="panel-title">RACE LOG</div></div>
+                    <table class="tech-table">
+                        <thead><tr><th>TRACK</th><th>TEAM</th><th style="text-align:right">PTS</th></tr></thead>
                         <tbody id="statsHistoryBody"></tbody>
                     </table>
                 </div>
@@ -413,47 +527,49 @@
 
         <!-- 5. MANAGE -->
         <div id="manage-drivers" class="section">
-            <h3 style="color:var(--accent-cyan); margin-bottom:10px;">DRIVER REGISTRATION</h3>
-            <p style="color:#666; font-family:'JetBrains Mono'; font-size:0.9rem; margin-bottom:20px;">ADDING TO: <span class="season-display" style="color:var(--accent-red); font-weight:bold;"></span></p>
-            
-            <div style="background:var(--glass-bg); padding:20px; border:1px solid #333; margin-bottom:30px;">
-                <div class="form-group">
-                    <label>Driver Handle / Name</label>
-                    <input type="text" id="newDriverName" placeholder="ENTER DRIVER NAME">
+            <div class="panel-card">
+                <div class="panel-header"><div class="panel-title">ADD NEW ENTRY</div></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                    <div class="input-module">
+                        <label>DRIVER NAME</label>
+                        <input type="text" class="data-input" id="newDriverName" placeholder="ENTER NAME">
+                    </div>
+                    <div class="input-module">
+                        <label>CONTRACT</label>
+                        <select id="newDriverTeam" class="data-input" style="background:transparent; border-bottom:1px solid #444; padding:5px 0;">
+                            <option value="red-bull-racing">Red Bull Racing</option>
+                            <option value="ferrari">Ferrari</option>
+                            <option value="mercedes">Mercedes</option>
+                            <option value="mclaren">McLaren</option>
+                            <option value="aston-martin">Aston Martin</option>
+                            <option value="alpine">Alpine</option>
+                            <option value="williams">Williams</option>
+                            <option value="racing-bulls">Racing Bulls</option>
+                            <option value="kick-sauber">Kick Sauber</option>
+                            <option value="haas">Haas</option>
+                            <option value="reserve">Reserve / Free Agent</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Contracted Team</label>
-                    <select id="newDriverTeam">
-                        <option value="red-bull-racing">Red Bull Racing</option>
-                        <option value="ferrari">Ferrari</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="mclaren">McLaren</option>
-                        <option value="aston-martin">Aston Martin</option>
-                        <option value="alpine">Alpine</option>
-                        <option value="williams">Williams</option>
-                        <option value="racing-bulls">Racing Bulls</option>
-                        <option value="kick-sauber">Kick Sauber</option>
-                        <option value="haas">Haas</option>
-                        <option value="reserve">Reserve / Free Agent</option>
-                    </select>
-                </div>
-                <button class="action-btn" onclick="registerDriver()">ADD TO GRID</button>
-                <div id="register-status" style="text-align:center; margin-top:15px; font-family:'JetBrains Mono'; color:var(--accent-cyan);"></div>
+                <button class="btn-main" onclick="registerDriver()">CONFIRM ENTRY</button>
+                <div id="register-status" style="text-align:center; margin-top:10px; color:var(--neon-cyan); font-family:var(--mono-font);"></div>
             </div>
 
-            <h3 style="margin-bottom:15px;">CURRENT GRID (<span class="season-display"></span>)</h3>
-            <div id="driverList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:10px;">Loading...</div>
+            <div class="panel-card" style="margin-top:20px;">
+                <div class="panel-header"><div class="panel-title">ACTIVE GRID</div></div>
+                <div id="driverList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
+            </div>
         </div>
+
     </div>
 
+    <!-- SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ==========================================
-        //  1. CONFIGURATION
-        // ==========================================
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyApUD33ao9DfFa8IAfA2qby3IFKhLtcNFU",
             authDomain: "ttrl-9f3ef.firebaseapp.com",
@@ -470,11 +586,8 @@
         let currentSeason = "season_1"; 
         let unsubscribe = null; 
         let knownSeasons = [];
-        try {
-            knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1'];
-        } catch(e) { knownSeasons = ['season_1']; }
+        try { knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1']; } catch(e) { knownSeasons = ['season_1']; }
 
-        // --- CONSTANTS ---
         const TRACKS = [
             {id:'bahrain', name:'Bahrain'}, {id:'australia', name:'Australia'}, {id:'imola', name:'Imola'},
             {id:'spain', name:'Spain'}, {id:'uk', name:'Great Britain'}, {id:'vegas', name:'Las Vegas'},
@@ -492,7 +605,7 @@
         let driversCache = {};
         let allDrivers = [];
 
-        // --- AUTHENTICATION LOGIC ---
+        // AUTHENTICATION
         window.checkLogin = () => {
             const email = document.getElementById("loginEmail").value;
             const pass = document.getElementById("loginPass").value;
@@ -503,18 +616,16 @@
             const statusMsg = document.getElementById("login-msg");
             statusMsg.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CONTACTING GOOGLE...';
             statusMsg.style.color = "#ccc";
-            statusMsg.style.display = "block";
             
             try {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-                // Auth listener handles the rest
+                await signInWithPopup(auth, new GoogleAuthProvider());
             } catch (error) {
                 console.error("Google Sign In Error:", error);
-                statusMsg.style.color = "var(--accent-red)";
+                statusMsg.style.color = "var(--neon-red)";
                 
-                if (error.code === 'auth/popup-closed-by-user') {
-                    statusMsg.innerText = "LOGIN CANCELLED";
+                if (error.code === 'auth/unauthorized-domain') {
+                    const currentDomain = window.location.hostname;
+                    statusMsg.innerHTML = `DOMAIN NOT AUTHORIZED. ADD TO FIREBASE: ${currentDomain}`;
                 } else {
                     statusMsg.innerText = "LOGIN FAILED";
                 }
@@ -523,23 +634,20 @@
 
         window.logout = () => signOut(auth).then(() => window.location.reload());
 
-        // Auth State Listener
         onAuthStateChanged(auth, (user) => {
-            const overlay = document.getElementById("login-overlay");
             if (user) {
-                // NO WHITELIST - Any authenticated user is granted access
-                overlay.style.display = "none";
+                document.getElementById("login-overlay").style.display = "none";
                 document.getElementById("main-interface").style.display = "block";
                 document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
                 renderKnownSeasons();
                 changeSeason(); 
             } else {
-                overlay.style.display = "flex";
+                document.getElementById("login-overlay").style.display = "flex";
                 document.getElementById("main-interface").style.display = "none";
             }
         });
 
-        // --- UI HELPERS ---
+        // UI HELPERS
         window.switchTab = (id) => {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -549,7 +657,7 @@
 
         function renderKnownSeasons() {
             const container = document.getElementById("knownSeasonsList");
-            container.innerHTML = "QUICK LOAD: " + knownSeasons.map(s => `<span class="season-tag" onclick="selectSeason('${s}')">${s}</span>`).join(' ');
+            container.innerHTML = "HISTORY: " + knownSeasons.map(s => `<span class="season-tag" style="cursor:pointer; border-bottom:1px solid #666; margin-right:10px;" onclick="selectSeason('${s}')">${s}</span>`).join(' ');
         }
 
         window.selectSeason = (sid) => {
@@ -557,7 +665,7 @@
             changeSeason();
         };
 
-        // --- CORE DATA LOGIC ---
+        // DATA LOGIC
         window.changeSeason = () => {
             const inputVal = document.getElementById("seasonInput").value.trim().toLowerCase().replace(/\s+/g, '_');
             if(!inputVal) return;
@@ -567,13 +675,7 @@
                 localStorage.setItem('ttrl_seasons', JSON.stringify(knownSeasons));
                 renderKnownSeasons();
             }
-            // Check for existence of label before setting
-            const seasonLabel = document.getElementById("currentSeasonLabel");
-            if(seasonLabel) seasonLabel.innerText = currentSeason;
             
-            document.querySelectorAll(".season-display").forEach(el => el.innerText = currentSeason);
-            
-            // Populate Race Director Dropdown
             const raceSelect = document.getElementById("raceDirectorTrackSelect");
             if(raceSelect) {
                 raceSelect.innerHTML = '<option value="">-- SELECT TRACK TO ENTER RESULTS --</option>';
@@ -592,12 +694,12 @@
                 const statsSelect = document.getElementById("statsDriverSelect");
                 const list = document.getElementById("driverList");
                 
-                select.innerHTML = '<option value="">-- SELECT DRIVER TO EDIT --</option>';
-                statsSelect.innerHTML = '<option value="">-- SELECT DRIVER FOR ANALYSIS --</option>';
+                select.innerHTML = '<option value="">-- SELECT DRIVER --</option>';
+                statsSelect.innerHTML = '<option value="">-- ANALYZE DRIVER --</option>';
                 list.innerHTML = "";
                 allDrivers = [];
 
-                if(snap.empty) list.innerHTML = `<div style="padding:20px; text-align:center; color:#888; grid-column: 1/-1;">NO DRIVERS FOUND IN ${currentSeason.toUpperCase()}.</div>`;
+                if(snap.empty) list.innerHTML = `<div style="color:#666; padding:10px;">NO DATA</div>`;
 
                 snap.forEach(doc => {
                     const data = doc.data();
@@ -605,13 +707,13 @@
                     driversCache[doc.id] = data;
                     allDrivers.push(data);
 
-                    const optText = `${data.name.toUpperCase()} // ${data.team.toUpperCase().replace('-',' ')}`;
+                    const optText = `${data.name.toUpperCase()}`;
                     select.innerHTML += `<option value="${doc.id}">${optText}</option>`;
-                    statsSelect.innerHTML += `<option value="${doc.id}">${data.name.toUpperCase()}</option>`;
+                    statsSelect.innerHTML += `<option value="${doc.id}">${optText}</option>`;
 
                     const div = document.createElement("div");
-                    div.className = "driver-item";
-                    div.innerHTML = `<div><div style="font-weight:bold; color:#fff;">${data.name}</div><small style="color:var(--accent-cyan); letter-spacing:1px; text-transform:uppercase;">${data.team}</small></div><button class="delete-btn" onclick="deleteDriver('${doc.id}', '${data.name}')"><i class="fas fa-trash"></i> DELETE</button>`;
+                    div.style.cssText = "background:rgba(255,255,255,0.05); padding:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #333;";
+                    div.innerHTML = `<div><div style="font-weight:bold; color:#fff;">${data.name}</div><small style="color:var(--neon-cyan); letter-spacing:1px; text-transform:uppercase;">${data.team}</small></div><button onclick="deleteDriver('${doc.id}', '${data.name}')" style="background:transparent; border:1px solid var(--neon-red); color:var(--neon-red); padding:5px 10px; cursor:pointer;">DEL</button>`;
                     list.appendChild(div);
                 });
 
@@ -619,11 +721,10 @@
                 const currentStatId = document.getElementById("statsDriverSelect").value;
                 if(currentStatId) viewDriverStats();
                 const currentRaceTrack = document.getElementById("raceDirectorTrackSelect").value;
-                if(currentRaceTrack) loadRaceGrid(); // Refresh race director view if open
+                if(currentRaceTrack) loadRaceGrid();
             });
         }
 
-        // --- EXPORT DATA ---
         window.exportData = () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allDrivers));
             const downloadAnchorNode = document.createElement('a');
@@ -634,7 +735,6 @@
             downloadAnchorNode.remove();
         };
 
-        // --- RACE DIRECTOR LOGIC (NEW) ---
         window.loadRaceGrid = () => {
             const trackId = document.getElementById("raceDirectorTrackSelect").value;
             const container = document.getElementById("raceInputsContainer");
@@ -644,13 +744,11 @@
             wrapper.style.display = "block";
             container.innerHTML = "";
 
-            // Sort drivers by name for easier finding, or by team
             const sorted = [...allDrivers].sort((a,b) => a.name.localeCompare(b.name));
 
             sorted.forEach(d => {
                 const results = d.results || {};
                 let currentPoints = 0;
-                // Handle both object and number formats
                 if(results[trackId]) {
                     currentPoints = typeof results[trackId] === 'object' ? results[trackId].points : results[trackId];
                 }
@@ -659,7 +757,7 @@
                 div.className = "race-input-row";
                 div.innerHTML = `
                     <div class="driver-name-label">${d.name} <span style="color:#666; font-size:0.8rem">(${d.team})</span></div>
-                    <input type="number" class="race-points-input" data-driverid="${d.id}" value="${currentPoints}">
+                    <input type="number" class="race-points-input" data-driverid="${d.id}" value="${currentPoints}" style="width:70px; background:#000; border:1px solid #444; color:var(--neon-cyan); padding:5px; text-align:center;">
                 `;
                 container.appendChild(div);
             });
@@ -671,9 +769,8 @@
             const status = document.getElementById("race-director-status");
             
             if(!trackId) return;
-            status.innerText = "PROCESSING BATCH UPDATE...";
-            status.style.color = "#ccc";
-
+            status.innerText = "PROCESSING...";
+            
             const batch = writeBatch(db);
             let updateCount = 0;
 
@@ -682,10 +779,6 @@
                 const newPoints = Number(input.value);
                 const driverData = driversCache[driverId];
                 
-                // We need to calculate the NEW total points. 
-                // 1. Remove old points for this track
-                // 2. Add new points
-                
                 let currentTotal = driverData.totalPoints || 0;
                 let oldTrackPoints = 0;
                 
@@ -693,13 +786,9 @@
                     oldTrackPoints = typeof driverData.results[trackId] === 'object' ? driverData.results[trackId].points : driverData.results[trackId];
                 }
                 
-                // Only update if points changed
                 if(oldTrackPoints !== newPoints) {
                     const newTotal = currentTotal - oldTrackPoints + newPoints;
-                    
-                    // Create update object
                     const resultsUpdate = { ...driverData.results };
-                    // We must preserve team if it exists in the result object, else default to current team
                     let teamForRace = driverData.team;
                     if(driverData.results && driverData.results[trackId] && typeof driverData.results[trackId] === 'object') {
                         teamForRace = driverData.results[trackId].team;
@@ -708,33 +797,23 @@
                     if(newPoints > 0) {
                         resultsUpdate[trackId] = { points: newPoints, team: teamForRace };
                     } else {
-                        delete resultsUpdate[trackId]; // Remove result if 0
+                        delete resultsUpdate[trackId]; 
                     }
 
-                    const docRef = doc(db, "seasons", currentSeason, "drivers", driverId);
-                    batch.update(docRef, { results: resultsUpdate, totalPoints: newTotal });
+                    batch.update(doc(db, "seasons", currentSeason, "drivers", driverId), { results: resultsUpdate, totalPoints: newTotal });
                     updateCount++;
                 }
             });
 
-            if(updateCount === 0) {
-                status.innerText = "NO CHANGES DETECTED.";
-                return;
-            }
+            if(updateCount === 0) { status.innerText = "NO CHANGES"; return; }
 
             try {
                 await batch.commit();
-                status.style.color = "var(--accent-cyan)";
-                status.innerText = `SUCCESS! UPDATED ${updateCount} DRIVERS.`;
+                status.innerText = `UPDATED ${updateCount} ENTRIES`;
                 setTimeout(() => status.innerText = "", 3000);
-            } catch(e) {
-                console.error(e);
-                status.style.color = "var(--accent-red)";
-                status.innerText = "BATCH ERROR: " + e.message;
-            }
+            } catch(e) { status.innerText = "ERROR: " + e.message; }
         };
 
-        // --- DRIVER EDITOR LOGIC (OLD) ---
         window.loadDriverData = () => {
             const id = document.getElementById("editorDriverSelect").value;
             const grid = document.getElementById("trackGrid");
@@ -760,8 +839,8 @@
                 }
                 let teamOpts = TEAMS.map(tm => `<option value="${tm.id}" ${tm.id === team ? 'selected':''}>${tm.name}</option>`).join('');
                 const div = document.createElement("div");
-                div.className = "track-input";
-                div.innerHTML = `<label>${t.name}</label><div class="row-inputs"><input type="number" class="points-input" data-track="${t.id}" value="${pts}" oninput="calcTotal()"><select class="team-input" id="team-${t.id}">${teamOpts}</select></div>`;
+                div.className = "input-module";
+                div.innerHTML = `<label>${t.name.toUpperCase()}</label><div style="display:flex; gap:5px;"><input type="number" class="points-input data-input" style="width:60px; text-align:center; color:var(--neon-cyan); font-weight:bold;" data-track="${t.id}" value="${pts}" oninput="calcTotal()"><select class="team-input data-input" id="team-${t.id}">${teamOpts}</select></div>`;
                 grid.appendChild(div);
             });
             calcTotal();
@@ -779,7 +858,7 @@
             const pointsInputs = document.querySelectorAll(".points-input");
             const teamInputs = document.querySelectorAll(".team-input");
             
-            status.innerText = "UPLOADING..."; status.style.color = "#ccc";
+            status.innerText = "SAVING..."; 
             let newResults = {};
             let newTotal = 0;
 
@@ -795,12 +874,10 @@
 
             try {
                 await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { results: newResults, totalPoints: newTotal });
-                status.style.color = "var(--accent-cyan)"; status.innerText = "✓ SAVED";
-                setTimeout(() => status.innerText = "", 2000);
-            } catch(e) { status.style.color = "var(--accent-red)"; status.innerText = "ERROR: " + e.message; }
+                status.innerText = "SAVED"; setTimeout(() => status.innerText = "", 2000);
+            } catch(e) { status.innerText = "ERROR: " + e.message; }
         };
 
-        // --- STATS LOGIC ---
         window.viewDriverStats = () => {
             const id = document.getElementById("statsDriverSelect").value;
             const display = document.getElementById("statsDisplay");
@@ -824,7 +901,7 @@
                         races++;
                         if(pts >= 25) wins++;
                         if(pts >= 15) podiums++;
-                        tableHTML += `<tr><td style="color:#fff; font-weight:bold;">${track.name.toUpperCase()}</td><td style="color:#888; text-transform:uppercase;">${TEAMS.find(t => t.id === tmId)?.name || tmId}</td><td style="text-align:right; font-weight:bold; color:var(--accent-cyan);">${pts}</td></tr>`;
+                        tableHTML += `<tr><td>${track.name.toUpperCase()}</td><td style="color:#888;">${TEAMS.find(t => t.id === tmId)?.name || tmId}</td><td style="text-align:right; font-weight:bold; color:var(--neon-cyan);">${pts}</td></tr>`;
                     }
                 }
             });
@@ -832,9 +909,7 @@
             document.getElementById("statWins").innerText = wins;
             document.getElementById("statPodiums").innerText = podiums;
             document.getElementById("statAvg").innerText = races > 0 ? (data.totalPoints / races).toFixed(1) : "0.0";
-            document.getElementById("barWins").style.width = races > 0 ? (wins/races)*100 + "%" : "0%";
-            document.getElementById("barPodiums").style.width = races > 0 ? (podiums/races)*100 + "%" : "0%";
-            document.getElementById("statsHistoryBody").innerHTML = tableHTML || `<tr><td colspan="3" style="text-align:center; padding:20px; color:#666;">NO DATA RECORDED</td></tr>`;
+            document.getElementById("statsHistoryBody").innerHTML = tableHTML || `<tr><td colspan="3" style="text-align:center; color:#666;">NO DATA</td></tr>`;
         };
 
         function updateLiveTables() {
@@ -847,7 +922,7 @@
             });
 
             sortedDrivers.forEach((d, i) => {
-                dTable.innerHTML += `<tr><td style="color:#666">${String(i+1).padStart(2,'0')}</td><td><div style="font-weight:bold; color:#fff;">${d.name}</div><div style="font-size:0.75rem; color:var(--accent-cyan); text-transform:uppercase;">${d.team === 'reserve' ? 'RESERVE' : TEAMS.find(t => t.id === d.team)?.name}</div></td><td style="text-align:right; font-weight:bold; font-size:1.1rem; color:var(--accent-cyan)">${d.totalPoints}</td></tr>`;
+                dTable.innerHTML += `<tr><td style="color:#666">${String(i+1).padStart(2,'0')}</td><td><div style="font-weight:bold; color:#fff;">${d.name}</div><div style="font-size:0.75rem; color:var(--neon-cyan); text-transform:uppercase;">${d.team === 'reserve' ? 'RESERVE' : TEAMS.find(t => t.id === d.team)?.name}</div></td><td style="text-align:right; font-weight:bold; font-size:1.1rem; color:var(--neon-cyan)">${d.totalPoints}</td></tr>`;
             });
 
             const teamPoints = {};
@@ -862,7 +937,7 @@
             const cTable = document.getElementById("liveConstructorsBody");
             cTable.innerHTML = "";
             Object.keys(teamPoints).map(k => ({name: k, pts: teamPoints[k]})).sort((a,b) => b.pts - a.pts).forEach((tm, i) => {
-                cTable.innerHTML += `<tr><td style="color:#666">${String(i+1).padStart(2,'0')}</td><td style="text-transform:uppercase; font-weight:bold; color:#fff;">${TEAMS.find(t => t.id === tm.name)?.name}</td><td style="text-align:right; font-weight:bold; color:var(--accent-red)">${tm.pts}</td></tr>`;
+                cTable.innerHTML += `<tr><td style="color:#666">${String(i+1).padStart(2,'0')}</td><td style="text-transform:uppercase; font-weight:bold; color:#fff;">${TEAMS.find(t => t.id === tm.name)?.name}</td><td style="text-align:right; font-weight:bold; color:var(--neon-red)">${tm.pts}</td></tr>`;
             });
         }
 
@@ -873,7 +948,7 @@
             try {
                 await addDoc(collection(db, "seasons", currentSeason, "drivers"), { name, team, totalPoints: 0, results: {} });
                 document.getElementById("newDriverName").value = "";
-                document.getElementById("register-status").innerText = "✓ ADDED"; setTimeout(() => document.getElementById("register-status").innerText = "", 2000);
+                document.getElementById("register-status").innerText = "CONFIRMED"; setTimeout(() => document.getElementById("register-status").innerText = "", 2000);
             } catch(e) { console.error(e); }
         };
 
