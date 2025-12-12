@@ -8,16 +8,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-deep: #030305;
-            --panel-bg: rgba(20, 20, 25, 0.95);
+            --bg-deep: #050507;
+            --panel-bg: rgba(20, 20, 25, 0.7);
+            --sidebar-bg: rgba(12, 12, 14, 0.95);
             --neon-cyan: #00f3ff;
             --neon-red: #ff003c;
             --neon-green: #00ff9d;
+            --neon-orange: #ff9900;
             --text-main: #e0e0e0;
-            --text-dim: #6e6e7a;
+            --text-dim: #888899;
             --glass-border: 1px solid rgba(255, 255, 255, 0.08);
             --tech-font: 'Rajdhani', sans-serif;
             --mono-font: 'JetBrains Mono', monospace;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 70px;
         }
 
         * { box-sizing: border-box; outline: none; }
@@ -28,14 +32,14 @@
             font-family: var(--tech-font);
             margin: 0;
             padding: 0;
-            min-height: 100vh;
+            height: 100vh;
             background-image: 
-                linear-gradient(rgba(3, 3, 5, 0.9), rgba(3, 3, 5, 0.95)),
+                linear-gradient(rgba(5, 5, 7, 0.92), rgba(5, 5, 7, 0.98)),
                 url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg');
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         /* --- DECORATIVE BACKGROUND GRID --- */
@@ -50,304 +54,618 @@
             z-index: 0;
         }
 
-        /* --- CUSTOM MODAL & TOAST --- */
-        .custom-modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-            display: none; justify-content: center; align-items: center; z-index: 10000;
+        /* --- LAYOUT STRUCTURE --- */
+        .app-container {
+            display: none;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
-        .custom-modal-box {
-            background: #111; border: 1px solid var(--neon-cyan); padding: 25px;
-            max-width: 400px; width: 90%; text-align: center;
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
-        .modal-msg { font-size: 1.1rem; margin-bottom: 20px; color: #fff; }
-        .modal-btns { display: flex; gap: 10px; justify-content: center; }
-        
-        .toast-notification {
-            position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.9);
-            border-left: 4px solid var(--neon-cyan); color: #fff; padding: 15px 25px;
-            font-family: var(--mono-font); font-size: 0.9rem; z-index: 10001;
-            transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .toast-visible { transform: translateY(0); opacity: 1; }
 
-        /* --- LOGIN --- */
-        #login-overlay {
-            position: fixed; inset: 0; z-index: 9999;
-            background-image: linear-gradient(rgba(3, 3, 5, 0.6), rgba(3, 3, 5, 0.9)), url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/1-w-GettyImages-2048270135.webp');
-            background-size: cover; background-position: center;
-            display: flex; justify-content: center; align-items: center; transition: opacity 0.4s ease;
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            flex-shrink: 0;
+            backdrop-filter: blur(20px);
+            transition: width 0.3s ease;
+            overflow: hidden;
         }
-        .login-box {
-            width: 100%; max-width: 420px; background: rgba(10, 10, 15, 0.9); border: 1px solid var(--neon-cyan);
-            padding: 3rem 2rem; position: relative; box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
-            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
-        }
-        .login-logo { height: 60px; display: block; margin: 0 auto 1.5rem; }
-        .login-title { text-align: center; font-size: 1.5rem; letter-spacing: 0.2em; color: var(--neon-cyan); margin-bottom: 2rem; font-weight: 700; }
-        .login-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; padding: 12px; margin-bottom: 15px; font-family: var(--mono-font); }
-        .btn-main { width: 100%; padding: 12px; background: var(--neon-cyan); color: #000; border: none; font-family: var(--tech-font); font-weight: 800; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
-        .btn-main:hover { background: #fff; }
-        .btn-google { background: #fff; color: #000; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-        /* --- MAIN UI --- */
-        .container { max-width: 1400px; margin: 0 auto; display: none; padding: 20px; animation: fadeIn 0.5s; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem; }
-        .header-logo { height: 40px; margin-right: 15px; }
-        .header-title { font-size: 1.8rem; font-weight: 800; color: #fff; }
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px 40px;
+            position: relative;
+            transition: padding 0.3s ease;
+        }
+
+        /* --- SIDEBAR COMPONENTS --- */
+        .brand-area {
+            height: 80px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            white-space: nowrap;
+        }
+        .brand-logo { height: 35px; min-width: 35px; object-fit: contain; }
+        .brand-text { transition: opacity 0.2s; opacity: 1; }
+        .sidebar.collapsed .brand-text { opacity: 0; pointer-events: none; width: 0; }
         
-        .control-bar { background: rgba(255,0,60,0.05); border-left: 4px solid var(--neon-red); padding: 1rem; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
-        .flat-input { background: transparent; border: none; border-bottom: 1px solid #555; color: #fff; font-family: var(--mono-font); padding: 5px; }
-        .btn-small { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #ccc; padding: 6px 15px; cursor: pointer; font-family: var(--mono-font); text-transform: uppercase; }
-        .btn-small:hover { background: #fff; color: #000; }
-        .btn-accent { border-color: var(--neon-red); color: var(--neon-red); }
+        .brand-text h1 { font-size: 1.4rem; font-weight: 800; margin: 0; color: #fff; line-height: 1; letter-spacing: 0.05em; }
+        .brand-text span { font-size: 0.7rem; color: var(--neon-cyan); letter-spacing: 0.3em; font-weight: 600; }
+
+        .nav-menu {
+            flex-grow: 1;
+            padding: 20px 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-family: var(--tech-font);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+        .nav-item i { width: 24px; font-size: 1.1rem; text-align: center; margin-right: 15px; flex-shrink: 0; transition: margin 0.3s; }
+        .sidebar.collapsed .nav-item i { margin-right: 0; }
+        .sidebar.collapsed .nav-text { opacity: 0; display: none; }
+        
+        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.03); }
+        .nav-item.active {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(0, 243, 255, 0.1), transparent);
+            border-left: 3px solid var(--neon-cyan);
+            border-radius: 0 6px 6px 0;
+        }
+        .nav-item.active i { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); }
+
+        .user-area {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.2);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .user-badge { display: none; }
+        .sidebar.collapsed .btn-logout span { display: none; }
+        .sidebar.collapsed .btn-logout i { margin: 0; }
+        
+        .user-badge { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .user-info { font-size: 0.9rem; color: #fff; font-weight: 700; letter-spacing: 0.05em; }
+        .user-role { font-size: 0.7rem; color: var(--text-dim); font-family: var(--mono-font); }
+        
+        .btn-logout { 
+            width: 100%; background: transparent; border: 1px solid #333; color: #888;
+            padding: 10px; font-family: var(--mono-font); font-size: 0.75rem; cursor: pointer; transition: 0.2s;
+            border-radius: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-logout:hover { border-color: var(--neon-red); color: var(--neon-red); background: rgba(255, 0, 60, 0.05); }
+
+        /* --- TOGGLE BUTTON --- */
+        .sidebar-toggle-btn {
+            background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim);
+            width: 35px; height: 35px; border-radius: 4px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .sidebar-toggle-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+
+        /* --- DASHBOARD WIDGETS --- */
+        .dash-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px;
+        }
+        .dash-card {
+            background: rgba(30, 30, 35, 0.4); border: 1px solid rgba(255,255,255,0.08);
+            padding: 25px; border-radius: 8px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 140px; transition: transform 0.2s;
+        }
+        .dash-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        
+        .dash-icon-bg {
+            position: absolute; top: -10px; right: -10px; font-size: 5rem;
+            color: rgba(255,255,255,0.03); transform: rotate(15deg); pointer-events: none;
+        }
+        
+        .dash-label { font-size: 0.85rem; color: var(--text-dim); font-family: var(--mono-font); letter-spacing: 1px; font-weight: 600; text-transform: uppercase; }
+        .dash-value { font-size: 2.2rem; font-weight: 800; color: #fff; margin: 10px 0 5px; line-height: 1; letter-spacing: 0.02em; }
+        .dash-sub { font-size: 0.85rem; color: var(--neon-cyan); font-family: var(--tech-font); font-weight: 600; display: flex; align-items: center; gap: 5px; }
+
+        .progress-track { width: 100%; height: 4px; background: #333; margin-top: auto; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--neon-green); width: 0%; transition: width 1s ease; box-shadow: 0 0 10px var(--neon-green); }
+
+        /* --- SECTIONS --- */
+        .section { display: none; animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CONTROLS --- */
+        .control-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+            background: rgba(255,255,255,0.02); padding: 15px 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px); gap: 20px;
+        }
+        .control-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        
+        .flat-input { 
+            background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 4px;
+            color: #fff; font-family: var(--mono-font); padding: 8px 12px; width: 160px; text-align: center;
+        }
+        .flat-input:focus { border-color: var(--neon-cyan); outline: none; }
+
+        .btn-small { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); 
+            color: #ccc; padding: 8px 18px; cursor: pointer; font-family: var(--mono-font); 
+            text-transform: uppercase; font-size: 0.75rem; font-weight: 700; border-radius: 4px;
+            transition: all 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;
+        }
+        .btn-small:hover { background: #fff; color: #000; border-color: #fff; }
+        .btn-accent { border-color: var(--neon-red); color: var(--neon-red); background: rgba(255,0,60,0.05); }
         .btn-accent:hover { background: var(--neon-red); color: #fff; }
-        .btn-upload { border-color: var(--neon-green); color: var(--neon-green); }
+        .btn-upload { border-color: var(--neon-green); color: var(--neon-green); background: rgba(0,255,157,0.05); }
         .btn-upload:hover { background: var(--neon-green); color: #000; }
+        .btn-migrate { border-color: var(--neon-orange); color: var(--neon-orange); background: rgba(255,153,0,0.05); }
+        .btn-migrate:hover { background: var(--neon-orange); color: #000; }
 
-        .nav-container { display: flex; gap: 2px; overflow-x: auto; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; background: rgba(255,255,255,0.03); border: none; color: #666; font-family: var(--tech-font); font-weight: 700; cursor: pointer; white-space: nowrap; }
-        .tab-btn.active { background: var(--neon-cyan); color: #000; }
+        .btn-action { 
+            background: var(--neon-cyan); color: #000; border: none; font-weight: 700; border-radius: 4px; 
+            cursor: pointer; font-family: var(--tech-font); text-transform: uppercase; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-action:hover { box-shadow: 0 0 15px var(--neon-cyan); transform: translateY(-1px); }
 
-        .section { display: none; }
-        .section.active { display: block; animation: slideUp 0.3s; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- PANELS --- */
+        .panel-card { 
+            background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.08); 
+            padding: 30px; margin-bottom: 25px; border-radius: 8px; backdrop-filter: blur(10px);
+        }
+        .panel-title { 
+            color: #fff; font-size: 1.3rem; margin-bottom: 25px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; 
+            letter-spacing: 0.05em; font-weight: 800; display: flex; align-items: center; gap: 10px;
+        }
+        .panel-title i { color: var(--neon-cyan); font-size: 1rem; }
 
-        .panel-card { background: var(--panel-bg); border: var(--glass-border); padding: 20px; margin-bottom: 20px; }
-        .panel-title { color: var(--neon-cyan); font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-
-        /* Inputs & Tables */
-        .input-module { background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 10px; margin-bottom: 10px; }
-        .input-module label { display: block; font-size: 0.7rem; color: #888; margin-bottom: 5px; font-family: var(--mono-font); }
-        .data-input, select { width: 100%; background: transparent; border: 1px solid #444; color: #fff; padding: 8px; font-family: var(--mono-font); }
+        /* Inputs & Lists */
+        .input-module { background: rgba(0,0,0,0.3); border: 1px solid #333; padding: 20px; margin-bottom: 15px; border-radius: 6px; }
+        .input-module label { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 8px; font-family: var(--mono-font); letter-spacing: 1px; font-weight: 600; }
+        .data-input, select { width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 12px; font-family: var(--mono-font); border-radius: 4px; }
         .data-input:focus, select:focus { border-color: var(--neon-cyan); outline: none; }
         select option { background: #000; }
 
-        .track-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .stat-box { border: 1px solid #333; padding: 15px; text-align: center; }
-        .stat-num { font-size: 2rem; font-weight: 800; color: #fff; }
+        .rc-points-input { 
+            width: 60px; background: #050505; border: 1px solid #333; color: var(--neon-cyan); 
+            font-family: var(--mono-font); font-weight: 700; font-size: 1.2rem; text-align: center; 
+            padding: 8px 0; border-radius: 4px; 
+        }
+        .rc-points-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
+        .rc-points-input.has-points { background: rgba(0, 243, 255, 0.05); border-color: rgba(0, 243, 255, 0.3); }
 
-        .tech-table { width: 100%; border-collapse: collapse; font-family: var(--mono-font); font-size: 0.85rem; }
-        .tech-table th { text-align: left; padding: 10px; color: #666; border-bottom: 1px solid #333; }
-        .tech-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ccc; }
-
-        /* List Items */
-        .track-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.02); margin-bottom: 5px; border: 1px solid transparent; }
-        .track-list-item:hover { border-color: var(--neon-cyan); }
+        .tech-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-family: var(--mono-font); font-size: 0.85rem; }
+        .tech-table th { text-align: left; padding: 12px 15px; color: var(--text-dim); font-weight: 600; font-size: 0.75rem; letter-spacing: 1px; }
+        .tech-table td { padding: 12px 15px; background: rgba(255,255,255,0.02); color: #ccc; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tech-table td:first-child { border-left: 1px solid rgba(255,255,255,0.05); border-radius: 4px 0 0 4px; }
+        .tech-table td:last-child { border-right: 1px solid rgba(255,255,255,0.05); border-radius: 0 4px 4px 0; }
         
-        .driver-row { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.02); border-bottom: 1px solid #222; }
-        .driver-row:hover { background: rgba(255,255,255,0.05); }
+        .track-list-item { 
+            display: flex; justify-content: space-between; align-items: center; padding: 15px; 
+            background: rgba(255,255,255,0.02); margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); border-radius: 4px; 
+        }
+        .driver-row { 
+            display: flex; align-items: center; gap: 15px; padding: 12px 15px; 
+            background: rgba(255,255,255,0.02); margin-bottom: 5px; border-radius: 4px; border: 1px solid transparent; 
+        }
+        .race-control-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 10px 0; }
+        .rc-card { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.4) 100%); 
+            border: 1px solid rgba(255,255,255,0.08); border-left: 4px solid var(--team-color, #555); 
+            border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; 
+        }
+        .rc-driver-info { display: flex; flex-direction: column; }
+        .rc-name { font-family: var(--tech-font); font-weight: 700; font-size: 1.1rem; color: #fff; }
+        .rc-team { font-family: var(--mono-font); font-size: 0.75rem; color: #888; text-transform: uppercase; margin-top: 4px; }
 
-        /* Validation Status */
-        .status-valid { color: var(--neon-green); }
-        .status-invalid { color: var(--neon-red); }
-        .invalid-row { background: rgba(255, 0, 60, 0.1); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .stat-box { border: 1px solid rgba(255,255,255,0.1); padding: 25px; text-align: center; background: rgba(0,0,0,0.2); border-radius: 6px; }
 
-        /* Date Picker Reset */
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        /* Modals & Toast */
+        .custom-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10000; }
+        .custom-modal-box { background: #0a0a0c; border: 1px solid var(--neon-cyan); padding: 40px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 0 50px rgba(0, 243, 255, 0.1); border-radius: 12px; }
+        .modal-btns { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        
+        .toast-notification { position: fixed; bottom: 30px; right: 30px; background: #050507; border: 1px solid var(--neon-cyan); border-left-width: 5px; color: #fff; padding: 15px 30px; font-family: var(--mono-font); font-size: 0.9rem; z-index: 10001; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 4px; }
+        .toast-visible { transform: translateY(0); opacity: 1; }
+
+        /* --- NEW LOGIN SCREEN --- */
+        #login-overlay { 
+            position: fixed; inset: 0; z-index: 9999; 
+            background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)), url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg'); 
+            background-size: cover; background-position: center;
+            display: flex; justify-content: center; align-items: center; 
+        }
+        .login-card { 
+            width: 100%; max-width: 380px; 
+            background: rgba(15, 15, 20, 0.6); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-top: 2px solid var(--neon-cyan);
+            padding: 40px; 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 12px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .login-logo-img { height: 50px; margin-bottom: 20px; }
+        .login-header { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 5px; letter-spacing: 0.1em; }
+        .login-sub { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 30px; font-family: var(--mono-font); }
+        
+        .login-input { 
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); 
+            color: #fff; padding: 12px 15px; margin-bottom: 15px; font-family: var(--mono-font); font-size: 0.9rem;
+            border-radius: 4px; transition: all 0.3s; 
+        }
+        .login-input:focus { border-color: var(--neon-cyan); background: rgba(255,255,255,0.05); }
+        
+        .login-btn { 
+            width: 100%; padding: 12px; background: var(--neon-cyan); color: #000; border: none; 
+            font-family: var(--tech-font); font-weight: 800; font-size: 1.1rem; cursor: pointer; 
+            text-transform: uppercase; border-radius: 4px; transition: all 0.2s;
+        }
+        .login-btn:hover { background: #fff; box-shadow: 0 0 15px var(--neon-cyan); }
+        
+        .google-btn { 
+            width: 100%; padding: 12px; background: #fff; color: #000; border: none; 
+            font-family: var(--tech-font); font-weight: 700; font-size: 1rem; cursor: pointer; 
+            text-transform: uppercase; border-radius: 4px; margin-bottom: 20px; display: flex; 
+            align-items: center; justify-content: center; gap: 10px; transition: 0.2s;
+        }
+        .google-btn:hover { background: #eee; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .app-container { flex-direction: column; overflow: auto; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; align-items: center; padding: 10px 20px; border-right: none; border-bottom: 1px solid #333; position: sticky; top: 0; }
+            .brand-area { padding: 0; border: none; height: auto; }
+            .brand-text { display: block; }
+            .nav-menu { 
+                position: absolute; top: 100%; left: 0; width: 100%; height: 0; 
+                background: #0a0a0c; overflow: hidden; transition: height 0.3s; padding: 0;
+            }
+            .nav-menu.open { height: auto; padding: 15px; border-bottom: 1px solid var(--neon-cyan); }
+            .user-area { display: none; }
+            .main-content { padding: 20px; }
+            .control-header { flex-direction: column; gap: 15px; align-items: stretch; }
+            .control-group { justify-content: space-between; }
+            .dash-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- CUSTOM CONFIRMATION MODAL -->
+    <!-- MODALS -->
     <div id="confirmModal" class="custom-modal-overlay">
         <div class="custom-modal-box">
-            <div id="modalTitle" style="color:var(--neon-red); font-weight:bold; margin-bottom:10px;">CONFIRM ACTION</div>
-            <div id="modalMessage" class="modal-msg">Are you sure?</div>
+            <div id="modalTitle" style="color:var(--neon-red); font-weight:bold; margin-bottom:10px; font-size:1.4rem;">CONFIRM ACTION</div>
+            <div id="modalMessage" style="color:#ccc; margin-bottom:20px;">Are you sure?</div>
             <div class="modal-btns">
-                <button id="btnConfirmYes" class="btn-main" style="width:100px; background:var(--neon-red); color:#fff;">YES</button>
-                <button onclick="closeModal()" class="btn-main" style="width:100px; background:#333; color:#fff;">NO</button>
+                <button id="btnConfirmYes" class="btn-action" style="background:var(--neon-red); color:#fff; padding: 12px 30px;">YES</button>
+                <button onclick="closeModal()" class="btn-action" style="background:#333; color:#fff; padding: 12px 30px;">NO</button>
             </div>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
+    <div id="migrationModal" class="custom-modal-overlay">
+        <div class="custom-modal-box" style="border-color: var(--neon-orange);">
+            <div style="color:var(--neon-orange); font-weight:bold; margin-bottom:10px; font-size:1.4rem;">DATA MIGRATION</div>
+            <div style="color:#ccc; margin-bottom:30px; font-size:0.9rem;">Copy all tracks and drivers between seasons.</div>
+            
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="color: var(--neon-orange); font-size:0.8rem; font-family:var(--mono-font);">SOURCE (COPY FROM)</label>
+                <input type="text" id="migrateSource" class="data-input" placeholder="e.g. season_2" style="border-color: var(--neon-orange);">
+            </div>
+            <div style="text-align: left; margin-bottom: 25px;">
+                <label style="color: var(--neon-green); font-size:0.8rem; font-family:var(--mono-font);">TARGET (PASTE TO)</label>
+                <input type="text" id="migrateTarget" class="data-input" placeholder="e.g. season_1" style="border-color: var(--neon-green);">
+            </div>
+            <div style="text-align: left; margin-bottom: 30px; display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" id="migrateDelete" style="width:auto; transform:scale(1.2);">
+                <label for="migrateDelete" style="color:#fff; font-size:0.8rem; font-family:var(--mono-font);">DELETE SOURCE AFTER COPY</label>
+            </div>
+
+            <div class="modal-btns">
+                <button onclick="performMigration()" class="btn-action" style="background:var(--neon-orange); color:#000; padding:12px 25px;">TRANSFER</button>
+                <button onclick="document.getElementById('migrationModal').style.display='none'" class="btn-action" style="background:#333; color:#fff; padding:12px 25px;">CANCEL</button>
+            </div>
+            <div id="migrationStatus" style="margin-top:15px; font-family:var(--mono-font); color:var(--neon-cyan); font-size:0.8rem;"></div>
+        </div>
+    </div>
+
     <div id="toast" class="toast-notification">Notification</div>
 
-    <!-- LOGIN -->
+    <!-- NEW LOGIN DESIGN -->
     <div id="login-overlay">
-        <div class="login-box">
-            <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="login-logo" alt="TTRL">
-            <div class="login-title">SYSTEM ACCESS</div>
-            <button class="btn-main btn-google" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Login with Google</button>
-            <div class="divider"><span>OR MANUAL ENTRY</span></div>
+        <div class="login-card">
+            <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="login-logo-img" alt="TTRL">
+            <div class="login-header">TTRL CONTROL</div>
+            <div class="login-sub">RESTRICTED ACCESS ONLY</div>
+            
+            <button class="google-btn" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Login with Google</button>
+            
+            <div style="width:100%; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0 0 20px 0;"></div>
+
             <input type="email" id="loginEmail" class="login-input" placeholder="OPERATOR ID">
             <input type="password" id="loginPass" class="login-input" placeholder="SECURITY KEY">
-            <button class="btn-main" onclick="checkLogin()">INITIATE LINK</button>
-            <div id="login-msg" style="margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem; color:var(--neon-red); text-align: center;"></div>
+            <button class="login-btn" onclick="checkLogin()">INITIATE UPLINK</button>
+            <div id="login-msg" style="margin-top:20px; color:var(--neon-red); text-align:center; font-size:0.8rem;"></div>
         </div>
     </div>
 
-    <!-- DASHBOARD -->
-    <div class="container" id="main-interface">
-        <header>
-            <div class="header-left">
-                <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="header-logo" alt="TTRL">
-                <div>
-                    <div class="header-title">PITWALL <span style="color:var(--neon-cyan)">CONTROL</span></div>
-                    <div class="header-subtitle">ADMINISTRATION CONSOLE</div>
+    <!-- MAIN APP STRUCTURE -->
+    <div class="app-container" id="main-interface" style="display:none;">
+        
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="appSidebar">
+            <div class="brand-area">
+                <button class="sidebar-toggle-btn" onclick="toggleSidebar()" style="margin-right: 15px;"><i class="fas fa-bars"></i></button>
+                <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="brand-logo" alt="TTRL">
+                <div class="brand-text">
+                    <h1>PITWALL</h1>
+                    <span>CONTROL</span>
                 </div>
             </div>
-            <div style="text-align:right;">
-                <div style="font-size:0.8rem; color:#888;">OPERATOR</div>
-                <div id="userName" style="color:#fff; font-weight:700;">UNKNOWN</div>
-                <button class="btn-small" onclick="logout()" style="margin-top:5px; border-color:var(--neon-red); color:var(--neon-red);">EXIT</button>
+
+            <div class="nav-menu" id="navMenu">
+                <a class="nav-item active" onclick="switchTab('dashboard')"><i class="fas fa-grid-2"></i> <span class="nav-text">Dashboard</span></a>
+                <a class="nav-item" onclick="switchTab('season-setup')"><i class="fas fa-calendar-alt"></i> <span class="nav-text">Season Setup</span></a>
+                <a class="nav-item" onclick="switchTab('manage-drivers')"><i class="fas fa-users-cog"></i> <span class="nav-text">Manage Grid</span></a>
+                <a class="nav-item" onclick="switchTab('race-director')"><i class="fas fa-flag-checkered"></i> <span class="nav-text">Race Director</span></a>
+                <a class="nav-item" onclick="switchTab('driver-editor')"><i class="fas fa-user-edit"></i> <span class="nav-text">Edit Driver</span></a>
+                <a class="nav-item" onclick="switchTab('live-view')"><i class="fas fa-chart-line"></i> <span class="nav-text">Live Data</span></a>
+                <a class="nav-item" onclick="switchTab('driver-stats')"><i class="fas fa-chart-pie"></i> <span class="nav-text">Statistics</span></a>
             </div>
-        </header>
 
-        <div class="control-bar">
-            <span class="control-label">DATA STREAM:</span>
-            <input type="text" id="seasonInput" class="flat-input" value="season_1" placeholder="SEASON ID">
-            <button class="btn-small btn-accent" onclick="changeSeason()"><i class="fas fa-sync"></i> SYNC</button>
-            <button class="btn-small btn-upload" onclick="triggerImport()" style="margin-left: 20px;"><i class="fas fa-file-csv"></i> IMPORT DATA</button>
-            <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFileSelect(this)">
-            <button class="btn-small" onclick="exportData()" style="margin-left:auto;"><i class="fas fa-download"></i> EXPORT JSON</button>
-        </div>
-        <div id="knownSeasonsList" style="margin-bottom:20px; padding-left:10px; font-size:0.8rem; color:#666; font-family:var(--mono-font);"></div>
+            <div class="user-area">
+                <div class="user-badge">
+                    <div class="user-info" id="userName">UNKNOWN</div>
+                    <div class="user-role">ADMIN</div>
+                </div>
+                <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>DISCONNECT</span></button>
+            </div>
+        </nav>
 
-        <div class="nav-container">
-            <button class="tab-btn active" onclick="switchTab('season-setup')">Season Setup</button>
-            <button class="tab-btn" onclick="switchTab('manage-drivers')">Manage Grid</button>
-            <button class="tab-btn" onclick="switchTab('race-director')">Race Director</button>
-            <button class="tab-btn" onclick="switchTab('driver-editor')">Edit Driver</button>
-            <button class="tab-btn" onclick="switchTab('live-view')">Live Data</button>
-            <button class="tab-btn" onclick="switchTab('driver-stats')">Statistics</button>
-        </div>
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- SHARED CONTROL HEADER -->
+            <div class="control-header">
+                <div class="control-group">
+                    <span style="color:var(--neon-red); font-weight:700; font-family:var(--tech-font); font-size:1.1rem;">ACTIVE SEASON:</span>
+                    <input type="text" id="seasonInput" class="flat-input" value="season_1">
+                    <button class="btn-small" onclick="changeSeason()"><i class="fas fa-sync"></i> RELOAD</button>
+                </div>
+                <div class="control-group">
+                    <button class="btn-small btn-migrate" onclick="openMigrationModal()"><i class="fas fa-exchange-alt"></i> MIGRATE</button>
+                    <button class="btn-small btn-upload" onclick="triggerImport()"><i class="fas fa-file-csv"></i> IMPORT</button>
+                    <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFileSelect(this)">
+                    <button class="btn-small" onclick="exportData()"><i class="fas fa-download"></i> EXPORT</button>
+                </div>
+            </div>
+            <div id="knownSeasonsList" style="margin-bottom:30px; font-size:0.8rem; color:#666; font-family:var(--mono-font); text-transform:uppercase;"></div>
 
-        <!-- 0. SEASON SETUP -->
-        <div id="season-setup" class="section active">
-            <div class="panel-card">
-                <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
-                    TRACK CONFIGURATION
-                    <div>
-                        <button class="btn-small" onclick="toggleTrackSelectAll()">SELECT ALL</button>
-                        <button class="btn-small" onclick="deleteSelectedTracks()" style="border-color:var(--neon-red); color:var(--neon-red);">DELETE SELECTED</button>
+            <!-- 00. DASHBOARD -->
+            <div id="dashboard" class="section active">
+                <div class="panel-title"><i class="fas fa-tachometer-alt"></i> MISSION OVERVIEW</div>
+                <div class="dash-grid">
+                    <div class="dash-card">
+                        <i class="fas fa-users dash-icon-bg"></i>
+                        <div class="dash-label">ACTIVE DRIVERS</div>
+                        <div class="dash-value" id="dashDriverCount">0</div>
+                        <div class="dash-sub">REGISTERED GRID</div>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-trophy dash-icon-bg" style="color:rgba(255, 215, 0, 0.1);"></i>
+                        <div class="dash-label">DRIVER LEADER</div>
+                        <div class="dash-value" id="dashLeader" style="color:var(--neon-cyan);">--</div>
+                        <div class="dash-sub" id="dashLeaderPts">0 PTS</div>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-cogs dash-icon-bg" style="color:rgba(255, 0, 60, 0.1);"></i>
+                        <div class="dash-label">CONSTRUCTOR LEADER</div>
+                        <div class="dash-value" id="dashTeamLeader" style="color:var(--neon-red);">--</div>
+                        <div class="dash-sub" id="dashTeamPts">0 PTS</div>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-map-marked-alt dash-icon-bg"></i>
+                        <div class="dash-label">TRACKS</div>
+                        <div class="dash-value" id="dashTrackCount">0</div>
+                        <div class="dash-sub">CONFIGURED</div>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-flag-checkered dash-icon-bg"></i>
+                        <div class="dash-label">LAST WINNER</div>
+                        <div class="dash-value" id="dashLastWinner">--</div>
+                        <div class="dash-sub" id="dashLastGP">WAITING FOR RESULTS</div>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-calendar-alt dash-icon-bg"></i>
+                        <div class="dash-label">NEXT EVENT</div>
+                        <div class="dash-value" id="dashNextRace" style="font-size:1.8rem;">--</div>
+                        <div class="dash-sub" id="dashNextDate">TBD</div>
+                    </div>
+                    <div class="dash-card">
+                        <i class="fas fa-user-astronaut dash-icon-bg"></i>
+                        <div class="dash-label">RESERVE POOL</div>
+                        <div class="dash-value" id="dashReserveCount">0</div>
+                        <div class="dash-sub">AVAILABLE DRIVERS</div>
+                    </div>
+                    <div class="dash-card" style="grid-column: span 2;">
+                        <i class="fas fa-hourglass-half dash-icon-bg"></i>
+                        <div class="dash-label">SEASON PROGRESS</div>
+                        <div style="display:flex; justify-content:space-between; align-items:end;">
+                            <div class="dash-value" id="dashProgressPct" style="font-size:3rem; margin-bottom:0;">0%</div>
+                            <div class="dash-sub" id="dashRacesDone" style="margin-bottom:10px;">0 / 0 RACES</div>
+                        </div>
+                        <div class="progress-track"><div class="progress-fill" id="dashProgressBar"></div></div>
                     </div>
                 </div>
-                <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:15px; margin-bottom:20px; align-items:end;">
-                    <div class="input-module">
-                        <label>SELECT TRACK</label>
-                        <select id="trackSelector"><option value="">-- CHOOSE --</option></select>
-                    </div>
-                    <div class="input-module">
-                        <label>DATE</label>
-                        <input type="date" class="data-input" id="newTrackDate">
-                    </div>
-                    <button class="btn-main" onclick="addTrackConfig()" style="height:42px; width:auto; padding:0 30px;"><i class="fas fa-plus"></i></button>
-                </div>
-                <div id="trackConfigList" style="max-height:400px; overflow-y:auto; border-top:1px solid #333; padding-top:10px;"></div>
             </div>
-        </div>
 
-        <!-- 1. MANAGE GRID -->
-        <div id="manage-drivers" class="section">
-            <div class="panel-card">
-                <div class="panel-title">ADD DRIVER</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                    <input type="text" class="data-input" id="newDriverName" placeholder="DRIVER NAME">
-                    <select id="newDriverTeam" class="data-input"></select>
-                </div>
-                <button class="btn-main" onclick="registerDriver()" style="margin-top:15px;">ADD ENTRY</button>
-            </div>
-            <div class="panel-card">
-                <div class="panel-title" style="display:flex; justify-content:space-between;">
-                    ACTIVE GRID
-                    <div>
-                        <button class="btn-small" onclick="toggleSelectAll()">SELECT ALL</button>
-                        <button class="btn-small" onclick="deleteSelectedDrivers()" style="border-color:var(--neon-red); color:var(--neon-red);">DELETE SELECTED</button>
-                    </div>
-                </div>
-                <div id="driverList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
-            </div>
-        </div>
-
-        <!-- 2. RACE DIRECTOR -->
-        <div id="race-director" class="section">
-            <div class="panel-card">
-                <div class="panel-title">RACE RESULTS</div>
-                <select id="raceDirectorTrackSelect" onchange="loadRaceGrid()" style="margin-bottom:15px; background:rgba(0,0,0,0.5);"><option>Loading...</option></select>
-                <div id="raceDirectorGrid" style="display:none;">
-                    <div class="race-header-row"><span>DRIVER</span><span>POINTS</span></div>
-                    <div id="raceInputsContainer" style="max-height:500px; overflow-y:auto; background:#050505; border:1px solid #333; margin-bottom:15px;"></div>
-                    <button class="btn-main" onclick="saveRaceResults()">COMMIT RESULTS</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. EDIT DRIVER -->
-        <div id="driver-editor" class="section">
-            <div class="panel-card">
-                <div class="panel-title">INDIVIDUAL ADJUSTMENT</div>
-                <select id="editorDriverSelect" onchange="loadDriverData()" style="margin-bottom:20px;"></select>
-                <div id="editor-area" style="display:none;">
-                    <div class="input-module" style="margin-bottom:20px;">
-                        <label>CURRENT MAIN CONTRACT</label>
-                        <select id="editorMainTeam" class="data-input" onchange="updateMainTeam()"></select>
-                    </div>
-                    <div class="track-grid" id="trackGrid"></div>
-                    <div style="margin-top:20px; text-align:right; font-size:1.2rem; color:var(--neon-cyan);">TOTAL: <span id="calculatedTotal">0</span></div>
-                    <button class="btn-main" onclick="saveAllChanges()" style="margin-top:20px;">SAVE CHANGES</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. LIVE VIEW -->
-        <div id="live-view" class="section">
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap:20px;">
+            <!-- 0. SEASON SETUP -->
+            <div id="season-setup" class="section">
                 <div class="panel-card">
-                    <div class="panel-title" style="color:var(--neon-cyan)">DRIVERS STANDINGS</div>
-                    <div style="max-height:600px; overflow-y:auto;"><table class="tech-table"><tbody id="liveDriversBody"></tbody></table></div>
+                    <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span><i class="fas fa-calendar-alt"></i> TRACK CONFIGURATION</span>
+                        <div>
+                            <button class="btn-small" onclick="toggleTrackSelectAll()">SELECT ALL</button>
+                            <button class="btn-small" onclick="deleteSelectedTracks()" style="border-color:var(--neon-red); color:var(--neon-red);">DELETE</button>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:20px; margin-bottom:30px; align-items:end;">
+                        <div class="input-module" style="margin:0;">
+                            <label>SELECT TRACK</label>
+                            <select id="trackSelector"><option value="">-- CHOOSE --</option></select>
+                        </div>
+                        <div class="input-module" style="margin:0;">
+                            <label>DATE</label>
+                            <input type="date" class="data-input" id="newTrackDate">
+                        </div>
+                        <button class="btn-action" onclick="addTrackConfig()" style="height:50px; width:50px; border-radius:6px; font-size:1.2rem;"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="trackConfigList" style="max-height:500px; overflow-y:auto; padding-right:10px;"></div>
+                </div>
+            </div>
+
+            <!-- 1. MANAGE GRID -->
+            <div id="manage-drivers" class="section">
+                <div class="panel-card">
+                    <div class="panel-title"><i class="fas fa-user-plus"></i> ADD DRIVER</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <input type="text" class="data-input" id="newDriverName" placeholder="DRIVER NAME">
+                        <select id="newDriverTeam" class="data-input"></select>
+                    </div>
+                    <button class="btn-action" onclick="registerDriver()" style="margin-top:20px; width:100%; padding:15px;">ADD ENTRY</button>
                 </div>
                 <div class="panel-card">
-                    <div class="panel-title" style="color:var(--neon-red)">CONSTRUCTORS</div>
-                    <div style="max-height:600px; overflow-y:auto;"><table class="tech-table"><tbody id="liveConstructorsBody"></tbody></table></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. STATS -->
-        <div id="driver-stats" class="section">
-            <div class="panel-card">
-                <select id="statsDriverSelect" onchange="viewDriverStats()" style="margin-bottom:20px;"></select>
-                <div id="statsDisplay" style="display:none;">
-                    <h2 id="statsDriverName" style="font-size:2.5rem; margin:0;">NAME</h2>
-                    <div id="statsTeamName" style="color:var(--neon-red); margin-bottom:20px;">TEAM</div>
-                    <div class="stats-grid">
-                        <div class="stat-box"><div class="stat-num" id="statPoints">0</div><div>PTS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statWins" style="color:var(--neon-cyan)">0</div><div>WINS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statPodiums">0</div><div>PODIUMS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statAvg">0</div><div>AVG</div></div>
+                    <div class="panel-title" style="display:flex; justify-content:space-between;">
+                        <span><i class="fas fa-users"></i> ACTIVE GRID</span>
+                        <div>
+                            <button class="btn-small" onclick="toggleSelectAll()">SELECT ALL</button>
+                            <button class="btn-small" onclick="deleteSelectedDrivers()" style="border-color:var(--neon-red); color:var(--neon-red);">DELETE</button>
+                        </div>
                     </div>
-                    <div class="panel-title" style="margin-top:20px;">HISTORY</div>
-                    <table class="tech-table"><tbody id="statsHistoryBody"></tbody></table>
+                    <div id="driverList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px;"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- IMPORT PREVIEW -->
-        <div id="import-preview" class="section">
-            <div class="panel-card">
-                <div class="panel-title" style="color:var(--neon-green)">IMPORT REVIEW</div>
-                <div style="margin-bottom:15px; font-size:0.9rem; color:#888;">Detected Tracks: <span id="detectedTracksList" style="color:var(--neon-green)"></span></div>
-                <div style="max-height:500px; overflow-y:auto; border:1px solid #333; margin-bottom:15px;">
-                    <table class="tech-table"><thead><tr><th>DRIVER</th><th>TEAM</th><th>PTS</th><th>STATUS</th></tr></thead><tbody id="importTableBody"></tbody></table>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-main" onclick="commitImport()" style="background:var(--neon-green);">CONFIRM</button>
-                    <button class="btn-main" onclick="cancelImport()" style="background:#333; color:#fff;">CANCEL</button>
+            <!-- 2. RACE DIRECTOR -->
+            <div id="race-director" class="section">
+                <div class="panel-card">
+                    <div class="panel-title"><i class="fas fa-flag-checkered"></i> RACE RESULTS</div>
+                    <select id="raceDirectorTrackSelect" onchange="loadRaceGrid()" style="margin-bottom:20px; background:rgba(0,0,0,0.5); padding:15px; font-size:1rem;"><option>Loading...</option></select>
+                    <div id="raceDirectorGrid" style="display:none;">
+                        <div class="race-control-grid" id="raceInputsContainer"></div>
+                        <button class="btn-action" onclick="saveRaceResults()" style="margin-top:30px; width:100%; padding:15px; font-size:1.1rem; background:var(--neon-green); color:#000;">COMMIT RESULTS</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
+            <!-- 3. EDIT DRIVER -->
+            <div id="driver-editor" class="section">
+                <div class="panel-card">
+                    <div class="panel-title"><i class="fas fa-user-edit"></i> INDIVIDUAL ADJUSTMENT</div>
+                    <select id="editorDriverSelect" onchange="loadDriverData()" style="margin-bottom:25px; padding:15px;"></select>
+                    <div id="editor-area" style="display:none;">
+                        <div class="input-module" style="margin-bottom:25px;">
+                            <label>CURRENT MAIN CONTRACT</label>
+                            <select id="editorMainTeam" class="data-input" onchange="updateMainTeam()"></select>
+                        </div>
+                        <div class="track-grid" id="trackGrid"></div>
+                        <div style="margin-top:30px; text-align:right; font-size:1.5rem; color:var(--neon-cyan); font-weight:700;">TOTAL: <span id="calculatedTotal">0</span> PTS</div>
+                        <button class="btn-action" onclick="saveAllChanges()" style="margin-top:20px; width:100%; padding:15px;">SAVE CHANGES</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. LIVE VIEW -->
+            <div id="live-view" class="section">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:25px;">
+                    <div class="panel-card">
+                        <div class="panel-title" style="color:var(--neon-cyan)"><i class="fas fa-trophy"></i> DRIVERS STANDINGS</div>
+                        <div style="max-height:600px; overflow-y:auto;"><table class="tech-table"><tbody id="liveDriversBody"></tbody></table></div>
+                    </div>
+                    <div class="panel-card">
+                        <div class="panel-title" style="color:var(--neon-red)"><i class="fas fa-cogs"></i> CONSTRUCTORS</div>
+                        <div style="max-height:600px; overflow-y:auto;"><table class="tech-table"><tbody id="liveConstructorsBody"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. STATS -->
+            <div id="driver-stats" class="section">
+                <div class="panel-card">
+                    <select id="statsDriverSelect" onchange="viewDriverStats()" style="margin-bottom:25px; padding:15px;"></select>
+                    <div id="statsDisplay" style="display:none;">
+                        <h2 id="statsDriverName" style="font-size:3rem; margin:0; color:#fff; font-family:var(--tech-font);">NAME</h2>
+                        <div id="statsTeamName" style="color:var(--neon-red); margin-bottom:30px; font-family:var(--mono-font); font-size:1.2rem;">TEAM</div>
+                        <div class="stats-grid">
+                            <div class="stat-box"><div class="stat-num" id="statPoints" style="color:var(--neon-orange);">0</div><div style="color:#aaa;">PTS</div></div>
+                            <div class="stat-box"><div class="stat-num" id="statWins" style="color:var(--neon-cyan);">0</div><div style="color:#aaa;">WINS</div></div>
+                            <div class="stat-box"><div class="stat-num" id="statPodiums" style="color:var(--neon-green);">0</div><div style="color:#aaa;">PODIUMS</div></div>
+                            <div class="stat-box"><div class="stat-num" id="statAvg" style="color:#fff;">0</div><div style="color:#aaa;">AVG</div></div>
+                        </div>
+                        <div class="panel-title" style="margin-top:40px;">HISTORY</div>
+                        <table class="tech-table"><tbody id="statsHistoryBody"></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMPORT PREVIEW -->
+            <div id="import-preview" class="section">
+                <div class="panel-card">
+                    <div class="panel-title" style="color:var(--neon-green)"><i class="fas fa-check-circle"></i> IMPORT REVIEW</div>
+                    <div style="margin-bottom:20px; font-size:1rem; color:#888;">Detected Tracks: <span id="detectedTracksList" style="color:var(--neon-green)"></span></div>
+                    <div style="max-height:500px; overflow-y:auto; border:1px solid #333; margin-bottom:25px;">
+                        <table class="tech-table"><thead><tr><th>DRIVER</th><th>TEAM</th><th>PTS</th><th>STATUS</th></tr></thead><tbody id="importTableBody"></tbody></table>
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                        <button class="btn-action" onclick="commitImport()" style="background:var(--neon-green); flex:1; padding:15px;">CONFIRM IMPORT</button>
+                        <button class="btn-action" onclick="cancelImport()" style="background:#333; color:#fff; flex:1; padding:15px;">CANCEL</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <!-- LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDoc, setDoc, query, orderBy, onSnapshot, writeBatch, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDoc, setDoc, getDocs, query, orderBy, onSnapshot, writeBatch, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyApUD33ao9DfFa8IAfA2qby3IFKhLtcNFU",
@@ -374,6 +692,12 @@
             {id:'williams', name:'Williams'}, {id:'racing-bulls', name:'Racing Bulls'}, {id:'kick-sauber', name:'Kick Sauber'},
             {id:'haas', name:'Haas'}, {id:'reserve', name:'Reserve'}
         ];
+
+        const TEAM_COLORS = {
+            "red-bull-racing": "#3671C6", "ferrari": "#E80020", "mercedes": "#27F4D2", "mclaren": "#FF8000",
+            "aston-martin": "#229971", "alpine": "#0093CC", "williams": "#64C4FF", "racing-bulls": "#6692FF",
+            "kick-sauber": "#52E252", "haas": "#B6BABD", "reserve": "#666666"
+        };
 
         const MASTER_TRACK_LIST = [
             { id: "bahrain", name: "Bahrain GP" }, { id: "saudi_arabia", name: "Saudi Arabian GP" }, { id: "australia", name: "Australian GP" },
@@ -410,6 +734,19 @@
         };
         window.closeModal = () => document.getElementById('confirmModal').style.display = 'none';
 
+        // --- SIDEBAR TOGGLE ---
+        window.toggleSidebar = () => {
+            const sidebar = document.getElementById('appSidebar');
+            const menu = document.getElementById('navMenu');
+            
+            // Check if mobile
+            if (window.innerWidth <= 900) {
+                menu.classList.toggle('open');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        };
+
         // --- AUTH ---
         window.checkLogin = () => {
             const email = document.getElementById("loginEmail").value;
@@ -422,7 +759,7 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById("login-overlay").style.display = "none";
-                document.getElementById("main-interface").style.display = "block";
+                document.getElementById("main-interface").style.display = "flex";
                 document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
                 initApp();
             } else {
@@ -451,13 +788,21 @@
         // --- NAVIGATION ---
         window.switchTab = (id) => {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             
             const target = document.getElementById(id);
             if(target) target.classList.add('active');
             
-            const btn = document.querySelector(`.tab-btn[onclick="switchTab('${id}')"]`);
-            if(btn) btn.classList.add('active');
+            // Highlight sidebar item
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(i => {
+                if(i.getAttribute('onclick').includes(id)) i.classList.add('active');
+            });
+
+            // Close mobile menu if open
+            if(window.innerWidth <= 900) {
+                document.getElementById('navMenu').classList.remove('open');
+            }
         };
 
         window.changeSeason = async () => {
@@ -475,7 +820,109 @@
 
         function renderKnownSeasons() {
             const c = document.getElementById("knownSeasonsList");
-            c.innerHTML = "HISTORY: " + knownSeasons.map(s => `<span class="season-tag" style="cursor:pointer; border-bottom:1px solid #666; margin-right:10px;" onclick="document.getElementById('seasonInput').value='${s}';changeSeason()">${s}</span>`).join(' ');
+            c.innerHTML = "HISTORY: " + knownSeasons.map(s => `<span class="season-tag" style="cursor:pointer; border-bottom:1px solid #666; margin-right:15px; font-weight:700;" onclick="document.getElementById('seasonInput').value='${s}';changeSeason()">${s}</span>`).join(' ');
+        }
+
+        // --- DASHBOARD UPDATER ---
+        function updateDashboard() {
+            // Safe setter to avoid crashes
+            const safeSet = (id, val) => {
+                const el = document.getElementById(id);
+                if(el) el.innerText = val;
+            };
+
+            // 1. Basic Counts
+            safeSet('dashDriverCount', allDrivers.length);
+            safeSet('dashTrackCount', activeTracks.length);
+            const reserves = allDrivers.filter(d => d.team === 'reserve').length;
+            safeSet('dashReserveCount', reserves);
+            
+            // 2. Driver Leader
+            if(allDrivers.length > 0) {
+                const leader = allDrivers.reduce((prev, current) => (prev.totalPoints > current.totalPoints) ? prev : current);
+                safeSet('dashLeader', leader.name.toUpperCase());
+                safeSet('dashLeaderPts', `${leader.totalPoints} PTS`);
+            } else {
+                safeSet('dashLeader', "--");
+                safeSet('dashLeaderPts', "0 PTS");
+            }
+
+            // 3. Constructor Leader Logic
+            const teamPoints = {};
+            allDrivers.forEach(d => {
+                const results = d.results || {};
+                Object.values(results).forEach(r => {
+                    const p = (typeof r === 'object') ? r.points : r;
+                    const t = (typeof r === 'object') ? r.team : d.team;
+                    if(t !== 'reserve') { teamPoints[t] = (teamPoints[t]||0) + p; }
+                });
+            });
+            let topTeam = { id: '--', pts: 0 };
+            Object.keys(teamPoints).forEach(tid => {
+                if(teamPoints[tid] > topTeam.pts) topTeam = { id: tid, pts: teamPoints[tid] };
+            });
+            const teamName = TEAMS.find(t => t.id === topTeam.id)?.name || topTeam.id;
+            safeSet('dashTeamLeader', teamName.toUpperCase());
+            safeSet('dashTeamPts', `${topTeam.pts} PTS`);
+
+            // 4. Next Race & Progress
+            const now = new Date();
+            let nextRace = null;
+            let racesDone = 0;
+            
+            for(let t of activeTracks) {
+                if(t.date) {
+                    const d = new Date(t.date);
+                    if(d < now) racesDone++;
+                    if(d >= now && !nextRace) nextRace = t;
+                }
+            }
+            
+            // Progress Bar
+            const totalRaces = activeTracks.length || 1; // avoid div/0
+            const pct = Math.round((racesDone / totalRaces) * 100);
+            safeSet('dashProgressPct', `${pct}%`);
+            safeSet('dashRacesDone', `${racesDone} / ${totalRaces} RACES`);
+            const bar = document.getElementById('dashProgressBar');
+            if(bar) bar.style.width = `${pct}%`;
+
+            // Next Race Display
+            if(nextRace) {
+                const parts = nextRace.id.split('_');
+                const name = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+                safeSet('dashNextRace', name + ' GP');
+                safeSet('dashNextDate', nextRace.date);
+            } else {
+                safeSet('dashNextRace', "SEASON END");
+                safeSet('dashNextDate', "");
+            }
+
+            // 5. Last Winner Logic
+            let lastWinnerName = "--";
+            let lastWinnerGP = "NO RACES";
+            
+            if (racesDone > 0) {
+                const pastRaces = activeTracks.filter(t => t.date && new Date(t.date) < now);
+                pastRaces.sort((a,b) => new Date(b.date) - new Date(a.date)); // descending
+                const lastRace = pastRaces[0];
+
+                if (lastRace) {
+                    lastWinnerGP = lastRace.name.toUpperCase();
+                    let maxPts = -1;
+                    let winner = null;
+                    
+                    allDrivers.forEach(d => {
+                        const r = d.results ? d.results[lastRace.id] : null;
+                        if (r) {
+                            const p = (typeof r === 'object') ? r.points : r;
+                            if (p > maxPts) { maxPts = p; winner = d.name; }
+                        }
+                    });
+                    if (winner) lastWinnerName = winner;
+                }
+            }
+            safeSet('dashLastWinner', lastWinnerName.toUpperCase());
+            safeSet('dashLastGP', lastWinnerGP);
         }
 
         // --- TRACK CONFIG ---
@@ -492,16 +939,16 @@
             else {
                 list.innerHTML = activeTracks.map(t => `
                     <div class="track-list-item">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <input type="checkbox" class="track-checkbox" value="${t.id}">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <input type="checkbox" class="track-checkbox" value="${t.id}" style="transform:scale(1.2);">
                             <div>
                                 <span class="track-code">${t.id.toUpperCase()}</span>
-                                <span style="font-weight:bold; color:#fff;">${t.name}</span>
+                                <span style="font-weight:bold; color:#fff; font-size:1.1rem;">${t.name}</span>
                             </div>
                         </div>
-                        <div style="display:flex; gap:10px; align-items:center;">
-                            <input type="date" value="${t.date || ''}" onchange="updateTrackDate('${t.id}', this.value)" style="background:transparent; border:1px solid #444; color:#fff; font-family:var(--mono-font); font-size:0.8rem; padding:4px;">
-                            <button class="btn-small" onclick="removeTrackConfig('${t.id}')" style="border-color:var(--neon-red); color:var(--neon-red);">X</button>
+                        <div style="display:flex; gap:15px; align-items:center;">
+                            <input type="date" value="${t.date || ''}" onchange="updateTrackDate('${t.id}', this.value)" style="background:transparent; border:1px solid #444; color:#fff; font-family:var(--mono-font); font-size:0.9rem; padding:6px; border-radius:4px;">
+                            <button class="btn-small" onclick="removeTrackConfig('${t.id}')" style="border-color:var(--neon-red); color:var(--neon-red); font-size:0.9rem; padding: 6px 12px;">X</button>
                         </div>
                     </div>`).join('');
             }
@@ -510,6 +957,8 @@
             const rs = document.getElementById("raceDirectorTrackSelect");
             rs.innerHTML = '<option value="">-- SELECT EVENT --</option>';
             activeTracks.forEach(t => rs.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`);
+            
+            updateDashboard();
         }
 
         window.addTrackConfig = async () => {
@@ -539,6 +988,7 @@
                     tracks[idx].date = newDate;
                     await updateDoc(ref, { trackConfig: tracks });
                     showToast("Date Updated");
+                    updateDashboard();
                 }
             }
         };
@@ -555,7 +1005,6 @@
             });
         };
 
-        // NEW: Batch Delete Tracks
         window.toggleTrackSelectAll = () => {
             const cbs = document.querySelectorAll('.track-checkbox');
             const all = Array.from(cbs).every(c => c.checked);
@@ -611,17 +1060,18 @@
                     const row = document.createElement("div");
                     row.className = "driver-row";
                     row.innerHTML = `
-                        <input type="checkbox" class="driver-checkbox" value="${d.id}">
+                        <input type="checkbox" class="driver-checkbox" value="${d.id}" style="transform:scale(1.2);">
                         <div style="flex-grow:1;">
-                            <div style="font-weight:bold; color:#fff;">${data.name}</div>
+                            <div style="font-weight:bold; color:#fff; font-size:1.1rem;">${data.name}</div>
                             <div style="font-size:0.75rem; color:var(--neon-cyan); text-transform:uppercase;">${data.team}</div>
                         </div>
-                        <button onclick="deleteDriver('${d.id}')" style="background:transparent; border:1px solid var(--neon-red); color:var(--neon-red); padding:5px 10px; cursor:pointer;">DEL</button>
+                        <button onclick="deleteDriver('${d.id}')" style="background:transparent; border:1px solid var(--neon-red); color:var(--neon-red); padding:8px 15px; cursor:pointer; font-weight:700;">DEL</button>
                     `;
                     list.appendChild(row);
                 });
                 
                 updateLiveTables();
+                updateDashboard();
                 if(document.getElementById("raceDirectorGrid").style.display === "block") loadRaceGrid();
                 if(document.getElementById("editor-area").style.display === "block") loadDriverData();
                 if(document.getElementById("statsDisplay").style.display === "block") viewDriverStats();
@@ -664,6 +1114,91 @@
             });
         };
 
+        // --- EXPORT JSON FIX ---
+        window.exportData = () => {
+            const exportObj = {
+                season: currentSeason,
+                tracks: activeTracks,
+                drivers: allDrivers
+            };
+            
+            // Use Blob for reliable download
+            const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TTRL_${currentSeason}_backup.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast("Export Started");
+        };
+
+        // --- MIGRATION UI HELPERS ---
+        window.openMigrationModal = () => {
+            document.getElementById('migrationModal').style.display = 'flex';
+            document.getElementById('migrationStatus').innerText = '';
+        };
+
+        window.performMigration = async () => {
+            const source = document.getElementById('migrateSource').value.trim();
+            const target = document.getElementById('migrateTarget').value.trim();
+            const deleteSource = document.getElementById('migrateDelete').checked;
+            const status = document.getElementById('migrationStatus');
+
+            if(!source || !target) { status.innerText = "Error: Invalid Season IDs"; return; }
+            if(source === target) { status.innerText = "Error: Same Season"; return; }
+
+            status.innerText = "Fetching Source Data...";
+
+            try {
+                // 1. Get Track Config
+                const sourceRef = doc(db, 'seasons', source);
+                const sourceSnap = await getDoc(sourceRef);
+                const tracks = sourceSnap.exists() ? (sourceSnap.data().trackConfig || []) : [];
+
+                // 2. Get Drivers
+                const driversRef = collection(db, 'seasons', source, 'drivers');
+                const driversSnap = await getDocs(driversRef);
+                
+                status.innerText = `Migrating ${tracks.length} tracks & ${driversSnap.size} drivers...`;
+
+                // 3. Write Tracks
+                const targetRef = doc(db, 'seasons', target);
+                await setDoc(targetRef, { trackConfig: tracks }, { merge: true });
+
+                // 4. Write Drivers
+                const batch = writeBatch(db);
+                driversSnap.forEach(d => {
+                    const newDocRef = doc(db, 'seasons', target, 'drivers', d.id);
+                    batch.set(newDocRef, d.data());
+                });
+                await batch.commit();
+
+                // 5. Cleanup
+                if(deleteSource) {
+                    status.innerText = "Cleaning source...";
+                    const delBatch = writeBatch(db);
+                    driversSnap.forEach(d => delBatch.delete(d.ref));
+                    delBatch.delete(sourceRef);
+                    await delBatch.commit();
+                }
+
+                status.innerText = "SUCCESS!";
+                setTimeout(() => {
+                    document.getElementById('migrationModal').style.display = 'none';
+                    if(document.getElementById('seasonInput').value === target) changeSeason();
+                }, 1500);
+
+            } catch(e) {
+                console.error(e);
+                status.innerText = "Failed: " + e.message;
+            }
+        };
+
         // --- EDITOR ---
         window.loadDriverData = () => {
             const id = document.getElementById("editorDriverSelect").value;
@@ -681,7 +1216,7 @@
 
             const res = data.results || {};
             
-            // Build Enhanced Dropdown with Reserve Options
+            // Build Enhanced Dropdown
             let teamOpts = `<optgroup label="Standard Teams">`;
             teamOpts += TEAMS.map(tm => `<option value="${tm.id}">${tm.name}</option>`).join('');
             teamOpts += `</optgroup><optgroup label="Reserve / Sub Options">`;
@@ -703,15 +1238,14 @@
                 div.className = "input-module";
                 div.innerHTML = `
                     <label>${t.name.toUpperCase()}</label>
-                    <div style="display:flex; gap:5px;">
-                        <input type="number" class="pts-in data-input" style="width:60px; text-align:center; font-weight:bold; color:var(--neon-cyan);" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
+                    <div style="display:flex; gap:10px;">
+                        <input type="number" class="pts-in data-input" style="width:70px; text-align:center; font-weight:bold; color:var(--neon-cyan); font-size:1.1rem;" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
                         <select class="tm-in data-input" id="tm-${t.id}">
                             ${teamOpts}
                         </select>
                     </div>`;
                 grid.appendChild(div);
                 
-                // Set value after HTML injection
                 document.getElementById(`tm-${t.id}`).value = raceTeam;
             });
             calcTotal();
@@ -810,7 +1344,6 @@
 
                 const name = p[0];
                 const teamRaw = p[1].toLowerCase().replace(/\s/g,'-');
-                // fuzzy team match
                 let teamId = 'reserve';
                 const tObj = TEAMS.find(t => t.id === teamRaw || t.name.toLowerCase() === p[1].toLowerCase());
                 if(tObj) teamId = tObj.id;
@@ -827,12 +1360,9 @@
                 pendingImportData.push({ name, team: teamId, results: res, totalPoints: tot, valid: true });
             });
 
-            // Show UI
             switchTab('import-preview');
             document.getElementById('import-preview').classList.add('active');
-            
-            const div = document.getElementById('detectedTracksList');
-            div.innerText = Array.from(pendingImportTracks).join(', ').toUpperCase() || "NONE";
+            document.getElementById('detectedTracksList').innerText = Array.from(pendingImportTracks).join(', ').toUpperCase() || "NONE";
 
             const tb = document.getElementById('importTableBody');
             tb.innerHTML = "";
@@ -860,7 +1390,6 @@
         };
 
         window.commitImport = async () => {
-            // 1. Update Tracks
             const sRef = doc(db, "seasons", currentSeason);
             const snap = await getDoc(sRef);
             let tracks = (snap.exists() && snap.data().trackConfig) ? snap.data().trackConfig : [];
@@ -878,7 +1407,6 @@
                 else await setDoc(sRef, { trackConfig: newT });
             }
 
-            // 2. Add Drivers
             const batch = writeBatch(db);
             pendingImportData.forEach(d => {
                 if(d.name) {
@@ -895,7 +1423,6 @@
         };
 
         // --- TABLES & RACE DIRECTOR ---
-        // (Similar to previous versions but cleaner)
         function updateLiveTables() {
             const tD = document.getElementById("liveDriversBody");
             tD.innerHTML = "";
@@ -936,14 +1463,33 @@
             [...allDrivers].sort((a,b)=>a.name.localeCompare(b.name)).forEach(d => {
                 const r = d.results || {};
                 const pts = (r[tid] && typeof r[tid]==='object') ? r[tid].points : (r[tid] || 0);
-                con.innerHTML += `<div class="race-input-row"><div class="driver-name-label">${d.name} <span style="color:#666; font-size:0.8rem;">(${d.team})</span></div><input type="number" class="race-points-input" data-did="${d.id}" value="${pts}"></div>`;
+                const team = (r[tid] && typeof r[tid]==='object') ? r[tid].team : d.team;
+                const teamColor = TEAM_COLORS[team] || '#555';
+                const hasPointsClass = pts > 0 ? 'has-points' : '';
+
+                con.innerHTML += `
+                    <div class="rc-card" style="--team-color:${teamColor}">
+                        <div class="rc-driver-info">
+                            <span class="rc-name">${d.name}</span>
+                            <span class="rc-team">${team.replace('-',' ')}</span>
+                        </div>
+                        <div class="rc-input-wrapper">
+                            <input type="number" 
+                                class="rc-points-input ${hasPointsClass}" 
+                                data-did="${d.id}" 
+                                value="${pts}"
+                                oninput="this.classList.toggle('has-points', this.value > 0)"
+                            >
+                        </div>
+                    </div>
+                `;
             });
         };
 
         window.saveRaceResults = async () => {
             const tid = document.getElementById("raceDirectorTrackSelect").value;
             if(!tid) return;
-            const inps = document.querySelectorAll(".race-points-input");
+            const inps = document.querySelectorAll(".rc-points-input");
             const batch = writeBatch(db);
             let changes = 0;
 
@@ -957,8 +1503,6 @@
                 if(oldP !== newP) {
                     const newTot = d.totalPoints - oldP + newP;
                     const resUpd = { ...oldRes };
-                    
-                    // Maintain existing team logic for this track if present, else use current main team
                     let tRace = d.team;
                     if(oldRes[tid] && oldRes[tid].team) tRace = oldRes[tid].team;
 
@@ -989,7 +1533,7 @@
             activeTracks.forEach(t => {
                 const res = d.results ? d.results[t.id] : null;
                 if(res) {
-                    const pt = res.points || res; // handle old format if any
+                    const pt = res.points || res;
                     const tm = res.team || d.team;
                     if(pt > 0) {
                         r++;
