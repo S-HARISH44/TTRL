@@ -228,10 +228,6 @@
         .race-input-row:nth-child(even) { background: #141414; }
         .driver-name-label { width: 200px; font-weight: bold; color: #ddd; }
         .race-points-input { width: 80px; text-align: center; border-color: #444; }
-        
-        /* HELPER TOGGLE */
-        .help-toggle { color: #666; font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 15px; display: inline-block; }
-        .help-content { display: none; text-align: left; background: #111; padding: 15px; border: 1px solid #333; font-size: 0.85rem; color: #ccc; margin-top: 10px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -256,16 +252,6 @@
             <button class="action-btn" style="margin-top:0;" onclick="checkLogin()">AUTHENTICATE</button>
             
             <div id="login-msg" style="margin-top:20px; font-family:'JetBrains Mono'; font-size:0.8rem; word-break: break-word;"></div>
-            
-            <span class="help-toggle" onclick="document.getElementById('help-box').style.display = document.getElementById('help-box').style.display === 'none' ? 'block' : 'none'">Need configuration help?</span>
-            <div id="help-box" class="help-content">
-                <strong>1. Google Login Issues?</strong><br>
-                If you get "UNAUTHORIZED DOMAIN", copy the link provided in the error and add it to <em>Firebase Console -> Authentication -> Settings -> Authorized Domains</em>.<br><br>
-                <strong>2. "Provider Disabled"?</strong><br>
-                Go to <em>Firebase Console -> Authentication -> Sign-in method</em> and enable "Google".<br><br>
-                <strong>3. "Unauthorized Account"?</strong><br>
-                Your email must be in the `AUTHORIZED_ADMINS` list in the code to access this panel.
-            </div>
         </div>
     </div>
 
@@ -481,13 +467,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // --- AUTHORIZED ADMIN EMAILS (WHITELIST) ---
-        // REPLACE WITH YOUR REAL GMAIL ADDRESSES!
-        const AUTHORIZED_ADMINS = [
-            "your_email@gmail.com", 
-            "admin2@gmail.com"
-        ];
-
         let currentSeason = "season_1"; 
         let unsubscribe = null; 
         let knownSeasons = [];
@@ -524,6 +503,7 @@
             const statusMsg = document.getElementById("login-msg");
             statusMsg.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CONTACTING GOOGLE...';
             statusMsg.style.color = "#ccc";
+            statusMsg.style.display = "block";
             
             try {
                 const provider = new GoogleAuthProvider();
@@ -533,35 +513,11 @@
                 console.error("Google Sign In Error:", error);
                 statusMsg.style.color = "var(--accent-red)";
                 
-                let msg = "LOGIN FAILED";
-                let tip = "";
-
                 if (error.code === 'auth/popup-closed-by-user') {
-                    msg = "LOGIN CANCELLED";
-                    tip = "You closed the Google popup before finishing.";
-                } else if (error.code === 'auth/configuration-not-found') {
-                    msg = "CONFIG ERROR";
-                    tip = "Google Sign-In is not enabled in Firebase Console.";
-                } else if (error.code === 'auth/operation-not-allowed') {
-                    msg = "PROVIDER DISABLED";
-                    tip = "Go to Firebase Console > Authentication > Sign-in method > Enable Google.";
-                } else if (error.code === 'auth/unauthorized-domain') {
-                    // HELP THE USER FIX IT
-                    const currentDomain = window.location.hostname;
-                    msg = "DOMAIN ERROR";
-                    tip = `
-                        Firebase blocked this domain.<br>
-                        1. Copy this: <code style="background:#333; padding:2px; color:#fff; user-select:all;">${currentDomain}</code><br>
-                        2. Go to Firebase Console -> Authentication -> Settings -> Authorized Domains<br>
-                        3. Add the domain there.<br>
-                        4. Refresh page.
-                    `;
+                    statusMsg.innerText = "LOGIN CANCELLED";
                 } else {
-                    msg = "ERROR: " + error.code;
-                    tip = error.message;
+                    statusMsg.innerText = "LOGIN FAILED";
                 }
-                
-                statusMsg.innerHTML = `<strong>${msg}</strong><br><span style="color:#aaa;">${tip}</span>`;
             }
         };
 
@@ -571,20 +527,12 @@
         onAuthStateChanged(auth, (user) => {
             const overlay = document.getElementById("login-overlay");
             if (user) {
-                const isPasswordUser = user.providerData.some(p => p.providerId === 'password');
-                const isWhitelisted = AUTHORIZED_ADMINS.includes(user.email);
-
-                if (isPasswordUser || isWhitelisted) {
-                    overlay.style.display = "none";
-                    document.getElementById("main-interface").style.display = "block";
-                    document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
-                    renderKnownSeasons();
-                    changeSeason(); 
-                } else {
-                    document.getElementById("login-msg").innerText = `UNAUTHORIZED ACCOUNT: ${user.email}`;
-                    document.getElementById("login-msg").style.color = "var(--accent-red)";
-                    signOut(auth);
-                }
+                // NO WHITELIST - Any authenticated user is granted access
+                overlay.style.display = "none";
+                document.getElementById("main-interface").style.display = "block";
+                document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
+                renderKnownSeasons();
+                changeSeason(); 
             } else {
                 overlay.style.display = "flex";
                 document.getElementById("main-interface").style.display = "none";
