@@ -877,7 +877,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // FIREBASE CONFIG
         const firebaseConfig = {
@@ -900,11 +900,34 @@
             {id:'haas', name:'Haas'}, {id:'reserve', name:'Reserve'}
         ];
         
-        const TRACK_KEYS = ['bahrain', 'australia', 'imola', 'spain', 'uk', 'vegas', 'belgium', 'austria', 'brazil', 'abu_dhabi'];
-        const TRACK_LABELS = {
-            'bahrain': 'BAH', 'australia': 'AUS', 'imola': 'IMO', 'spain': 'ESP',
-            'uk': 'GBR', 'vegas': 'LVG', 'belgium': 'BEL', 'austria': 'AUT',
-            'brazil': 'BRA', 'abu_dhabi': 'ABU'
+        // Static Metadata for Tracks (Images, Insights) - Dates come from Firestore
+        const TRACK_METADATA = {
+            'bahrain': { gp: "Bahrain Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Bahrain-circuit-768x432.png", insight: "Stop and go track." },
+            'australia': { gp: "Australian Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Albert-Park-Circuit-768x432.png", insight: "Fast flowing street circuit." },
+            'imola': { gp: "Emilia Romagna GP", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Autodromo-Enzo-e-Dino-Ferrari-768x432.png", insight: "Narrow and technical." },
+            'spain': { gp: "Spanish Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Circuit-de-Barcelona-768x432.png", insight: "Test of aerodynamics." },
+            'uk': { gp: "British Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Silverstone-Circuit--768x432.png", insight: "High speed corners." },
+            'vegas': { gp: "Las Vegas Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Las-Vegas-GP-768x432.png", insight: "High speed street fight." },
+            'belgium': { gp: "Belgian Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Circuit-de-Spa-Francorchamps-768x432.png", insight: "Longest track on calendar." },
+            'austria': { gp: "Austrian Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Red-Bull-Ring-768x432.png", insight: "Short power lap." },
+            'brazil': { gp: "São Paulo Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Auto%CC%81dromo-Jose%CC%81-Carlos-Pace--768x432.png", insight: "Classic anti-clockwise track." },
+            'abu_dhabi': { gp: "Abu Dhabi Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Yas-Marina-Circuit--768x432.png", insight: "Season finale." },
+            'saudi_arabia': { gp: "Saudi Arabian GP", mapUrl: "https://placehold.co/768x432?text=Jeddah", insight: "Fastest street circuit." },
+            'japan': { gp: "Japanese GP", mapUrl: "https://placehold.co/768x432?text=Suzuka", insight: "Figure 8 layout." },
+            'china': { gp: "Chinese GP", mapUrl: "https://placehold.co/768x432?text=Shanghai", insight: "Technical sectors." },
+            'miami': { gp: "Miami GP", mapUrl: "https://placehold.co/768x432?text=Miami", insight: "Technical street circuit." },
+            'emilia_romagna': { gp: "Emilia Romagna GP", mapUrl: "https://placehold.co/768x432?text=Imola", insight: "History and speed." },
+            'monaco': { gp: "Monaco GP", mapUrl: "https://placehold.co/768x432?text=Monaco", insight: "The jewel in the crown." },
+            'canada': { gp: "Canadian GP", mapUrl: "https://placehold.co/768x432?text=Montreal", insight: "Wall of champions." },
+            'hungary': { gp: "Hungarian GP", mapUrl: "https://placehold.co/768x432?text=Hungaroring", insight: "Monaco without walls." },
+            'netherlands': { gp: "Dutch GP", mapUrl: "https://placehold.co/768x432?text=Zandvoort", insight: "Banked corners." },
+            'italy': { gp: "Italian GP", mapUrl: "https://placehold.co/768x432?text=Monza", insight: "Temple of Speed." },
+            'azerbaijan': { gp: "Azerbaijan GP", mapUrl: "https://placehold.co/768x432?text=Baku", insight: "Castle section." },
+            'singapore': { gp: "Singapore GP", mapUrl: "https://placehold.co/768x432?text=Marina+Bay", insight: "Night race endurance." },
+            'usa': { gp: "United States GP", mapUrl: "https://placehold.co/768x432?text=COTA", insight: "Elevation changes." },
+            'mexico': { gp: "Mexico City GP", mapUrl: "https://placehold.co/768x432?text=Mexico", insight: "High altitude." },
+            'las_vegas': { gp: "Las Vegas GP", mapUrl: "https://placehold.co/768x432?text=Vegas", insight: "The strip." },
+            'qatar': { gp: "Qatar GP", mapUrl: "https://placehold.co/768x432?text=Lusail", insight: "Fast flowing." }
         };
 
         const TEAM_COLORS = {
@@ -924,21 +947,6 @@
             "kick-sauber": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025kicksaubercarright.png",
             "haas": "https://raw.githubusercontent.com/S-HARISH44/TTRL/81a0eb55cacfee2f08a1b599ecd314608b6b0424/RESOURCES/Constructor/2025haasf1teamcarright.png"
         };
-
-        const CALENDAR = [
-            { round: 0, gp: "Pre-Season Testing", date: "12/09/25", track: "Suzuka International Racing Course", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Suzuka-International-Racing-Course--768x432.png", insight: "Crucial for data gathering.", stats: null },
-            { round: 1, gp: "Bahrain Grand Prix", date: "19/09/25", track: "Bahrain International Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Bahrain-circuit-768x432.png", insight: "Stop and go track.", stats: null },
-            { round: 2, gp: "Australian Grand Prix", date: "26/09/25", track: "Albert Park Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Albert-Park-Circuit-768x432.png", insight: "Fast flowing street circuit.", stats: null },
-            { round: 3, gp: "Emilia Romagna Grand Prix", date: "03/10/25", track: "Autodromo Enzo e Dino Ferrari", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Autodromo-Enzo-e-Dino-Ferrari-768x432.png", insight: "Narrow and technical.", stats: null },
-            { round: 4, gp: "Spanish Grand Prix", date: "10/10/25", track: "Circuit de Barcelona-Catalunya", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Circuit-de-Barcelona-768x432.png", insight: "Test of aerodynamics.", stats: null },
-            { round: "break", gp: "Season Break", date: "17/10/25", track: "Time to regroup.", mapUrl: "https://placehold.co/768x432/1f2937/e11d48?text=SEASON+BREAK", insight: "Mid-season break.", stats: null },
-            { round: 5, gp: "Great Britain Grand Prix", date: "24/10/25", track: "Silverstone Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Silverstone-Circuit--768x432.png", insight: "High speed corners.", stats: null },
-            { round: 6, gp: "Las Vegas Grand Prix", date: "31/10/25", track: "Las Vegas Strip Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Las-Vegas-GP-768x432.png", insight: "High speed street fight.", stats: null },
-            { round: 7, gp: "Belgian Grand Prix", date: "07/11/25", track: "Circuit de Spa-Francorchamps", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Circuit-de-Spa-Francorchamps-768x432.png", insight: "Longest track on calendar.", stats: null },
-            { round: 8, gp: "Austrian Grand Prix", date: "14/11/25", track: "Red Bull Ring", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Red-Bull-Ring-768x432.png", insight: "Short power lap.", stats: null },
-            { round: 9, gp: "São Paulo Grand Prix", date: "21/11/25", track: "Autódromo José Carlos Pace", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Auto%CC%81dromo-Jose%CC%81-Carlos-Pace--768x432.png", insight: "Classic anti-clockwise track.", stats: null },
-            { round: 10, gp: "Abu Dhabi Grand Prix", date: "28/11/25", track: "Yas Marina Circuit", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Yas-Marina-Circuit--768x432.png", insight: "Season finale.", stats: null }
-        ];
 
         const DOTD_DATA = [
             { gp: "Bahrain Grand Prix", driver: "Sanju Vibhi", team: "ASTON MARTIN", image: "https://raw.githubusercontent.com/S-HARISH44/TTRL/59bd92e0c4dff4bded6f75ae03ddf28148b4779a/RESOURCES/DOTD/Sanju.png", desc: "Voted Driver of the Day for a stellar performance." },
@@ -981,6 +989,7 @@
         };
 
         let allDrivers = [];
+        let activeTracks = []; // Loaded from Firebase
         let currentSeason = 'season_1';
         let unsubscribe = null;
 
@@ -1033,71 +1042,85 @@
             `;
         }
 
-        async function fetchTrackIntel(gpName) {
+        async function fetchTrackIntel(trackId) {
+            // trackId passed from button is now the stable ID (e.g. 'bahrain')
             intelModal.classList.add('active');
             requestAnimationFrame(async () => {
-                const raceData = CALENDAR.find(r => r.gp.includes(gpName) || gpName.includes(r.gp));
+                const meta = TRACK_METADATA[trackId] || { gp: trackId.toUpperCase(), mapUrl: 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND', insight: "No data." };
+                const gpName = meta.gp;
                 
-                // Fallback if exact match fails
-                const setupKey = Object.keys(f125SetupData).find(k => k.includes(gpName) || gpName.includes(k));
+                // Fallback for setup data matching
+                const setupKey = Object.keys(f125SetupData).find(k => k.toLowerCase().includes(gpName.toLowerCase()) || gpName.toLowerCase().includes(k.toLowerCase()));
                 const setup = f125SetupData[setupKey];
                 
-                const mapUrl = raceData ? raceData.mapUrl : 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND';
-                
                 intelTitle.innerText = gpName.toUpperCase();
-                intelMap.src = mapUrl;
+                intelMap.src = meta.mapUrl;
                 displaySetupData(setup);
                 
-                // Hardcoded Insight
                 aiBriefing.innerHTML = `
                     <div style="color: #fff; font-family: 'Rajdhani'; font-weight: bold; margin-bottom: 5px;">TRACK INSIGHT</div>
-                    <div style="color: #ccc; font-size: 0.9rem;">${raceData ? raceData.insight : 'No specific track data available.'}</div>
+                    <div style="color: #ccc; font-size: 0.9rem;">${meta.insight}</div>
                 `;
             });
         }
         window.fetchTrackIntel = fetchTrackIntel; // EXPOSE FOR HTML
 
         // --- FIREBASE LOGIC ---
-        function initArchiveSync(seasonId) {
+        async function loadSeasonData(seasonId) {
+            currentSeason = seasonId || "season_1";
+            
+            // 1. Fetch Track Config First
+            const seasonDoc = await getDoc(doc(db, "seasons", currentSeason));
+            if (seasonDoc.exists() && seasonDoc.data().trackConfig) {
+                activeTracks = seasonDoc.data().trackConfig;
+                activeTracks.sort((a, b) => new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31'));
+            } else {
+                activeTracks = [];
+            }
+
+            // 2. Fetch Drivers & Render
             if(unsubscribe) unsubscribe();
+            const q = query(collection(db, "seasons", currentSeason, "drivers"), orderBy("totalPoints", "desc"));
             
-            // Default to season 1 logic for main view
-            // For Archives, we use the seasonId passed
-            const targetSeason = seasonId || "season_1";
-            
-            const q = query(collection(db, "seasons", targetSeason, "drivers"), orderBy("totalPoints", "desc"));
             unsubscribe = onSnapshot(q, (snapshot) => {
                 allDrivers = [];
                 snapshot.forEach(doc => allDrivers.push(doc.data()));
                 
-                // Update based on view context
-                // If seasonId is null, it means we are initializing main site data (Season 1)
-                if(!seasonId) {
+                // Update views
+                if(!seasonId) { // Main View (Season 1)
+                    renderCalendar();
                     renderDrivers();
                     renderConstructors();
+                    updateCountdown();
                 }
                 
-                // Always update archive views when data changes
+                // Always update archives
                 renderArchiveDrivers();
                 renderArchiveTeams();
             });
         }
 
         window.setSeason = (sid) => {
-            currentSeason = sid;
             // Update button styles
             document.querySelectorAll('.season-btn-group .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if(btn.innerText.toLowerCase().replace(' ', '_') === sid) btn.classList.add('active');
             });
-            initArchiveSync(sid);
+            loadSeasonData(sid);
         };
 
         // 1. DRIVER STANDINGS (Main)
         function renderDrivers() {
             const tbody = document.getElementById("drivers-body");
             tbody.innerHTML = "";
-            allDrivers.forEach((d, i) => {
+            
+            const sortedDrivers = [...allDrivers].sort((a, b) => {
+                if (a.team === 'reserve' && b.team !== 'reserve') return 1;
+                if (a.team !== 'reserve' && b.team === 'reserve') return -1;
+                return b.totalPoints - a.totalPoints;
+            });
+
+            sortedDrivers.forEach((d, i) => {
                 const color = TEAM_COLORS[d.team] || '#fff';
                 let teamName = TEAMS.find(t => t.id === d.team)?.name || d.team;
                 
@@ -1170,14 +1193,24 @@
         function renderArchiveDrivers() {
             const container = document.getElementById("archives-drivers-container");
             
+            if(activeTracks.length === 0) {
+                container.innerHTML = `<div class="archive-loading">NO TRACK DATA FOR THIS SEASON</div>`;
+                return;
+            }
+
             let html = `<table class="standings-table">`;
             html += `<thead><tr><th class="sticky-corner">DRIVER</th>`;
-            TRACK_KEYS.forEach(k => {
-                html += `<th class="sticky-top" style="text-align:center">${TRACK_LABELS[k]}</th>`;
+            // Dynamic Columns based on Fetched Tracks
+            activeTracks.forEach(t => {
+                // Shorten name: "Bahrain Grand Prix" -> "BAH" (rough heuristic or first 3 chars of ID)
+                const label = t.id.substring(0, 3).toUpperCase(); 
+                html += `<th class="sticky-top" style="text-align:center">${label}</th>`;
             });
             html += `<th class="sticky-top" style="text-align:center">TOTAL</th></tr></thead><tbody>`;
 
-            allDrivers.forEach(d => {
+            const sortedDrivers = [...allDrivers].sort((a, b) => b.totalPoints - a.totalPoints);
+
+            sortedDrivers.forEach(d => {
                 const results = d.results || {};
                 const tColor = TEAM_COLORS[d.team] || '#fff';
                 
@@ -1185,16 +1218,16 @@
                 html += `<td class="sticky-left" style="font-weight:700; background:var(--glass-bg); border-left:3px solid ${tColor}">${d.name}</td>`;
                 
                 let rowTotal = 0;
-                TRACK_KEYS.forEach(k => {
+                activeTracks.forEach(t => {
                     let pts = '-';
-                    if (results[k]) {
-                        const val = typeof results[k] === 'object' ? results[k].points : results[k];
-                        if (val > 0) { pts = val; rowTotal += val; }
+                    if (results[t.id]) {
+                        const val = typeof results[t.id] === 'object' ? results[t.id].points : results[t.id];
+                        if (val > 0) { pts = val; } // Don't add to total here as we use stored total, but good for verify
                     }
                     html += `<td style="text-align:center; opacity:${pts === '-' ? 0.3 : 1}">${pts}</td>`;
                 });
                 
-                html += `<td style="text-align:center; color:var(--accent-cyan); font-weight:700">${rowTotal}</td></tr>`;
+                html += `<td style="text-align:center; color:var(--accent-cyan); font-weight:700">${d.totalPoints}</td></tr>`;
             });
             html += `</tbody></table>`;
             container.innerHTML = html;
@@ -1203,18 +1236,25 @@
         // 4. ARCHIVE TEAMS (Matrix)
         function renderArchiveTeams() {
             const container = document.getElementById("archives-teams-container");
-            const teamTrackPoints = {};
             
+            if(activeTracks.length === 0) {
+                container.innerHTML = `<div class="archive-loading">NO TRACK DATA</div>`;
+                return;
+            }
+
+            const teamTrackPoints = {};
             TEAMS.forEach(t => {
                 if (t.id === 'reserve') return;
                 teamTrackPoints[t.id] = { total: 0 };
-                TRACK_KEYS.forEach(k => teamTrackPoints[t.id][k] = 0);
+                activeTracks.forEach(tr => teamTrackPoints[t.id][tr.id] = 0);
             });
 
             allDrivers.forEach(d => {
                 const results = d.results || {};
                 Object.keys(results).forEach(trackKey => {
-                    if(!TRACK_KEYS.includes(trackKey)) return;
+                    // Only count if track exists in current config
+                    if(!activeTracks.some(at => at.id === trackKey)) return;
+                    
                     const r = results[trackKey];
                     let pts = 0, teamId = d.team;
 
@@ -1232,7 +1272,10 @@
 
             let html = `<table class="standings-table">`;
             html += `<thead><tr><th class="sticky-corner">TEAM</th>`;
-            TRACK_KEYS.forEach(k => html += `<th class="sticky-top" style="text-align:center">${TRACK_LABELS[k]}</th>`);
+            activeTracks.forEach(t => {
+                const label = t.id.substring(0, 3).toUpperCase();
+                html += `<th class="sticky-top" style="text-align:center">${label}</th>`
+            });
             html += `<th class="sticky-top" style="text-align:center">TOTAL</th></tr></thead><tbody>`;
 
             sortedTeamIds.forEach(tId => {
@@ -1242,8 +1285,8 @@
                 html += `<tr style="--team-color: ${tColor}">`;
                 html += `<td class="sticky-left" style="font-weight:700; background:var(--glass-bg); border-left:3px solid ${tColor}; text-transform:uppercase;">${tName}</td>`;
                 
-                TRACK_KEYS.forEach(k => {
-                    const pts = teamTrackPoints[tId][k];
+                activeTracks.forEach(t => {
+                    const pts = teamTrackPoints[tId][t.id];
                     html += `<td style="text-align:center; opacity:${pts === 0 ? 0.3 : 1}">${pts > 0 ? pts : '-'}</td>`;
                 });
                 html += `<td style="text-align:center; color:var(--accent-cyan); font-weight:700">${teamTrackPoints[tId].total}</td></tr>`;
@@ -1254,27 +1297,30 @@
 
         // --- CALENDAR & DOTD RENDERERS ---
         function renderCalendar() {
-            document.getElementById('calendar-grid').innerHTML = CALENDAR.map(r => {
-                // Handle Break Round
-                if (r.round === "break") {
-                    return `<div class="cal-item" style="opacity:0.6; border-color:rgba(255,255,255,0.1);">
-                        <span class="round" style="color:#666">BREAK</span>
-                        <span class="gp" style="color:#888; font-size:1.2rem;">SEASON BREAK</span>
-                        <span class="date">${r.date}</span>
-                        <div style="margin-top:auto; font-size:0.7rem; color:#555; font-family:'JetBrains Mono'; text-transform:uppercase;">${r.insight}</div>
-                    </div>`;
+            // Dynamic calendar from fetched activeTracks
+            const grid = document.getElementById('calendar-grid');
+            if(activeTracks.length === 0) {
+                grid.innerHTML = `<div style="text-align:center; width:100%; color:#666;">SEASON CALENDAR NOT CONFIGURED</div>`;
+                return;
+            }
+
+            grid.innerHTML = activeTracks.map((r, i) => {
+                // Merge static metadata with dynamic date
+                const meta = TRACK_METADATA[r.id] || { gp: r.name, insight: "Global Tour" };
+                const displayGP = meta.gp.replace(' Grand Prix', '').replace(' GP', '').toUpperCase();
+                
+                // Format Date if exists
+                let dateDisplay = "TBD";
+                if(r.date) {
+                    const d = new Date(r.date);
+                    dateDisplay = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)}`;
                 }
 
-                // Regular Round
-                const displayGP = r.gp.replace(' Grand Prix', '').toUpperCase();
-                // Simplified matching for setup/strategy call
-                const strategyGPName = r.gp; 
-                
                 return `<div class="cal-item hover-target">
-                    <span class="round">RD ${String(r.round).padStart(2,'0')}</span>
+                    <span class="round">RD ${String(i+1).padStart(2,'0')}</span>
                     <span class="gp">${displayGP}</span>
-                    <span class="date">${r.date}</span>
-                    <button class="btn-ai-intel hover-target" onclick="fetchTrackIntel('${strategyGPName}')"><i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY</button>
+                    <span class="date">${dateDisplay}</span>
+                    <button class="btn-ai-intel hover-target" onclick="fetchTrackIntel('${r.id}')"><i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY</button>
                 </div>`;
             }).join('');
         }
@@ -1297,28 +1343,12 @@
 
         // --- NEW: SEASON 1 AWARDS RENDERER ---
         function renderSeasonAwards() {
-            // Configuration for a perfect 20-cell bento grid (4 cols x 5 rows)
-            // 0: Champion (2x2=4) | 1: Season Driver (2x1=2) | 2: Team Champ (1x2=2)
-            // 3: Team Season (1)  | 4: Cleanest (1)         | 5: Super Sub (2x1=2)
-            // 6: Rain Master (1)  | 7: Underdog (1)         | 8: Consistent (2x1=2) -> FIXES GAP
-            // 9: Emerging (4x1=4)
             const gridConfig = [
-                "span-2-both", // 0: Driver Champion
-                "span-2-col",  // 1: Driver of the Season
-                "span-2-row",  // 2: Team Champions
-                "",            // 3: Team of the Season
-                "",            // 4: Cleanest Driver
-                "span-2-col",  // 5: The Super Sub
-                "",            // 6: Rain Master
-                "",            // 7: The Underdog
-                "span-2-col",  // 8: Most Consistent Driver (Apex Entropy) - Span 2 to fill gap
-                "span-full"    // 9: Emerging Driver
+                "span-2-both", "span-2-col", "span-2-row", "", "", "span-2-col", "", "", "span-2-col", "span-full"
             ];
 
             document.getElementById('season-awards-grid').innerHTML = SEASON_AWARDS.map((a, index) => {
-                // Use config or fallback to standard 1x1
                 let cardClass = gridConfig[index] || "";
-                
                 return `
                     <div class="award-card hover-target ${cardClass}" onclick="openImageModal('${a.img}', '${a.title}', '${a.winner}')">
                         <img src="${a.img}" class="award-img" alt="${a.title}">
@@ -1376,29 +1406,30 @@
                 
                 // Find parent container to scope active class removal (handle multiple tab groups)
                 const parentGroup = e.target.closest('.standings-tabs') || e.target.parentNode;
-                parentGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                // Find relevant view container
-                const wrapper = e.target.closest('.slide-content').querySelector('.standings-wrapper');
-                if(wrapper) {
-                    wrapper.querySelectorAll('.standings-view').forEach(v => v.classList.remove('active-view'));
-                    const targetView = document.getElementById('view-'+targetTab);
-                    if(targetView) {
-                        targetView.classList.add('active-view');
-                        
-                        // Trigger specific render functions if needed on tab switch
-                        if(targetTab === 'constructors') {
-                             // constructor animations
-                             gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
-                        } else if (targetTab === 'dotd' || targetTab === 'archive-dotd') {
-                             gsap.fromTo('.dotd-panel', { width: "10%", opacity: 0 }, { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" });
-                        } else if (targetTab === 'archive-season-awards') {
-                            gsap.fromTo('.award-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
-                        } else if (targetTab === 'archive-teams') {
-                             renderArchiveTeams(); // Ensure updated
-                        }
-                    }
+                if(parentGroup.classList.contains('standings-tabs')) {
+                     parentGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                     e.target.classList.add('active');
+                     
+                     // Find relevant view container
+                     const wrapper = e.target.closest('.slide-content').querySelector('.standings-wrapper');
+                     if(wrapper) {
+                         wrapper.querySelectorAll('.standings-view').forEach(v => v.classList.remove('active-view'));
+                         const targetView = document.getElementById('view-'+targetTab);
+                         if(targetView) {
+                             targetView.classList.add('active-view');
+                             
+                             // Trigger specific render functions if needed on tab switch
+                             if(targetTab === 'constructors') {
+                                 gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
+                             } else if (targetTab === 'dotd' || targetTab === 'archive-dotd') {
+                                 gsap.fromTo('.dotd-panel', { width: "10%", opacity: 0 }, { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" });
+                             } else if (targetTab === 'archive-season-awards') {
+                                 gsap.fromTo('.award-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
+                             } else if (targetTab === 'archive-teams') {
+                                 renderArchiveTeams(); // Ensure updated
+                             }
+                         }
+                     }
                 }
             });
         });
@@ -1409,16 +1440,10 @@
             let nextRace = null;
             let nextRaceInfo = null;
 
-            // Helper to parse "DD/MM/YY"
-            const getRaceDate = (dateStr) => {
-                const parts = dateStr.split('/');
-                return new Date(`20${parts[2]}-${parts[1]}-${parts[0]}T13:00:00`); 
-            };
-
-            // Find the next race
-            for (const race of CALENDAR) {
-                if (race.round === 'break') continue;
-                const raceDate = getRaceDate(race.date);
+            // Find the next race from activeTracks
+            for (const race of activeTracks) {
+                if(!race.date) continue;
+                const raceDate = new Date(race.date + "T13:00:00"); // Assume 1PM race start if not specified
                 if (raceDate > now) {
                     nextRace = raceDate;
                     nextRaceInfo = race;
@@ -1436,7 +1461,14 @@
 
             // Update info text if race exists
             if(infoEl && nextRaceInfo) {
-                infoEl.innerText = `NEXT RACE: ${nextRaceInfo.gp.toUpperCase()} // ${nextRaceInfo.date}`;
+                // Use metadata for pretty name
+                const meta = TRACK_METADATA[nextRaceInfo.id] || { gp: nextRaceInfo.name };
+                const displayName = meta.gp.toUpperCase();
+                
+                // Format date nicely
+                const day = nextRace.getDate();
+                const month = nextRace.toLocaleString('default', { month: 'short' }).toUpperCase();
+                infoEl.innerText = `NEXT RACE: ${displayName} // ${day} ${month}`;
             }
 
             function tick() {
@@ -1468,11 +1500,9 @@
             gsap.to('#load-bar', { width: '100%', duration: 1, onComplete: () => {
                 gsap.to('#loader', { y: '-100%', duration: 0.8 });
                 // Initialize Data (Default Season 1)
-                initArchiveSync(null); 
-                renderCalendar();
+                loadSeasonData(null); 
                 renderDOTD();
                 renderSeasonAwards(); // Initial render of Season Awards
-                updateCountdown(); // Start countdown
             }});
             
             const cursor = document.getElementById('cursor');
