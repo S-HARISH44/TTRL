@@ -12,6 +12,7 @@
             --panel-bg: rgba(20, 20, 25, 0.7);
             --neon-cyan: #00f3ff;
             --neon-red: #ff003c;
+            --neon-green: #00ff9d;
             --text-main: #e0e0e0;
             --text-dim: #6e6e7a;
             --glass-border: 1px solid rgba(255, 255, 255, 0.08);
@@ -319,6 +320,15 @@
         .race-points-input { width: 80px; text-align: center; border-color: #444; background: #000; padding: 8px; color: var(--neon-cyan); font-weight: bold; }
         .race-points-input:focus { border-color: var(--neon-cyan); }
 
+        /* --- TRACK CONFIG LIST --- */
+        .track-list-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid #333;
+            margin-bottom: 10px; font-family: var(--mono-font);
+        }
+        .track-list-item:hover { border-color: var(--neon-cyan); }
+        .track-code { color: var(--neon-red); font-weight: bold; margin-right: 15px; width: 60px; }
+
         /* Mobile */
         @media (max-width: 768px) {
             .header-title { font-size: 1.2rem; }
@@ -393,124 +403,44 @@
 
         <!-- NAVIGATION -->
         <div class="nav-container">
-            <button class="tab-btn active" onclick="switchTab('race-director')"><i class="fas fa-flag-checkered"></i> Race Director</button>
+            <button class="tab-btn active" onclick="switchTab('season-setup')"><i class="fas fa-tools"></i> Season Setup</button>
+            <button class="tab-btn" onclick="switchTab('manage-drivers')"><i class="fas fa-users-cog"></i> Manage Grid</button>
+            <button class="tab-btn" onclick="switchTab('race-director')"><i class="fas fa-flag-checkered"></i> Race Director</button>
             <button class="tab-btn" onclick="switchTab('driver-editor')"><i class="fas fa-user-edit"></i> Edit Driver</button>
             <button class="tab-btn" onclick="switchTab('live-view')"><i class="fas fa-chart-line"></i> Live Data</button>
             <button class="tab-btn" onclick="switchTab('driver-stats')"><i class="fas fa-chart-pie"></i> Statistics</button>
-            <button class="tab-btn" onclick="switchTab('manage-drivers')"><i class="fas fa-users-cog"></i> Grid Manage</button>
         </div>
 
-        <!-- 1. RACE DIRECTOR -->
-        <div id="race-director" class="section active">
+        <!-- 0. SEASON SETUP (TRACK CONFIG) -->
+        <div id="season-setup" class="section active">
             <div class="panel-card">
                 <div class="panel-header">
-                    <div class="panel-title">RACE RESULT ENTRY</div>
-                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">BULK UPDATE MODE</div>
-                </div>
-                
-                <div class="form-group">
-                    <label>SELECT EVENT</label>
-                    <select id="raceDirectorTrackSelect" onchange="loadRaceGrid()" style="background:rgba(0,0,0,0.5);">
-                        <option value="">-- AWAITING SELECTION --</option>
-                    </select>
+                    <div class="panel-title">TRACK CONFIGURATION</div>
+                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">DEFINE SEASON SCHEDULE</div>
                 </div>
 
-                <div id="raceDirectorGrid" style="display:none; animation: fadeIn 0.5s;">
-                    <div class="race-header-row">
-                        <span>DRIVER</span>
-                        <span>POINTS</span>
+                <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:15px; margin-bottom:20px; align-items:end;">
+                    <div class="input-module">
+                        <label>TRACK NAME (e.g. Bahrain Grand Prix)</label>
+                        <input type="text" class="data-input" id="newTrackName" placeholder="ENTER TRACK NAME">
                     </div>
-                    <div id="raceInputsContainer" style="max-height:500px; overflow-y:auto; border:1px solid #333; margin-bottom:20px; background:#050505;">
-                        <!-- JS Generated -->
+                    <div class="input-module">
+                        <label>TRACK ID (e.g. bahrain)</label>
+                        <input type="text" class="data-input" id="newTrackId" placeholder="UNIQUE ID">
                     </div>
-                    <button class="btn-main" onclick="saveRaceResults()">COMMIT RESULTS</button>
-                    <div id="race-director-status" style="text-align:center; margin-top:15px; font-family:var(--mono-font); color:var(--neon-cyan);"></div>
+                    <button class="btn-main" onclick="addTrackConfig()" style="height:54px; width:auto; padding:0 30px;"><i class="fas fa-plus"></i> ADD</button>
+                </div>
+
+                <div id="trackConfigList" style="max-height:400px; overflow-y:auto; border-top:1px solid #333; padding-top:10px;">
+                    <div style="text-align:center; color:#666; padding:20px;">NO TRACKS CONFIGURED FOR THIS SEASON</div>
                 </div>
             </div>
         </div>
 
-        <!-- 2. DRIVER EDITOR -->
-        <div id="driver-editor" class="section">
-            <div class="panel-card">
-                <div class="panel-header">
-                    <div class="panel-title">INDIVIDUAL ADJUSTMENT</div>
-                </div>
-                
-                <select id="editorDriverSelect" onchange="loadDriverData()" style="margin-bottom:20px;">
-                    <option value="">-- SELECT DRIVER --</option>
-                </select>
-
-                <div id="editor-area" style="display:none;">
-                    <div class="track-grid" id="trackGrid"></div>
-                    <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center; background:rgba(0,243,255,0.05); padding:20px; border:1px solid var(--neon-cyan);">
-                        <span style="color:var(--neon-cyan); letter-spacing:1px;">CALCULATED TOTAL</span>
-                        <span class="total-value" id="calculatedTotal">0</span>
-                    </div>
-                    <button class="btn-main" onclick="saveAllChanges()" style="margin-top:20px;">UPDATE DATABASE</button>
-                    <div id="editor-status" style="text-align:center; margin-top:10px; font-family:var(--mono-font);"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. LIVE VIEW -->
-        <div id="live-view" class="section">
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap:20px;">
-                <div class="panel-card">
-                    <div class="panel-header">
-                        <div class="panel-title" style="color:var(--neon-cyan)">DRIVERS STANDINGS</div>
-                    </div>
-                    <div style="max-height:600px; overflow-y:auto;">
-                        <table class="tech-table">
-                            <thead><tr><th>#</th><th>DRIVER / TEAM</th><th style="text-align:right">PTS</th></tr></thead>
-                            <tbody id="liveDriversBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="panel-card">
-                    <div class="panel-header">
-                        <div class="panel-title" style="color:var(--neon-red)">CONSTRUCTORS</div>
-                    </div>
-                    <div style="max-height:600px; overflow-y:auto;">
-                        <table class="tech-table">
-                            <thead><tr><th>#</th><th>TEAM</th><th style="text-align:right">PTS</th></tr></thead>
-                            <tbody id="liveConstructorsBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. STATS -->
-        <div id="driver-stats" class="section">
-            <div class="panel-card">
-                <select id="statsDriverSelect" onchange="viewDriverStats()" style="margin-bottom:20px;">
-                    <option value="">-- ANALYZE DRIVER --</option>
-                </select>
-
-                <div id="statsDisplay" style="display:none;">
-                    <h2 id="statsDriverName" style="font-size:2.5rem; margin-bottom:0;">NAME</h2>
-                    <div id="statsTeamName" style="color:var(--neon-red); font-family:var(--mono-font); margin-bottom:20px;">TEAM</div>
-
-                    <div class="stats-grid">
-                        <div class="stat-box"><div class="stat-num" id="statPoints">0</div><div class="stat-desc">TOTAL POINTS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statWins" style="color:var(--neon-cyan)">0</div><div class="stat-desc">WINS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statPodiums">0</div><div class="stat-desc">PODIUMS</div></div>
-                        <div class="stat-box"><div class="stat-num" id="statAvg">0</div><div class="stat-desc">AVG / RACE</div></div>
-                    </div>
-
-                    <div class="panel-header"><div class="panel-title">RACE LOG</div></div>
-                    <table class="tech-table">
-                        <thead><tr><th>TRACK</th><th>TEAM</th><th style="text-align:right">PTS</th></tr></thead>
-                        <tbody id="statsHistoryBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. MANAGE -->
+        <!-- 1. MANAGE DRIVERS (GRID) -->
         <div id="manage-drivers" class="section">
             <div class="panel-card">
-                <div class="panel-header"><div class="panel-title">ADD NEW ENTRY</div></div>
+                <div class="panel-header"><div class="panel-title">ADD NEW DRIVER</div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
                     <div class="input-module">
                         <label>DRIVER NAME</label>
@@ -543,13 +473,121 @@
             </div>
         </div>
 
+        <!-- 2. RACE DIRECTOR -->
+        <div id="race-director" class="section">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-title">RACE RESULT ENTRY</div>
+                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">BULK UPDATE MODE</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>SELECT EVENT</label>
+                    <select id="raceDirectorTrackSelect" onchange="loadRaceGrid()" style="background:rgba(0,0,0,0.5);">
+                        <option value="">-- AWAITING SEASON CONFIG --</option>
+                    </select>
+                </div>
+
+                <div id="raceDirectorGrid" style="display:none; animation: fadeIn 0.5s;">
+                    <div class="race-header-row">
+                        <span>DRIVER</span>
+                        <span>POINTS</span>
+                    </div>
+                    <div id="raceInputsContainer" style="max-height:500px; overflow-y:auto; border:1px solid #333; margin-bottom:20px; background:#050505;">
+                        <!-- JS Generated -->
+                    </div>
+                    <button class="btn-main" onclick="saveRaceResults()">COMMIT RESULTS</button>
+                    <div id="race-director-status" style="text-align:center; margin-top:15px; font-family:var(--mono-font); color:var(--neon-cyan);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. DRIVER EDITOR -->
+        <div id="driver-editor" class="section">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-title">INDIVIDUAL ADJUSTMENT</div>
+                    <div style="font-family:var(--mono-font); color:#666; font-size:0.8rem;">RESERVE POINTS & CORRECTIONS</div>
+                </div>
+                
+                <select id="editorDriverSelect" onchange="loadDriverData()" style="margin-bottom:20px;">
+                    <option value="">-- SELECT DRIVER --</option>
+                </select>
+
+                <div id="editor-area" style="display:none;">
+                    <div class="track-grid" id="trackGrid"></div>
+                    <div style="margin-top:30px; display:flex; justify-content:space-between; align-items:center; background:rgba(0,243,255,0.05); padding:20px; border:1px solid var(--neon-cyan);">
+                        <span style="color:var(--neon-cyan); letter-spacing:1px;">CALCULATED TOTAL</span>
+                        <span class="total-value" id="calculatedTotal">0</span>
+                    </div>
+                    <button class="btn-main" onclick="saveAllChanges()" style="margin-top:20px;">UPDATE DATABASE</button>
+                    <div id="editor-status" style="text-align:center; margin-top:10px; font-family:var(--mono-font);"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. LIVE VIEW -->
+        <div id="live-view" class="section">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap:20px;">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title" style="color:var(--neon-cyan)">DRIVERS STANDINGS</div>
+                    </div>
+                    <div style="max-height:600px; overflow-y:auto;">
+                        <table class="tech-table">
+                            <thead><tr><th>#</th><th>DRIVER / TEAM</th><th style="text-align:right">PTS</th></tr></thead>
+                            <tbody id="liveDriversBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title" style="color:var(--neon-red)">CONSTRUCTORS</div>
+                    </div>
+                    <div style="max-height:600px; overflow-y:auto;">
+                        <table class="tech-table">
+                            <thead><tr><th>#</th><th>TEAM</th><th style="text-align:right">PTS</th></tr></thead>
+                            <tbody id="liveConstructorsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. STATS -->
+        <div id="driver-stats" class="section">
+            <div class="panel-card">
+                <select id="statsDriverSelect" onchange="viewDriverStats()" style="margin-bottom:20px;">
+                    <option value="">-- ANALYZE DRIVER --</option>
+                </select>
+
+                <div id="statsDisplay" style="display:none;">
+                    <h2 id="statsDriverName" style="font-size:2.5rem; margin-bottom:0;">NAME</h2>
+                    <div id="statsTeamName" style="color:var(--neon-red); font-family:var(--mono-font); margin-bottom:20px;">TEAM</div>
+
+                    <div class="stats-grid">
+                        <div class="stat-box"><div class="stat-num" id="statPoints">0</div><div class="stat-desc">TOTAL POINTS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statWins" style="color:var(--neon-cyan)">0</div><div class="stat-desc">WINS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statPodiums">0</div><div class="stat-desc">PODIUMS</div></div>
+                        <div class="stat-box"><div class="stat-num" id="statAvg">0</div><div class="stat-desc">AVG / RACE</div></div>
+                    </div>
+
+                    <div class="panel-header"><div class="panel-title">RACE LOG</div></div>
+                    <table class="tech-table">
+                        <thead><tr><th>TRACK</th><th>TEAM</th><th style="text-align:right">PTS</th></tr></thead>
+                        <tbody id="statsHistoryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDoc, setDoc, query, orderBy, onSnapshot, writeBatch, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // FIREBASE CONFIG
         const firebaseConfig = {
@@ -568,14 +606,8 @@
         let currentSeason = "season_1"; 
         let unsubscribe = null; 
         let knownSeasons = [];
+        let activeTracks = []; // Stores the manually entered tracks
         try { knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1']; } catch(e) { knownSeasons = ['season_1']; }
-
-        const TRACKS = [
-            {id:'bahrain', name:'Bahrain'}, {id:'australia', name:'Australia'}, {id:'imola', name:'Imola'},
-            {id:'spain', name:'Spain'}, {id:'uk', name:'Great Britain'}, {id:'vegas', name:'Las Vegas'},
-            {id:'belgium', name:'Belgium'}, {id:'austria', name:'Austria'}, {id:'brazil', name:'Brazil'},
-            {id:'abu_dhabi', name:'Abu Dhabi'}
-        ];
 
         const TEAMS = [
             {id:'red-bull-racing', name:'Red Bull'}, {id:'ferrari', name:'Ferrari'}, {id:'mercedes', name:'Mercedes'},
@@ -641,8 +673,93 @@
             changeSeason();
         };
 
+        // TRACK CONFIGURATION (MANUAL ENTRY)
+        async function loadTrackConfig() {
+            const trackListEl = document.getElementById("trackConfigList");
+            const docRef = doc(db, "seasons", currentSeason);
+            
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().trackConfig) {
+                    activeTracks = docSnap.data().trackConfig;
+                } else {
+                    activeTracks = [];
+                }
+            } catch (error) {
+                console.error("Error loading track config:", error);
+                activeTracks = [];
+            }
+
+            // Render List
+            if(activeTracks.length === 0) {
+                trackListEl.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">NO TRACKS CONFIGURED FOR THIS SEASON</div>`;
+            } else {
+                trackListEl.innerHTML = activeTracks.map(t => `
+                    <div class="track-list-item">
+                        <div>
+                            <span class="track-code">${t.id.toUpperCase()}</span>
+                            <span style="color:#fff;">${t.name}</span>
+                        </div>
+                        <button class="btn-small" onclick="removeTrackConfig('${t.id}')" style="border-color:var(--neon-red); color:var(--neon-red);">REMOVE</button>
+                    </div>
+                `).join('');
+            }
+
+            // Update Race Director Dropdown
+            const raceSelect = document.getElementById("raceDirectorTrackSelect");
+            if(raceSelect) {
+                raceSelect.innerHTML = '<option value="">-- SELECT TRACK TO ENTER RESULTS --</option>';
+                if(activeTracks.length === 0) {
+                    raceSelect.innerHTML = '<option value="">-- NO TRACKS FOUND --</option>';
+                } else {
+                    activeTracks.forEach(t => raceSelect.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`);
+                }
+            }
+        }
+        
+        window.removeTrackConfig = async (trackId) => {
+            if(!confirm(`Remove track ${trackId}? Existing data for this track will persist but be hidden.`)) return;
+            const trackToRemove = activeTracks.find(t => t.id === trackId);
+            if(trackToRemove) {
+                await updateDoc(doc(db, "seasons", currentSeason), {
+                    trackConfig: arrayRemove(trackToRemove)
+                });
+                loadTrackConfig(); // Reload
+                // Also refresh driver editor to remove that input field
+                loadDriverData(); 
+            }
+        };
+
+        window.addTrackConfig = async () => {
+            const name = document.getElementById("newTrackName").value.trim();
+            const id = document.getElementById("newTrackId").value.trim().toLowerCase();
+            
+            if(!name || !id) { alert("Please enter both Name and ID"); return; }
+            if(activeTracks.some(t => t.id === id)) { alert("Track ID already exists"); return; }
+
+            const newTrack = { id, name };
+            
+            // Ensure season doc exists, then update
+            const seasonRef = doc(db, "seasons", currentSeason);
+            const seasonSnap = await getDoc(seasonRef);
+            
+            if(!seasonSnap.exists()) {
+                await setDoc(seasonRef, { trackConfig: [newTrack] });
+            } else {
+                await updateDoc(seasonRef, {
+                    trackConfig: arrayUnion(newTrack)
+                });
+            }
+            
+            document.getElementById("newTrackName").value = "";
+            document.getElementById("newTrackId").value = "";
+            
+            loadTrackConfig();
+            alert("Track Added");
+        };
+
         // DATA LOGIC
-        window.changeSeason = () => {
+        window.changeSeason = async () => {
             const inputVal = document.getElementById("seasonInput").value.trim().toLowerCase().replace(/\s+/g, '_');
             if(!inputVal) return;
             currentSeason = inputVal;
@@ -652,12 +769,10 @@
                 renderKnownSeasons();
             }
             
-            const raceSelect = document.getElementById("raceDirectorTrackSelect");
-            if(raceSelect) {
-                raceSelect.innerHTML = '<option value="">-- SELECT TRACK TO ENTER RESULTS --</option>';
-                TRACKS.forEach(t => raceSelect.innerHTML += `<option value="${t.id}">${t.name.toUpperCase()}</option>`);
-            }
+            // 1. Load Tracks FIRST
+            await loadTrackConfig();
 
+            // 2. Then Load Drivers
             initListener(); 
         };
 
@@ -698,6 +813,8 @@
                 if(currentStatId) viewDriverStats();
                 const currentRaceTrack = document.getElementById("raceDirectorTrackSelect").value;
                 if(currentRaceTrack) loadRaceGrid();
+                const currentEditorId = document.getElementById("editorDriverSelect").value;
+                if(currentEditorId) loadDriverData();
             });
         }
 
@@ -766,6 +883,7 @@
                     const newTotal = currentTotal - oldTrackPoints + newPoints;
                     const resultsUpdate = { ...driverData.results };
                     let teamForRace = driverData.team;
+                    // Preserve existing team override if just updating points
                     if(driverData.results && driverData.results[trackId] && typeof driverData.results[trackId] === 'object') {
                         teamForRace = driverData.results[trackId].team;
                     }
@@ -802,7 +920,12 @@
             const data = driversCache[id];
             const results = data.results || {};
 
-            TRACKS.forEach(t => {
+            if(activeTracks.length === 0) {
+                grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; color:#666;'>NO TRACKS CONFIGURED FOR THIS SEASON.<br>GO TO 'SEASON SETUP' TAB.</div>";
+                return;
+            }
+
+            activeTracks.forEach(t => {
                 let pts = 0;
                 let team = data.team; 
                 if(results[t.id]) {
@@ -813,10 +936,19 @@
                         pts = results[t.id]; 
                     }
                 }
+                
                 let teamOpts = TEAMS.map(tm => `<option value="${tm.id}" ${tm.id === team ? 'selected':''}>${tm.name}</option>`).join('');
+                
                 const div = document.createElement("div");
                 div.className = "input-module";
-                div.innerHTML = `<label>${t.name.toUpperCase()}</label><div style="display:flex; gap:5px;"><input type="number" class="points-input data-input" style="width:60px; text-align:center; color:var(--neon-cyan); font-weight:bold;" data-track="${t.id}" value="${pts}" oninput="calcTotal()"><select class="team-input data-input" id="team-${t.id}">${teamOpts}</select></div>`;
+                // Reserve Logic: Dropdown allows selecting a different team for this specific race
+                div.innerHTML = `
+                    <label>${t.name.toUpperCase()}</label>
+                    <div style="display:flex; gap:5px;">
+                        <input type="number" class="points-input data-input" style="width:60px; text-align:center; color:var(--neon-cyan); font-weight:bold;" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
+                        <select class="team-input data-input" id="team-${t.id}" title="Select Team for this Race (Reserve Logic)">${teamOpts}</select>
+                    </div>
+                `;
                 grid.appendChild(div);
             });
             calcTotal();
@@ -841,7 +973,7 @@
             pointsInputs.forEach((input, idx) => {
                 const val = Number(input.value);
                 const track = input.dataset.track;
-                const team = teamInputs[idx].value;
+                const team = teamInputs[idx].value; // Captures team override (Reserve logic)
                 if(val > 0) {
                     newResults[track] = { points: val, team: team };
                     newTotal += val;
@@ -868,7 +1000,9 @@
             document.getElementById("statPoints").innerText = data.totalPoints;
 
             let wins = 0, podiums = 0, races = 0, tableHTML = "";
-            TRACKS.forEach(track => {
+            
+            // Iterate over ACTIVE TRACKS to preserve order
+            activeTracks.forEach(track => {
                 const res = results[track.id];
                 if(res) {
                     const pts = typeof res === 'object' ? res.points : res;
@@ -892,6 +1026,7 @@
             const dTable = document.getElementById("liveDriversBody");
             dTable.innerHTML = "";
             const sortedDrivers = [...allDrivers].sort((a, b) => {
+                // Reserves at bottom
                 if (a.team === 'reserve' && b.team !== 'reserve') return 1;
                 if (a.team !== 'reserve' && b.team === 'reserve') return -1;
                 return b.totalPoints - a.totalPoints;
@@ -907,7 +1042,12 @@
                 Object.values(results).forEach(r => {
                     let p = 0, t = d.team; 
                     if(typeof r === 'object') { p = r.points || 0; t = r.team || d.team; } else { p = r; }
-                    if(t !== 'reserve') { if(!teamPoints[t]) teamPoints[t] = 0; teamPoints[t] += p; }
+                    
+                    // Reserve logic: Points count towards the team they drove for
+                    if(t !== 'reserve') { 
+                        if(!teamPoints[t]) teamPoints[t] = 0; 
+                        teamPoints[t] += p; 
+                    }
                 });
             });
             const cTable = document.getElementById("liveConstructorsBody");
