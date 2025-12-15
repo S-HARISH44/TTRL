@@ -225,40 +225,75 @@
         .table-scroll { height: 100%; overflow: auto; padding-right: 1rem; scrollbar-width: none; }
         .table-scroll::-webkit-scrollbar { display: none; }
         
-        .standings-table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: 'JetBrains Mono', monospace; }
+        /* FIXED TABLE STYLES */
+        .standings-table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0; 
+            font-family: 'JetBrains Mono', monospace; 
+        }
+        
         .standings-table th {
-            text-align: left; color: var(--accent-cyan); padding: 0.8rem; position: sticky; top: 0; background: #050505; 
-            z-index: 30; font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 0.1em; white-space: nowrap; font-size: 0.9rem;
+            text-align: left; color: var(--accent-cyan); padding: 0.8rem; position: sticky; top: 0; 
+            background: #050505; 
+            z-index: 30; 
+            font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 0.1em;
+            white-space: nowrap; font-size: 0.9rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        .standings-table td { padding: 0.8rem; background: var(--glass-bg); border-top: 1px solid transparent; border-bottom: 1px solid transparent; transition: all 0.2s ease; white-space: nowrap; font-size: 0.9rem; }
+        
+        .standings-table td { 
+            padding: 0.8rem; 
+            background: var(--glass-bg); 
+            border-top: 1px solid transparent; 
+            border-bottom: 1px solid transparent; 
+            transition: all 0.2s ease; 
+            white-space: nowrap; 
+            font-size: 0.9rem;
+        }
+
         .standings-table td:first-child, .standings-table th:first-child { position: sticky; left: 0; }
         .standings-table th:first-child { z-index: 40; background: #050505; border-right: 1px solid rgba(255,255,255,0.1); }
         .standings-table td:first-child { 
             z-index: 20; background: #0a0a0a; border-radius: 4px 0 0 4px; 
-            border-left: 3px solid var(--team-color, transparent); border-right: 1px solid rgba(255,255,255,0.1); box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            border-left: 3px solid var(--team-color, transparent); 
+            border-right: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
         }
         .standings-table td:last-child { border-radius: 0 4px 4px 0; border-right: 1px solid transparent; }
         .standings-table tr:hover td { background: rgba(255, 255, 255, 0.1); transform: scale(1.01); }
         .standings-table tr:hover td:first-child { background: #111; } 
         
+        .team-cell { display: flex; align-items: center; gap: 0.8rem; }
+        .team-logo-mini { height: 20px; width: auto; max-width: 30px; object-fit: contain; }
+
+        /* --- GARAGE GRID --- */
         .garage-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem; scrollbar-width: none;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem; height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem;
+            scrollbar-width: none;
         }
         .garage-grid::-webkit-scrollbar { display: none; }
+        
         @media (min-width: 1200px) { .garage-grid { grid-template-columns: repeat(5, 1fr); } }
 
         .constructor-card {
             background: linear-gradient(145deg, rgba(30,30,30,0.8) 0%, rgba(10,10,10,0.95) 100%);
-            border: 1px solid var(--glass-border); border-bottom: 4px solid var(--team-color, #444);
-            border-radius: 12px; padding: 1.2rem; display: flex; flex-direction: column; position: relative;
+            border: 1px solid var(--glass-border);
+            border-bottom: 4px solid var(--team-color, #444);
+            border-radius: 12px; padding: 1.2rem;
+            display: flex; flex-direction: column; position: relative;
             transform-style: preserve-3d; transition: transform 0.2s ease, box-shadow 0.3s ease;
-            height: 100%; justify-content: space-between; min-height: 220px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            height: 100%; justify-content: space-between; min-height: 220px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .constructor-card:hover { 
-            border-color: rgba(255,255,255,0.3); border-bottom-color: var(--team-color);
-            box-shadow: 0 10px 40px var(--team-color, rgba(255,255,255,0.1)); transform: translateY(-5px); z-index: 2;
+            border-color: rgba(255,255,255,0.3);
+            border-bottom-color: var(--team-color);
+            box-shadow: 0 10px 40px var(--team-color, rgba(255,255,255,0.1)); 
+            transform: translateY(-5px); z-index: 2;
         }
+        
         .cc-bg-rank { position: absolute; top: -0.5rem; right: 0.5rem; font-size: 4rem; font-family: 'Rajdhani'; font-weight: 800; color: rgba(255,255,255,0.03); pointer-events: none; }
         .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; z-index: 2; transform: translateZ(30px); }
         .cc-name { font-family: 'Rajdhani'; font-weight: 700; font-size: 1rem; }
@@ -266,7 +301,7 @@
         .cc-img-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; transform: translateZ(50px); height: 80px; margin-top: auto; margin-bottom: auto; }
         .cc-car-img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
 
-        /* --- DOTD --- */
+        /* --- DOTD (Accordion) --- */
         .dotd-accordion-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 0; overflow: hidden; }
         @media (min-width: 768px) { .dotd-accordion-container { flex-direction: row; } }
         .dotd-panel {
@@ -310,22 +345,38 @@
         }
         .dotd-panel:hover .dotd-badge-icon { opacity: 1; transform: scale(1); }
 
-        /* --- CALENDAR GRID --- */
-        .cal-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; max-width: 1400px; margin-top: 2rem; justify-content: center; }
+        /* --- CALENDAR GRID (GLOSSY CARDS FIXED) --- */
+        .cal-grid { 
+            display: flex; flex-wrap: wrap; gap: 1.5rem; max-width: 1400px; margin-top: 2rem; 
+            justify-content: center; 
+        }
         .cal-item {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            padding: 1.5rem; text-align: center; transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            padding: 1.5rem; text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             display: flex; flex-direction: column; justify-content: space-between;
-            flex: 1 1 220px; max-width: 280px; min-height: 180px; border-radius: 12px; position: relative; overflow: hidden;
+            flex: 1 1 220px; max-width: 280px; min-height: 180px; 
+            border-radius: 12px; position: relative; overflow: hidden;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
         .cal-item::before {
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
-            background: var(--accent-cyan); transform: scaleX(0); transition: transform 0.3s ease; transform-origin: left;
+            background: var(--accent-cyan); transform: scaleX(0); transition: transform 0.3s ease;
+            transform-origin: left;
         }
-        .cal-item:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.4); box-shadow: 0 10px 40px rgba(0, 240, 255, 0.15); }
+        .cal-item:hover { 
+            transform: translateY(-5px); border-color: rgba(255,255,255,0.4); 
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.15);
+        }
         .cal-item:hover::before { transform: scaleX(1); }
+        .cal-item.future-race { opacity: 0.7; }
+        .cal-item.next-race { 
+            opacity: 1; border: 1px solid var(--accent-cyan); 
+            background: rgba(0, 240, 255, 0.05); box-shadow: 0 0 30px rgba(0, 240, 255, 0.1); 
+        }
+        .cal-item.next-race .gp { color: var(--accent-cyan); text-shadow: 0 0 10px var(--accent-cyan); }
         .round { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent-red); display: block; margin-bottom: 0.5rem; letter-spacing: 0.1em; font-weight: 700; }
         .gp { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.4rem; color: #fff; line-height: 1.1; margin-bottom: 0.5rem; display: block; }
         .date { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #aaa; display: block; margin-bottom: 1rem; }
@@ -342,71 +393,127 @@
         /* --- ARCHIVE SECTION --- */
         .archive-controls { margin-bottom: 1rem; display: flex; gap: 10px; }
         .archive-loading { text-align: center; padding: 2rem; color: var(--accent-cyan); font-family: 'JetBrains Mono'; }
-        .season-btn-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
+        .season-btn-group {
+            display: flex; gap: 10px; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap;
+        }
+
+        /* Sticky Headers for Archive - FIXED OVERLAP */
         .sticky-left { position: sticky; left: 0; z-index: 15; background: #050505; border-right: 1px solid rgba(255,255,255,0.1); }
         .sticky-top { position: sticky; top: 0; z-index: 20; background: #000; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sticky-corner { position: sticky; left: 0; top: 0; z-index: 30; background: #000; border-right: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
 
         /* --- SEASON AWARDS (BENTO GRID - COMPACT) --- */
         .awards-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding: 1rem;
-            grid-auto-flow: dense; max-width: 1000px; margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Fixed 4 columns for tighter packing on desktop */
+            gap: 1rem; /* Smaller gap */
+            padding: 1rem;
+            grid-auto-flow: dense; 
+            max-width: 1000px; /* Reduced max-width for more compact look */
+            margin: 0 auto;
         }
+        
+        /* Fallback for smaller screens */
         @media (max-width: 1024px) { .awards-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .awards-grid { grid-template-columns: 1fr; } }
+        
         .award-card {
-            background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden; 
-            position: relative; transition: transform 0.3s; display: flex; flex-direction: column; cursor: pointer; height: 180px;
+            background: #111; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px; overflow: hidden; position: relative;
+            transition: transform 0.3s;
+            display: flex; flex-direction: column;
+            cursor: pointer;
+            height: 180px; /* Fixed base height for cards */
         }
         .award-card:hover { transform: scale(1.03); border-color: var(--accent-cyan); z-index: 5; }
-        .award-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; opacity: 0.7; }
+        
+        .award-img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            transition: opacity 0.3s; opacity: 0.7;
+        }
         .award-card:hover .award-img { opacity: 1; }
-        .award-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 0.8rem; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); z-index: 2; }
+        
+        .award-info {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            padding: 0.8rem; 
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+            z-index: 2;
+        }
         .award-title { color: var(--accent-cyan); font-family: 'Rajdhani'; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 0.1rem; text-shadow: 0 2px 4px #000; }
         .award-winner { color: #fff; font-family: 'JetBrains Mono'; font-size: 0.8rem; font-weight: 700; text-shadow: 0 2px 4px #000; }
-        .span-2-row { grid-row: span 2; height: 376px; }
+        
+        /* Grid Spans for Bento Layout */
+        .span-2-row { grid-row: span 2; height: 376px; } /* 180*2 + 16(gap) */
         .span-2-col { grid-column: span 2; }
         .span-2-both { grid-column: span 2; grid-row: span 2; height: 376px; }
         .span-full { grid-column: 1 / -1; }
 
         /* --- IMAGE MODAL (LIGHTBOX) --- */
         #img-modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; 
-            display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.3s;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 20000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: 0.3s;
         }
         #img-modal-overlay.active { opacity: 1; visibility: visible; }
-        .img-modal-content { max-width: 90vh; max-height: 90vh; display: flex; flex-direction: column; position: relative; pointer-events: auto; }
-        .img-modal-content img { max-width: 100%; max-height: 80vh; object-fit: contain; border: 2px solid var(--accent-cyan); box-shadow: 0 0 50px rgba(0, 243, 255, 0.2); background: #000; }
-        .img-modal-text { background: #000; padding: 1rem; text-align: center; border: 1px solid var(--accent-cyan); border-top: none; color: #fff; }
-        .close-img-modal { position: absolute; top: -40px; right: 0; color: #fff; font-size: 2rem; cursor: pointer; }
+        .img-modal-content {
+            max-width: 90vh; max-height: 90vh;
+            display: flex; flex-direction: column;
+            position: relative; pointer-events: auto;
+        }
+        .img-modal-content img {
+            max-width: 100%; max-height: 80vh;
+            object-fit: contain;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+            background: #000;
+        }
+        .img-modal-text {
+            background: #000; padding: 1rem; text-align: center;
+            border: 1px solid var(--accent-cyan); border-top: none;
+            color: #fff;
+        }
+        .close-img-modal {
+            position: absolute; top: -40px; right: 0;
+            color: #fff; font-size: 2rem; cursor: pointer;
+        }
         .close-img-modal:hover { color: var(--accent-cyan); }
+
 
         /* Other UI */
         .btn-tech {
-            pointer-events: auto; display: inline-block; padding: 0.8rem 2.5rem; background: var(--accent-red); color: #fff; 
-            font-family: 'Rajdhani'; font-weight: 700; text-decoration: none; clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+            pointer-events: auto; display: inline-block; padding: 0.8rem 2.5rem;
+            background: var(--accent-red); color: #fff; font-family: 'Rajdhani'; font-weight: 700;
+            text-decoration: none; clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
             transition: all 0.3s; border: none; font-size: 1rem;
         }
         .btn-tech:hover { background: #fff; color: var(--accent-red); box-shadow: 0 0 20px rgba(255,31,75,0.5); }
+        
+        /* Contact Grid */
         .contact-grid { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
         .contact-item {
-            display: flex; align-items: center; gap: 1rem; padding: 1.5rem 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border);
+            display: flex; align-items: center; gap: 1rem; padding: 1.5rem 2rem;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
             color: #fff; text-decoration: none; transition: all 0.3s ease; pointer-events: auto;
         }
         .contact-item:hover { background: #fff; color: #000; transform: translateY(-5px); }
 
         /* Modals */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9990; 
-            display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(10px); z-index: 9990; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        
         .intel-modal {
-            width: 90%; max-width: 800px; background: #000; border: 1px solid var(--accent-cyan); padding: 2rem; 
-            position: relative; clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%); display: flex; flex-direction: column;
+            width: 90%; max-width: 800px; background: #000; border: 1px solid var(--accent-cyan);
+            padding: 2rem; position: relative; clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
+            display: flex; flex-direction: column;
         }
         .intel-title { color: var(--accent-cyan); font-family: 'Rajdhani', sans-serif; font-size: 2rem; margin-bottom: 1rem; text-transform: uppercase; }
-        .intel-content-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; flex-grow: 1; max-height: 55vh; overflow: hidden; }
+        .intel-content-layout {
+            display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; flex-grow: 1; max-height: 55vh; overflow: hidden;
+        }
         .intel-left-column, .intel-right-column { overflow-y: auto; padding-right: 10px; }
         .intel-map-container { flex-shrink: 0; width: 100%; height: 0; padding-bottom: 56.25%; position: relative; }
         .intel-map-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8) contrast(1.1); }
@@ -441,12 +548,12 @@
         <img id="app-logo" src="https://raw.githubusercontent.com/HARISHWINNER/TTRL/ade50d630c482acbb96676fc69c2849a58494f7f/RESOURCES/image.png" alt="TTRL" class="logo hover-target">
         <div class="header-right">
             <div class="top-nav">
-                <a href="#" class="nav-link active hover-target" data-slide="0">HOME</a>
-                <a href="#" class="nav-link hover-target" data-slide="1">CALENDAR</a>
-                <a href="#" class="nav-link hover-target" data-slide="2">STANDINGS</a>
-                <a href="#" class="nav-link hover-target" data-slide="3">REGISTER</a>
-                <a href="#" class="nav-link hover-target" data-slide="4">PADDOCK</a>
-                <a href="#" class="nav-link hover-target" data-slide="5">ARCHIVES</a>
+                <a href="#home" class="nav-link active hover-target">HOME</a>
+                <a href="#calendar" class="nav-link hover-target">CALENDAR</a>
+                <a href="#standings" class="nav-link hover-target">STANDINGS</a>
+                <a href="#register" class="nav-link hover-target">REGISTER</a>
+                <a href="#paddock" class="nav-link hover-target">PADDOCK</a>
+                <a href="#archives" class="nav-link hover-target">ARCHIVES</a>
             </div>
             <div class="mono-font text-sm uppercase tracking-widest"><span style="color: var(--accent-cyan)">Season 1</span> <span style="color: #666">// Completed</span></div>
         </div>
@@ -486,7 +593,7 @@
 
     <div class="slides-wrapper">
         <!-- SLIDE 0: HERO -->
-        <section class="slide active" id="slide-0">
+        <section class="slide active" id="home">
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/a63c5b81b6a861f85d3efb76fe0c9bb2590de507/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg'); opacity:0.8;"></div>
 
             <div class="slide-content home-design-container">
@@ -534,7 +641,7 @@
         </section>
 
         <!-- SLIDE 1: CALENDAR -->
-        <section class="slide" id="slide-1">
+        <section class="slide" id="calendar">
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/Belgium.avif')"></div>
             <div class="slide-content">
                 <div class="slide-tag">02 // GLOBAL TOUR</div>
@@ -544,7 +651,7 @@
         </section>
 
         <!-- SLIDE 2: STANDINGS -->
-        <section class="slide" id="slide-2">
+        <section class="slide" id="standings">
             <div class="slide-bg" style="background-image: url('https://f1chronicle.com/wp-content/uploads/2024/01/SI202412010400-1920x1080.jpg')"></div>
             <div class="slide-content">
                 <div class="slide-tag">03 // LEADERBOARD</div>
@@ -572,7 +679,7 @@
         </section>
 
         <!-- SLIDE 3: REGISTER -->
-        <section class="slide" id="slide-3">
+        <section class="slide" id="register">
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/1-w-GettyImages-2048270135.webp')"></div>
             <div class="slide-content">
                 <div class="slide-tag">04 // ENLIST</div>
@@ -582,7 +689,7 @@
         </section>
 
          <!-- SLIDE 4: PADDOCK -->
-        <section class="slide" id="slide-4">
+        <section class="slide" id="paddock">
             <div class="slide-bg" id="vanta-bg"></div>
             <div class="slide-content">
                 <div class="slide-tag">05 // PADDOCK</div>
@@ -596,7 +703,7 @@
         </section>
 
         <!-- SLIDE 5: ARCHIVES -->
-        <section class="slide" id="slide-5">
+        <section class="slide" id="archives">
             <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/a63c5b81b6a861f85d3efb76fe0c9bb2590de507/RESOURCES/001-EA-Sports-F1-2023-Video-Game-Review.jpg'); filter: brightness(0.2);"></div>
             <div class="slide-content">
                 <div class="slide-tag">06 // DATA VAULT</div>
@@ -842,6 +949,25 @@
             });
         }
         window.fetchTrackIntel = fetchTrackIntel; // EXPOSE FOR HTML
+
+        // --- ROUTER LOGIC ---
+        // Slide to Hash map
+        const routeMap = {
+            '#home': 0,
+            '#calendar': 1,
+            '#standings': 2,
+            '#register': 3,
+            '#paddock': 4,
+            '#archives': 5
+        };
+
+        function handleHashChange() {
+            const hash = window.location.hash || '#home';
+            const index = routeMap[hash];
+            if (index !== undefined) {
+                gotoSlide(index);
+            }
+        }
 
         // --- FIREBASE LOGIC ---
         async function loadSeasonData(seasonId) {
@@ -1152,7 +1278,8 @@
             const nextSlide = slides[nextIndex];
             
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.querySelectorAll('.nav-link')[index].classList.add('active');
+            const newLink = document.querySelectorAll('.nav-link')[index];
+            if(newLink) newLink.classList.add('active');
 
             gsap.set(nextSlide, { zIndex: 20, visibility: 'visible', opacity: 0 });
             const tl = gsap.timeline({
@@ -1171,11 +1298,15 @@
             gsap.fromTo(elements, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, delay: 0.5 });
         }
 
-        document.querySelectorAll('.nav-link').forEach((link, idx) => {
-            link.addEventListener('click', (e) => { e.preventDefault(); gotoSlide(idx); });
-        });
+        // Handle Hash Change
+        window.addEventListener('hashchange', handleHashChange);
+
+        // Update Nav Links to just use href
+        // document.querySelectorAll('.nav-link').forEach((link, idx) => {
+        //     link.addEventListener('click', (e) => { e.preventDefault(); gotoSlide(idx); });
+        // });
         
-        document.getElementById('app-logo').addEventListener('click', () => gotoSlide(0));
+        document.getElementById('app-logo').addEventListener('click', () => { window.location.hash = '#home'; });
 
         // GLOBAL TAB LISTENER
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1281,6 +1412,9 @@
                 loadSeasonData(null); 
                 renderDOTD();
                 renderSeasonAwards(); // Initial render of Season Awards
+                
+                // Handle initial hash
+                handleHashChange();
             }});
             
             const cursor = document.getElementById('cursor');
