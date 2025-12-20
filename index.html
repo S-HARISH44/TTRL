@@ -36,7 +36,8 @@
         #cursor-follower { display: none; }
 
         #cursor, #cursor-follower {
-            position: fixed; top: 0; left: 0; pointer-events: none; 
+            position: fixed; top: 0; left: 0; 
+            pointer-events: none !important; /* CRITICAL FIX: Ensures cursor doesn't block clicks */
             z-index: 99999;
             transform: translate(-50%, -50%);
             will-change: transform, left, top;
@@ -107,7 +108,7 @@
         .slide {
             position: absolute; inset: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            visibility: hidden; overflow: hidden; opacity: 0;
+            visibility: hidden; opacity: 0;
             will-change: opacity, transform;
         }
         .slide.active { visibility: visible; z-index: 10; opacity: 1; }
@@ -118,7 +119,10 @@
             filter: brightness(0.3) grayscale(0.2);
             transform: scale(1.1); will-change: transform;
         }
-        #vanta-bg { filter: brightness(1) grayscale(0); }
+        #vanta-bg { 
+            filter: brightness(1) grayscale(0); 
+            background: radial-gradient(circle at center, #111 0%, #050505 100%); /* Fallback for when WebGL fails */
+        }
         #vanta-bg canvas { width: 100% !important; height: 100% !important; }
 
         .slide-content {
@@ -267,39 +271,105 @@
         .team-cell { display: flex; align-items: center; gap: 0.8rem; }
         .team-logo-mini { height: 20px; width: auto; max-width: 30px; object-fit: contain; }
 
-        /* --- GARAGE GRID --- */
+        /* --- GARAGE GRID (Redesigned) --- */
         .garage-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem; height: 100%; overflow-y: auto; padding: 0.5rem 1rem 2rem 1rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem; height: 100%; overflow-y: auto; padding: 1rem 2rem 4rem 2rem;
             scrollbar-width: none;
         }
         .garage-grid::-webkit-scrollbar { display: none; }
         
-        @media (min-width: 1200px) { .garage-grid { grid-template-columns: repeat(5, 1fr); } }
-
         .constructor-card {
-            background: linear-gradient(145deg, rgba(30,30,30,0.8) 0%, rgba(10,10,10,0.95) 100%);
-            border: 1px solid var(--glass-border);
-            border-bottom: 4px solid var(--team-color, #444);
-            border-radius: 12px; padding: 1.2rem;
-            display: flex; flex-direction: column; position: relative;
-            transform-style: preserve-3d; transition: transform 0.2s ease, box-shadow 0.3s ease;
-            height: 100%; justify-content: space-between; min-height: 220px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #151515 0%, #050505 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid var(--team-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-height: 320px;
         }
-        .constructor-card:hover { 
-            border-color: rgba(255,255,255,0.3);
-            border-bottom-color: var(--team-color);
-            box-shadow: 0 10px 40px var(--team-color, rgba(255,255,255,0.1)); 
-            transform: translateY(-5px); z-index: 2;
+        .constructor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255,255,255,0.2);
+            z-index: 10;
         }
         
-        .cc-bg-rank { position: absolute; top: -0.5rem; right: 0.5rem; font-size: 4rem; font-family: 'Rajdhani'; font-weight: 800; color: rgba(255,255,255,0.03); pointer-events: none; }
-        .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; z-index: 2; transform: translateZ(30px); }
-        .cc-name { font-family: 'Rajdhani'; font-weight: 700; font-size: 1rem; }
-        .cc-points { color: var(--team-color); font-family: 'JetBrains Mono'; font-weight: 700; background: rgba(0,0,0,0.5); padding: 0.2rem 0.4rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); }
-        .cc-img-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; transform: translateZ(50px); height: 80px; margin-top: auto; margin-bottom: auto; }
-        .cc-car-img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
+        /* SVG Pattern */
+        .cc-pattern {
+            position: absolute; bottom: 0; left: 0; margin-bottom: 2rem;
+            transform: scale(1.5); opacity: 0.15; pointer-events: none;
+            width: 100%; height: auto;
+        }
+        
+        /* Image Area */
+        .cc-img-container {
+            position: relative;
+            padding: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        
+        .cc-shadow-blob {
+            display: block; position: absolute;
+            width: 12rem; height: 12rem;
+            bottom: 0; left: 50%; transform: translateX(-50%) translateY(2rem) rotate3d(0, 0, 1, 20deg) scale3d(1, 0.6, 1);
+            background: radial-gradient(circle, rgba(0,0,0,0.8) 0%, transparent 70%);
+            opacity: 0.4; pointer-events: none;
+        }
+        
+        .cc-car-img {
+            position: relative;
+            width: 100%;
+            max-width: 240px;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+            z-index: 2;
+        }
+
+        /* Content Area */
+        .cc-content {
+            position: relative;
+            padding: 1.5rem;
+            margin-top: auto;
+            color: #fff;
+            background: linear-gradient(to top, rgba(0,0,0,0.2), transparent);
+            z-index: 5; /* Ensure content is above patterns */
+        }
+        
+        .cc-rank-label {
+            display: block; opacity: 0.9; margin-bottom: 0.25rem;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em;
+        }
+        
+        .cc-info-row {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .cc-name {
+            display: block; font-weight: 700; font-size: 1.5rem;
+            font-family: 'Rajdhani', sans-serif; text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .cc-points-pill {
+            display: flex; align-items: center;
+            background-color: #ffffff;
+            color: #000000; /* FIXED: Black text for contrast */
+            border-radius: 9999px;
+            font-size: 0.85rem; font-weight: 800;
+            padding: 0.5rem 1rem;
+            line-height: 1;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* Stronger shadow */
+            font-family: 'JetBrains Mono', monospace;
+            border: 2px solid rgba(255,255,255,0.5); /* Slight border for pop */
+        }
 
         /* --- DOTD (Accordion) --- */
         .dotd-accordion-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 0; overflow: hidden; }
@@ -545,15 +615,15 @@
     </div>
 
     <div class="fixed-ui">
-        <img id="app-logo" src="https://raw.githubusercontent.com/HARISHWINNER/TTRL/ade50d630c482acbb96676fc69c2849a58494f7f/RESOURCES/image.png" alt="TTRL" class="logo hover-target">
+        <img id="app-logo" src="https://raw.githubusercontent.com/HARISHWINNER/TTRL/ade50d630c482acbb96676fc69c2849a58494f7f/RESOURCES/image.png" alt="TTRL" class="logo hover-target" onclick="navigateTo(0)">
         <div class="header-right">
             <div class="top-nav">
-                <a href="#home" class="nav-link active hover-target">HOME</a>
-                <a href="#calendar" class="nav-link hover-target">CALENDAR</a>
-                <a href="#standings" class="nav-link hover-target">STANDINGS</a>
-                <a href="#register" class="nav-link hover-target">REGISTER</a>
-                <a href="#paddock" class="nav-link hover-target">PADDOCK</a>
-                <a href="#archives" class="nav-link hover-target">ARCHIVES</a>
+                <a onclick="navigateTo(0)" class="nav-link active hover-target">HOME</a>
+                <a onclick="navigateTo(1)" class="nav-link hover-target">CALENDAR</a>
+                <a onclick="navigateTo(2)" class="nav-link hover-target">STANDINGS</a>
+                <a onclick="navigateTo(3)" class="nav-link hover-target">REGISTER</a>
+                <a onclick="navigateTo(4)" class="nav-link hover-target">PADDOCK</a>
+                <a onclick="navigateTo(5)" class="nav-link hover-target">ARCHIVES</a>
             </div>
             <div class="mono-font text-sm uppercase tracking-widest"><span style="color: var(--accent-cyan)">Season 1</span> <span style="color: #666">// Completed</span></div>
         </div>
@@ -761,8 +831,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // UPDATE TO FIREBASE 11.6.1 (Matching Admin Panel)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // FIREBASE CONFIG
         const firebaseConfig = {
@@ -785,7 +856,7 @@
             {id:'haas', name:'Haas'}, {id:'reserve', name:'Reserve'}
         ];
         
-        // Static Metadata for Tracks (Images, Insights) - Dates come from Firestore
+        // Static Metadata for Tracks
         const TRACK_METADATA = {
             'bahrain': { gp: "Bahrain Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Bahrain-circuit-768x432.png", insight: "Stop and go track." },
             'australia': { gp: "Australian Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Albert-Park-Circuit-768x432.png", insight: "Fast flowing street circuit." },
@@ -846,7 +917,6 @@
             { gp: "Abu Dhabi Grand Prix", driver: "Wi7ard", team: "WILLIAMS", image: "https://github.com/S-HARISH44/TTRL/blob/ef6d28c8baa4a8e9c15f64a76f854e80a95fadbc/RESOURCES/DOTD/Lime_Green_and_Black_Dynamic_Match_Instagram_Post_4.png?raw=true", desc: "Dominant performance to end the season." }
         ];
         
-        // REORDERED AWARDS: Champions First
         const SEASON_AWARDS = [
             { title: "Driver Champion", winner: "Wi7ard", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/winner.png" },
             { title: "Driver of the Season", winner: "Simman", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/season%20driver.png" },
@@ -928,7 +998,6 @@
         }
 
         async function fetchTrackIntel(trackId) {
-            // trackId passed from button is now the stable ID (e.g. 'bahrain')
             intelModal.classList.add('active');
             requestAnimationFrame(async () => {
                 const meta = TRACK_METADATA[trackId] || { gp: trackId.toUpperCase(), mapUrl: 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND', insight: "No data." };
@@ -950,58 +1019,75 @@
         }
         window.fetchTrackIntel = fetchTrackIntel; // EXPOSE FOR HTML
 
-        // --- ROUTER LOGIC ---
-        // Slide to Hash map
-        const routeMap = {
-            '#home': 0,
-            '#calendar': 1,
-            '#standings': 2,
-            '#register': 3,
-            '#paddock': 4,
-            '#archives': 5
+        // --- ROUTER LOGIC (IMPROVED) ---
+        const slides = document.querySelectorAll('.slide');
+        let currentIndex = 0;
+        let isAnimating = false;
+
+        // Directly Navigate Function
+        window.navigateTo = (index) => {
+             // Stop if already there or animating
+             if(isAnimating || index === currentIndex) return;
+             
+             // Update URL hash without triggering duplicate events
+             const hashes = ['#home', '#calendar', '#standings', '#register', '#paddock', '#archives'];
+             history.pushState(null, null, hashes[index]);
+             
+             gotoSlide(index);
         };
 
         function handleHashChange() {
+            const hashes = ['#home', '#calendar', '#standings', '#register', '#paddock', '#archives'];
             const hash = window.location.hash || '#home';
-            const index = routeMap[hash];
-            if (index !== undefined) {
-                gotoSlide(index);
-            }
+            let index = hashes.indexOf(hash);
+            if(index === -1) index = 0; // Default to home
+            
+            gotoSlide(index);
         }
 
         // --- FIREBASE LOGIC ---
         async function loadSeasonData(seasonId) {
             currentSeason = seasonId || "season_1";
+            console.log("Loading data for:", currentSeason);
             
-            // 1. Fetch Track Config First
-            const seasonDoc = await getDoc(doc(db, "seasons", currentSeason));
-            if (seasonDoc.exists() && seasonDoc.data().trackConfig) {
-                activeTracks = seasonDoc.data().trackConfig;
-                activeTracks.sort((a, b) => new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31'));
-            } else {
-                activeTracks = [];
-            }
-
-            // 2. Fetch Drivers & Render
-            if(unsubscribe) unsubscribe();
-            const q = query(collection(db, "seasons", currentSeason, "drivers"), orderBy("totalPoints", "desc"));
-            
-            unsubscribe = onSnapshot(q, (snapshot) => {
-                allDrivers = [];
-                snapshot.forEach(doc => allDrivers.push(doc.data()));
-                
-                // Update views
-                if(!seasonId) { // Main View (Season 1)
-                    renderCalendar();
-                    renderDrivers();
-                    renderConstructors();
-                    updateCountdown();
+            try {
+                // 1. Fetch Track Config First (with error handling)
+                const seasonDoc = await getDoc(doc(db, "seasons", currentSeason));
+                if (seasonDoc.exists() && seasonDoc.data().trackConfig) {
+                    activeTracks = seasonDoc.data().trackConfig;
+                    activeTracks.sort((a, b) => new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31'));
+                } else {
+                    activeTracks = [];
                 }
+
+                // 2. Fetch Drivers & Render
+                if(unsubscribe) unsubscribe();
+                const q = query(collection(db, "seasons", currentSeason, "drivers"), orderBy("totalPoints", "desc"));
                 
-                // Always update archives
-                renderArchiveDrivers();
-                renderArchiveTeams();
-            });
+                unsubscribe = onSnapshot(q, (snapshot) => {
+                    allDrivers = [];
+                    snapshot.forEach(doc => allDrivers.push(doc.data()));
+                    
+                    // Update views
+                    if(!seasonId) { // Main View (Season 1)
+                        renderCalendar();
+                        renderDrivers();
+                        renderConstructors();
+                        updateCountdown();
+                    }
+                    
+                    // Always update archives
+                    renderArchiveDrivers();
+                    renderArchiveTeams();
+                }, (error) => {
+                    console.error("Error fetching drivers:", error);
+                });
+
+            } catch (err) {
+                console.error("Error loading season:", err);
+                activeTracks = [];
+                renderArchiveDrivers(); // Clear table
+            }
         }
 
         window.setSeason = (sid) => {
@@ -1016,6 +1102,7 @@
         // 1. DRIVER STANDINGS (Main)
         function renderDrivers() {
             const tbody = document.getElementById("drivers-body");
+            if(!tbody) return;
             tbody.innerHTML = "";
             
             const sortedDrivers = [...allDrivers].sort((a, b) => {
@@ -1071,12 +1158,34 @@
                 .map(id => ({ id, name: TEAMS.find(t=>t.id===id).name, points: teamPoints[id] }))
                 .sort((a,b) => b.points - a.points);
 
-            document.getElementById('garage-grid').innerHTML = sortedTeams.map((c, i) => {
+            const grid = document.getElementById('garage-grid');
+            if(!grid) return;
+
+            grid.innerHTML = sortedTeams.map((c, i) => {
                 const color = TEAM_COLORS[c.id];
-                return `<div class="constructor-card hover-target" style="--team-color: ${color}">
-                    <div class="cc-bg-rank">${String(i+1).padStart(2,'0')}</div>
-                    <div class="cc-header"><span class="cc-name">${c.name}</span><span class="cc-points">${c.points} PTS</span></div>
-                    <div class="cc-img-container"><img src="${CAR_IMAGES[c.id] || 'https://placehold.co/300x100?text=Car'}" class="cc-car-img"></div>
+                // REDESIGNED CARD HTML STRUCTURE
+                return `
+                <div class="constructor-card hover-target" style="--team-color: ${color}">
+                    <!-- SVG Pattern -->
+                    <svg class="cc-pattern" viewBox="0 0 375 283" fill="none">
+                        <rect x="159.52" y="175" width="152" height="152" rx="8" transform="rotate(-45 159.52 175)" fill="${color}"/>
+                        <rect y="107.48" width="152" height="152" rx="8" transform="rotate(-45 0 107.48)" fill="${color}"/>
+                    </svg>
+                    
+                    <!-- Image Area -->
+                    <div class="cc-img-container">
+                        <div class="cc-shadow-blob"></div>
+                        <img src="${CAR_IMAGES[c.id] || 'https://placehold.co/300x100?text=Car'}" class="cc-car-img" alt="${c.name}">
+                    </div>
+
+                    <!-- Content Area -->
+                    <div class="cc-content">
+                        <span class="cc-rank-label">POS ${String(i+1).padStart(2,'0')}</span>
+                        <div class="cc-info-row">
+                            <span class="cc-name">${c.name}</span>
+                            <span class="cc-points-pill">${c.points} PTS</span>
+                        </div>
+                    </div>
                 </div>`;
             }).join('');
             
@@ -1096,18 +1205,17 @@
         // 3. ARCHIVE DRIVERS (Matrix)
         function renderArchiveDrivers() {
             const container = document.getElementById("archives-drivers-container");
+            if(!container) return;
             
-            if(activeTracks.length === 0) {
+            if(!activeTracks || activeTracks.length === 0) {
                 container.innerHTML = `<div class="archive-loading">NO TRACK DATA FOR THIS SEASON</div>`;
                 return;
             }
 
             let html = `<table class="standings-table">`;
             html += `<thead><tr><th class="sticky-corner">DRIVER</th>`;
-            // Dynamic Columns based on Fetched Tracks
             activeTracks.forEach(t => {
-                // Shorten name: "Bahrain Grand Prix" -> "BAH" (rough heuristic or first 3 chars of ID)
-                const label = t.id.substring(0, 3).toUpperCase(); 
+                const label = t.id ? t.id.substring(0, 3).toUpperCase() : "UNK"; 
                 html += `<th class="sticky-top" style="text-align:center">${label}</th>`;
             });
             html += `<th class="sticky-top" style="text-align:center">TOTAL</th></tr></thead><tbody>`;
@@ -1121,12 +1229,11 @@
                 html += `<tr style="--team-color: ${tColor}">`;
                 html += `<td class="sticky-left" style="font-weight:700; background:var(--glass-bg); border-left:3px solid ${tColor}">${d.name}</td>`;
                 
-                let rowTotal = 0;
                 activeTracks.forEach(t => {
                     let pts = '-';
                     if (results[t.id]) {
                         const val = typeof results[t.id] === 'object' ? results[t.id].points : results[t.id];
-                        if (val > 0) { pts = val; } // Don't add to total here as we use stored total, but good for verify
+                        if (val > 0) { pts = val; }
                     }
                     html += `<td style="text-align:center; opacity:${pts === '-' ? 0.3 : 1}">${pts}</td>`;
                 });
@@ -1140,8 +1247,9 @@
         // 4. ARCHIVE TEAMS (Matrix)
         function renderArchiveTeams() {
             const container = document.getElementById("archives-teams-container");
+            if(!container) return;
             
-            if(activeTracks.length === 0) {
+            if(!activeTracks || activeTracks.length === 0) {
                 container.innerHTML = `<div class="archive-loading">NO TRACK DATA</div>`;
                 return;
             }
@@ -1177,7 +1285,7 @@
             let html = `<table class="standings-table">`;
             html += `<thead><tr><th class="sticky-corner">TEAM</th>`;
             activeTracks.forEach(t => {
-                const label = t.id.substring(0, 3).toUpperCase();
+                const label = t.id ? t.id.substring(0, 3).toUpperCase() : "UNK";
                 html += `<th class="sticky-top" style="text-align:center">${label}</th>`
             });
             html += `<th class="sticky-top" style="text-align:center">TOTAL</th></tr></thead><tbody>`;
@@ -1201,19 +1309,18 @@
 
         // --- CALENDAR & DOTD RENDERERS ---
         function renderCalendar() {
-            // Dynamic calendar from fetched activeTracks
             const grid = document.getElementById('calendar-grid');
-            if(activeTracks.length === 0) {
+            if(!grid) return;
+
+            if(!activeTracks || activeTracks.length === 0) {
                 grid.innerHTML = `<div style="text-align:center; width:100%; color:#666;">SEASON CALENDAR NOT CONFIGURED</div>`;
                 return;
             }
 
             grid.innerHTML = activeTracks.map((r, i) => {
-                // Merge static metadata with dynamic date
                 const meta = TRACK_METADATA[r.id] || { gp: r.name, insight: "Global Tour" };
                 const displayGP = meta.gp.replace(' Grand Prix', '').replace(' GP', '').toUpperCase();
                 
-                // Format Date if exists
                 let dateDisplay = "TBD";
                 if(r.date) {
                     const d = new Date(r.date);
@@ -1230,129 +1337,98 @@
         }
 
         function renderDOTD() {
-            document.getElementById('dotd-container').innerHTML = DOTD_DATA.map(d => {
-                const tColor = TEAM_COLORS[d.team.toUpperCase().replace(' ', '-').toLowerCase()] || '#fff';
-                return `<div class="dotd-panel" style="background-image: url('${d.image}'); --team-color: ${tColor}">
-                    <div class="dotd-label">${d.driver.split(' ')[0]}</div>
-                    <div class="dotd-badge-icon"><i class="fa-solid fa-award"></i></div>
-                    <div class="dotd-content">
-                        <div class="dotd-gp-name">${d.gp}</div>
-                        <div class="dotd-driver-name">${d.driver}</div>
-                        <div class="dotd-team-name" style="color:${tColor}">${d.team}</div>
-                        <div class="mono-font" style="font-size:0.8rem; color:#ccc; margin-top:0.5rem;">${d.desc}</div>
-                    </div>
-                </div>`;
-            }).join('');
+            const c = document.getElementById('dotd-container');
+            if(c) {
+                c.innerHTML = DOTD_DATA.map(d => {
+                    const tColor = TEAM_COLORS[d.team.toUpperCase().replace(' ', '-').toLowerCase()] || '#fff';
+                    return `<div class="dotd-panel" style="background-image: url('${d.image}'); --team-color: ${tColor}">
+                        <div class="dotd-label">${d.driver.split(' ')[0]}</div>
+                        <div class="dotd-badge-icon"><i class="fa-solid fa-award"></i></div>
+                        <div class="dotd-content">
+                            <div class="dotd-gp-name">${d.gp}</div>
+                            <div class="dotd-driver-name">${d.driver}</div>
+                            <div class="dotd-team-name" style="color:${tColor}">${d.team}</div>
+                            <div class="mono-font" style="font-size:0.8rem; color:#ccc; margin-top:0.5rem;">${d.desc}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
         }
 
-        // --- NEW: SEASON 1 AWARDS RENDERER ---
         function renderSeasonAwards() {
             const gridConfig = [
                 "span-2-both", "span-2-col", "span-2-row", "", "", "span-2-col", "", "", "span-2-col", "span-full"
             ];
-
-            document.getElementById('season-awards-grid').innerHTML = SEASON_AWARDS.map((a, index) => {
-                let cardClass = gridConfig[index] || "";
-                return `
-                    <div class="award-card hover-target ${cardClass}" onclick="openImageModal('${a.img}', '${a.title}', '${a.winner}')">
-                        <img src="${a.img}" class="award-img" alt="${a.title}">
-                        <div class="award-info">
-                            <div class="award-title">${a.title}</div>
-                            <div class="award-winner">${a.winner}</div>
+            const g = document.getElementById('season-awards-grid');
+            if(g) {
+                g.innerHTML = SEASON_AWARDS.map((a, index) => {
+                    let cardClass = gridConfig[index] || "";
+                    return `
+                        <div class="award-card hover-target ${cardClass}" onclick="openImageModal('${a.img}', '${a.title}', '${a.winner}')">
+                            <img src="${a.img}" class="award-img" alt="${a.title}">
+                            <div class="award-info">
+                                <div class="award-title">${a.title}</div>
+                                <div class="award-winner">${a.winner}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            }
         }
 
-        // --- ANIMATIONS ---
-        const slides = document.querySelectorAll('.slide');
-        let currentIndex = 0;
-        let isAnimating = false;
-
+        // --- ANIMATIONS & INIT ---
         function gotoSlide(index) {
             if (isAnimating || index === currentIndex) return;
             isAnimating = true;
-            let nextIndex = index;
-            const currentSlide = slides[currentIndex];
-            const nextSlide = slides[nextIndex];
             
+            const currentSlide = slides[currentIndex];
+            const nextSlide = slides[index];
+            
+            // Update Nav
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             const newLink = document.querySelectorAll('.nav-link')[index];
             if(newLink) newLink.classList.add('active');
 
-            gsap.set(nextSlide, { zIndex: 20, visibility: 'visible', opacity: 0 });
+            // Setup Next Slide (start invisible but in position)
+            // autoAlpha handles both opacity and visibility
+            gsap.set(nextSlide, { zIndex: 20, autoAlpha: 0, scale: 1.1 }); 
+            nextSlide.classList.add('active');
+
             const tl = gsap.timeline({
-                defaults: { ease: "power2.inOut", duration: 1.2 },
                 onComplete: () => {
-                    gsap.set(currentSlide, { visibility: 'hidden', zIndex: 1, opacity: 0 });
-                    currentIndex = nextIndex;
+                    // Cleanup Old Slide
+                    gsap.set(currentSlide, { zIndex: 1, autoAlpha: 0 });
+                    currentSlide.classList.remove('active');
+                    
+                    // Cleanup New Slide (let CSS take over completely)
+                    gsap.set(nextSlide, { clearProps: "all" }); 
+                    
+                    currentIndex = index;
                     isAnimating = false;
                 }
             });
-            tl.to(currentSlide, { scale: 0.9, opacity: 0, filter: 'brightness(0.5)' }, 0);
-            tl.fromTo(nextSlide, { scale: 1.1, opacity: 0, filter: 'brightness(1.5)' }, { scale: 1, opacity: 1, filter: 'brightness(1)' }, "-=0.8");
             
-            // Stagger animation for new home elements
-            const elements = nextSlide.querySelectorAll('.slide-tag, .slide-title, .hero-main-title, .btn-container, .cal-item, .standings-wrapper, .contact-grid, .glass-stat-card, .home-title-group, .home-countdown, .home-card, .next-race-display');
-            gsap.fromTo(elements, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, delay: 0.5 });
+            // Animate
+            tl.to(currentSlide, { duration: 1, scale: 0.9, autoAlpha: 0, ease: "power3.inOut" }, 0)
+              .to(nextSlide, { duration: 1, scale: 1, autoAlpha: 1, ease: "power3.inOut" }, "-=0.8");
+            
+            // Stagger Elements
+            const selector = '.slide-tag, .slide-title, .hero-main-title, .btn-container, .cal-item, .standings-wrapper, .contact-grid, .glass-stat-card, .home-title-group, .home-countdown, .home-card, .next-race-display';
+            const elements = nextSlide.querySelectorAll(selector);
+            
+            if(elements.length) {
+                tl.fromTo(elements, { y: 50, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.05, duration: 0.8, ease: "power2.out" }, "-=0.5");
+            }
         }
 
-        // Handle Hash Change
-        window.addEventListener('hashchange', handleHashChange);
-
-        // Update Nav Links to just use href
-        // document.querySelectorAll('.nav-link').forEach((link, idx) => {
-        //     link.addEventListener('click', (e) => { e.preventDefault(); gotoSlide(idx); });
-        // });
-        
-        document.getElementById('app-logo').addEventListener('click', () => { window.location.hash = '#home'; });
-
-        // GLOBAL TAB LISTENER
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const targetTab = e.target.dataset.tab;
-                
-                // Find parent container to scope active class removal (handle multiple tab groups)
-                const parentGroup = e.target.closest('.standings-tabs') || e.target.parentNode;
-                if(parentGroup.classList.contains('standings-tabs')) {
-                     parentGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                     e.target.classList.add('active');
-                     
-                     // Find relevant view container
-                     const wrapper = e.target.closest('.slide-content').querySelector('.standings-wrapper');
-                     if(wrapper) {
-                         wrapper.querySelectorAll('.standings-view').forEach(v => v.classList.remove('active-view'));
-                         const targetView = document.getElementById('view-'+targetTab);
-                         if(targetView) {
-                             targetView.classList.add('active-view');
-                             
-                             // Trigger specific render functions if needed on tab switch
-                             if(targetTab === 'constructors') {
-                                 gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
-                             } else if (targetTab === 'dotd' || targetTab === 'archive-dotd') {
-                                 gsap.fromTo('.dotd-panel', { width: "10%", opacity: 0 }, { width: "auto", opacity: 1, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "width" });
-                             } else if (targetTab === 'archive-season-awards') {
-                                 gsap.fromTo('.award-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
-                             } else if (targetTab === 'archive-teams') {
-                                 renderArchiveTeams(); // Ensure updated
-                             }
-                         }
-                     }
-                }
-            });
-        });
-
-        // Synced Countdown Logic with Next Race Text
         function updateCountdown() {
             const now = new Date();
             let nextRace = null;
             let nextRaceInfo = null;
 
-            // Find the next race from activeTracks
             for (const race of activeTracks) {
                 if(!race.date) continue;
-                const raceDate = new Date(race.date + "T13:00:00"); // Assume 1PM race start if not specified
+                const raceDate = new Date(race.date + "T13:00:00");
                 if (raceDate > now) {
                     nextRace = raceDate;
                     nextRaceInfo = race;
@@ -1362,19 +1438,14 @@
 
             const infoEl = document.getElementById('next-race-info');
 
-            // If no race found (Season Ended)
             if (!nextRace) {
                 if(infoEl) infoEl.innerText = "SEASON COMPLETED // WAITING FOR SEASON 2";
                 return;
             }
 
-            // Update info text if race exists
             if(infoEl && nextRaceInfo) {
-                // Use metadata for pretty name
                 const meta = TRACK_METADATA[nextRaceInfo.id] || { gp: nextRaceInfo.name };
                 const displayName = meta.gp.toUpperCase();
-                
-                // Format date nicely
                 const day = nextRace.getDate();
                 const month = nextRace.toLocaleString('default', { month: 'short' }).toUpperCase();
                 infoEl.innerText = `NEXT RACE: ${displayName} // ${day} ${month}`;
@@ -1383,9 +1454,8 @@
             function tick() {
                 const current = new Date();
                 const diff = nextRace - current;
-                
                 if (diff <= 0) return;
-
+                
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
                 const m = Math.floor((diff / 1000 / 60) % 60);
@@ -1405,31 +1475,93 @@
             tick();
         }
 
+        // Check for WebGL support
+        function isWebGLAvailable() {
+            try {
+                const canvas = document.createElement('canvas');
+                return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // --- GLOBAL EVENT LISTENERS ---
         window.onload = () => {
+            // Force loader hide after max 3s safety timeout
+            setTimeout(() => {
+                 if(document.getElementById('loader').style.transform !== 'translateY(-100%)') {
+                     gsap.to('#loader', { y: '-100%', duration: 0.8 });
+                 }
+            }, 3000);
+
+            // Normal Loader Logic
             gsap.to('#load-bar', { width: '100%', duration: 1, onComplete: () => {
                 gsap.to('#loader', { y: '-100%', duration: 0.8 });
-                // Initialize Data (Default Season 1)
                 loadSeasonData(null); 
                 renderDOTD();
-                renderSeasonAwards(); // Initial render of Season Awards
+                renderSeasonAwards();
                 
-                // Handle initial hash
+                // Force Initial Home State
+                // Explicitly set the home slide (index 0) to be visible initially
+                // so the first navigation from Home doesn't start from a black screen.
+                const homeSlide = slides[0];
+                gsap.set(homeSlide, { zIndex: 10, autoAlpha: 1 });
+                homeSlide.classList.add('active');
+                
                 handleHashChange();
             }});
             
+            // Cursor Logic
             const cursor = document.getElementById('cursor');
             const follower = document.getElementById('cursor-follower');
             document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+                if(cursor) { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; }
                 if(follower) gsap.to(follower, { x: e.clientX - 20, y: e.clientY - 20, duration: 0.1 });
             });
-            
-            VANTA.NET({
-                el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false,
-                minHeight: 200.00, minWidth: 200.00, scale: 1.00, scaleMobile: 1.00,
-                color: 0x00f0ff, backgroundColor: 0x050505, points: 12.00, maxDistance: 22.00, spacing: 18.00
-            });
+
+            // Vanta Background Check with Safe WebGL Init
+            if(window.VANTA && isWebGLAvailable()) {
+                try {
+                    VANTA.NET({
+                        el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false,
+                        minHeight: 200.00, minWidth: 200.00, scale: 1.00, scaleMobile: 1.00,
+                        color: 0x00f0ff, backgroundColor: 0x050505, points: 12.00, maxDistance: 22.00, spacing: 18.00
+                    });
+                } catch(e) { console.warn("Vanta failed to init:", e); }
+            } else {
+                 console.warn("WebGL not supported or Vanta missing: Background animation disabled.");
+            }
         };
+
+        // Handle Back/Forward Browser Buttons
+        window.addEventListener('popstate', handleHashChange);
+        
+        // Tab Listeners
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetTab = e.target.dataset.tab;
+                if(!targetTab) return; // ignore season buttons
+                
+                const parentGroup = e.target.closest('.standings-tabs') || e.target.parentNode;
+                if(parentGroup) {
+                     parentGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                     e.target.classList.add('active');
+                     
+                     const wrapper = e.target.closest('.slide-content')?.querySelector('.standings-wrapper');
+                     if(wrapper) {
+                         wrapper.querySelectorAll('.standings-view').forEach(v => v.classList.remove('active-view'));
+                         const targetView = document.getElementById('view-'+targetTab);
+                         if(targetView) {
+                             targetView.classList.add('active-view');
+                             // Trigger animations if needed
+                             if(targetTab === 'constructors') {
+                                 gsap.fromTo('.constructor-card', {y: 50, opacity: 0}, {y: 0, opacity: 1, stagger: 0.1, duration: 0.5, clearProps: "all"});
+                             }
+                         }
+                     }
+                }
+            });
+        });
     </script>
 </body>
 </html>
