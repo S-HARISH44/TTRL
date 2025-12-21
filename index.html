@@ -271,11 +271,16 @@
         .team-cell { display: flex; align-items: center; gap: 0.8rem; }
         .team-logo-mini { height: 20px; width: auto; max-width: 30px; object-fit: contain; }
 
-        /* --- GARAGE GRID (Redesigned) --- */
+        /* --- GARAGE GRID (Redesigned & Fixed Alignment) --- */
         .garage-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem; height: 100%; overflow-y: auto; padding: 1rem 2rem 4rem 2rem;
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Slightly wider for better fit */
+            gap: 2rem; 
+            height: 100%; 
+            overflow-y: auto; 
+            padding: 1rem 2rem 4rem 2rem;
             scrollbar-width: none;
+            align-items: stretch; /* Forces all cards in a row to be equal height */
         }
         .garage-grid::-webkit-scrollbar { display: none; }
         
@@ -289,13 +294,20 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            min-height: 320px;
+            height: 100%; /* CRITICAL: Ensures card fills the grid cell */
+            min-height: 340px; /* Consistent minimum height */
+            transform-style: preserve-3d; /* Prepare for 3D tilt */
+            will-change: transform; /* Optimize rendering */
         }
+        
+        /* Removed CSS hover transition for transform to prevent GSAP conflict */
+        .constructor-card {
+            transition: box-shadow 0.3s ease, border-color 0.3s ease; 
+        }
+
         .constructor-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
-            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.7), 0 10px 20px -5px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255,255,255,0.3);
             z-index: 10;
         }
         
@@ -306,69 +318,76 @@
             width: 100%; height: auto;
         }
         
-        /* Image Area */
+        /* Image Area - FIXED HEIGHT FOR ALIGNMENT */
         .cc-img-container {
             position: relative;
-            padding: 2.5rem;
+            height: 180px; /* Fixed height ensures all cars sit in same vertical space */
+            padding: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-grow: 1;
+            width: 100%;
+            margin-top: 2rem;
         }
         
         .cc-shadow-blob {
             display: block; position: absolute;
-            width: 12rem; height: 12rem;
-            bottom: 0; left: 50%; transform: translateX(-50%) translateY(2rem) rotate3d(0, 0, 1, 20deg) scale3d(1, 0.6, 1);
+            width: 10rem; height: 10rem;
+            bottom: 10px; left: 50%; transform: translateX(-50%) rotate3d(1, 0, 0, 60deg);
             background: radial-gradient(circle, rgba(0,0,0,0.8) 0%, transparent 70%);
-            opacity: 0.4; pointer-events: none;
+            opacity: 0.6; pointer-events: none;
+            filter: blur(10px);
         }
         
         .cc-car-img {
             position: relative;
-            width: 100%;
-            max-width: 240px;
-            object-fit: contain;
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+            width: 90%;
+            height: 100%;
+            object-fit: contain; /* Ensures car fits without stretching */
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
             z-index: 2;
         }
 
         /* Content Area */
         .cc-content {
             position: relative;
-            padding: 1.5rem;
-            margin-top: auto;
+            padding: 1.5rem 2rem;
+            margin-top: auto; /* Pushes content to bottom of card */
             color: #fff;
-            background: linear-gradient(to top, rgba(0,0,0,0.2), transparent);
-            z-index: 5; /* Ensure content is above patterns */
+            background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
         
         .cc-rank-label {
-            display: block; opacity: 0.9; margin-bottom: 0.25rem;
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em;
+            display: block; opacity: 0.6; 
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em;
         }
         
         .cc-info-row {
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: flex-end;
         }
         
         .cc-name {
-            display: block; font-weight: 700; font-size: 1.5rem;
+            display: block; font-weight: 800; font-size: 1.6rem;
             font-family: 'Rajdhani', sans-serif; text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            line-height: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         
         .cc-points-pill {
-            display: flex; align-items: center;
+            display: flex; align-items: center; justify-content: center;
             background-color: #ffffff;
-            color: #000000; /* FIXED: Black text for contrast */
-            border-radius: 9999px;
-            font-size: 0.85rem; font-weight: 800;
-            padding: 0.5rem 1rem;
+            color: #000000;
+            border-radius: 4px;
+            font-size: 0.9rem; font-weight: 800;
+            padding: 0.4rem 0.8rem;
             line-height: 1;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* Stronger shadow */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             font-family: 'JetBrains Mono', monospace;
-            border: 2px solid rgba(255,255,255,0.5); /* Slight border for pop */
+            min-width: 80px;
         }
 
         /* --- DOTD (Accordion) --- */
@@ -625,7 +644,7 @@
                 <a onclick="navigateTo(4)" class="nav-link hover-target">PADDOCK</a>
                 <a onclick="navigateTo(5)" class="nav-link hover-target">ARCHIVES</a>
             </div>
-            <div class="mono-font text-sm uppercase tracking-widest"><span style="color: var(--accent-cyan)">Season 1</span> <span style="color: #666">// Completed</span></div>
+            <div class="mono-font text-sm uppercase tracking-widest"><span style="color: var(--accent-cyan)" id="nav-season-label">Season 1</span> <span style="color: #666">// Live</span></div>
         </div>
     </div>
 
@@ -790,6 +809,7 @@
                 <div class="standings-tabs" style="justify-content: center;">
                     <button class="tab-btn active hover-target" data-tab="archive-drivers">DRIVERS</button>
                     <button class="tab-btn hover-target" data-tab="archive-teams">TEAMS</button>
+                    <button class="tab-btn hover-target" data-tab="archive-calendar">CALENDAR</button>
                     <button class="tab-btn hover-target" data-tab="archive-dotd">DOTD</button>
                     <button class="tab-btn hover-target" data-tab="archive-season-awards">SEASON AWARDS</button>
                 </div>
@@ -806,6 +826,13 @@
                     <div class="standings-view" id="view-archive-teams">
                         <div class="table-scroll" id="archives-teams-container">
                              <div class="archive-loading">LOADING TEAM MATRIX...</div>
+                        </div>
+                    </div>
+
+                    <!-- CALENDAR ARCHIVE -->
+                    <div class="standings-view" id="view-archive-calendar">
+                        <div id="archive-calendar-grid" class="cal-grid">
+                             <div class="archive-loading">LOADING CALENDAR...</div>
                         </div>
                     </div>
 
@@ -834,6 +861,7 @@
         // UPDATE TO FIREBASE 11.6.1 (Matching Admin Panel)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // FIREBASE CONFIG
         const firebaseConfig = {
@@ -847,6 +875,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app); // Initialize Auth
 
         // CONSTANTS
         const TEAMS = [
@@ -858,32 +887,30 @@
         
         // Static Metadata for Tracks
         const TRACK_METADATA = {
-            'bahrain': { gp: "Bahrain Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Bahrain-circuit-768x432.png", insight: "Stop and go track." },
-            'australia': { gp: "Australian Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Albert-Park-Circuit-768x432.png", insight: "Fast flowing street circuit." },
-            'imola': { gp: "Emilia Romagna GP", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Autodromo-Enzo-e-Dino-Ferrari-768x432.png", insight: "Narrow and technical." },
-            'spain': { gp: "Spanish Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Circuit-de-Barcelona-768x432.png", insight: "Test of aerodynamics." },
-            'uk': { gp: "British Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Silverstone-Circuit--768x432.png", insight: "High speed corners." },
-            'vegas': { gp: "Las Vegas Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2024/02/Las-Vegas-GP-768x432.png", insight: "High speed street fight." },
-            'belgium': { gp: "Belgian Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Circuit-de-Spa-Francorchamps-768x432.png", insight: "Longest track on calendar." },
-            'austria': { gp: "Austrian Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Red-Bull-Ring-768x432.png", insight: "Short power lap." },
-            'brazil': { gp: "São Paulo Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Auto%CC%81dromo-Jose%CC%81-Carlos-Pace--768x432.png", insight: "Classic anti-clockwise track." },
-            'abu_dhabi': { gp: "Abu Dhabi Grand Prix", mapUrl: "https://www.sportmonks.com/wp-content/uploads/2022/07/Yas-Marina-Circuit--768x432.png", insight: "Season finale." },
-            'saudi_arabia': { gp: "Saudi Arabian GP", mapUrl: "https://placehold.co/768x432?text=Jeddah", insight: "Fastest street circuit." },
-            'japan': { gp: "Japanese GP", mapUrl: "https://placehold.co/768x432?text=Suzuka", insight: "Figure 8 layout." },
-            'china': { gp: "Chinese GP", mapUrl: "https://placehold.co/768x432?text=Shanghai", insight: "Technical sectors." },
-            'miami': { gp: "Miami GP", mapUrl: "https://placehold.co/768x432?text=Miami", insight: "Technical street circuit." },
-            'emilia_romagna': { gp: "Emilia Romagna GP", mapUrl: "https://placehold.co/768x432?text=Imola", insight: "History and speed." },
-            'monaco': { gp: "Monaco GP", mapUrl: "https://placehold.co/768x432?text=Monaco", insight: "The jewel in the crown." },
-            'canada': { gp: "Canadian GP", mapUrl: "https://placehold.co/768x432?text=Montreal", insight: "Wall of champions." },
-            'hungary': { gp: "Hungarian GP", mapUrl: "https://placehold.co/768x432?text=Hungaroring", insight: "Monaco without walls." },
-            'netherlands': { gp: "Dutch GP", mapUrl: "https://placehold.co/768x432?text=Zandvoort", insight: "Banked corners." },
-            'italy': { gp: "Italian GP", mapUrl: "https://placehold.co/768x432?text=Monza", insight: "Temple of Speed." },
-            'azerbaijan': { gp: "Azerbaijan GP", mapUrl: "https://placehold.co/768x432?text=Baku", insight: "Castle section." },
-            'singapore': { gp: "Singapore GP", mapUrl: "https://placehold.co/768x432?text=Marina+Bay", insight: "Night race endurance." },
-            'usa': { gp: "United States GP", mapUrl: "https://placehold.co/768x432?text=COTA", insight: "Elevation changes." },
-            'mexico': { gp: "Mexico City GP", mapUrl: "https://placehold.co/768x432?text=Mexico", insight: "High altitude." },
-            'las_vegas': { gp: "Las Vegas GP", mapUrl: "https://placehold.co/768x432?text=Vegas", insight: "The strip." },
-            'qatar': { gp: "Qatar GP", mapUrl: "https://placehold.co/768x432?text=Lusail", insight: "Fast flowing." }
+            'bahrain': { gp: "Bahrain Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677245035/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Bahrain_Circuit.png", insight: "Stop and go track." },
+            'saudi_arabia': { gp: "Saudi Arabian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Saudi_Arabia_Circuit.png", insight: "Fastest street circuit." },
+            'australia': { gp: "Australian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Australia_Circuit.png", insight: "Fast flowing street circuit." },
+            'japan': { gp: "Japanese Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244987/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Japan_Circuit.png", insight: "Figure 8 layout." },
+            'china': { gp: "Chinese Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244984/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/China_Circuit.png", insight: "Technical sectors." },
+            'miami': { gp: "Miami Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Miami_Circuit.png", insight: "Technical street circuit." },
+            'emilia_romagna': { gp: "Emilia Romagna Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244984/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Emilia_Romagna_Circuit.png", insight: "Narrow and technical." },
+            'monaco': { gp: "Monaco Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244984/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Monaco_Circuit.png", insight: "The jewel in the crown." },
+            'canada': { gp: "Canadian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244984/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Canada_Circuit.png", insight: "Wall of champions." },
+            'spain': { gp: "Spanish Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244986/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Spain_Circuit.png", insight: "Test of aerodynamics." },
+            'austria': { gp: "Austrian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244983/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Austria_Circuit.png", insight: "Short power lap." },
+            'uk': { gp: "British Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244984/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Great_Britain_Circuit.png", insight: "High speed corners." },
+            'hungary': { gp: "Hungarian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244986/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Hungary_Circuit.png", insight: "Monaco without walls." },
+            'belgium': { gp: "Belgian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244983/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Belgium_Circuit.png", insight: "Longest track on calendar." },
+            'netherlands': { gp: "Dutch Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244984/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Netherlands_Circuit.png", insight: "Banked corners." },
+            'italy': { gp: "Italian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244986/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Italy_Circuit.png", insight: "Temple of Speed." },
+            'azerbaijan': { gp: "Azerbaijan Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244983/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Azerbaijan_Circuit.png", insight: "Castle section." },
+            'singapore': { gp: "Singapore Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244986/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Singapore_Circuit.png", insight: "Night race endurance." },
+            'usa': { gp: "United States Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244987/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png", insight: "Elevation changes." },
+            'mexico': { gp: "Mexico City Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Mexico_Circuit.png", insight: "High altitude." },
+            'brazil': { gp: "São Paulo Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244983/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Brazil_Circuit.png", insight: "Classic anti-clockwise track." },
+            'las_vegas': { gp: "Las Vegas Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Las_Vegas_Circuit.png", insight: "High speed street fight." },
+            'qatar': { gp: "Qatar Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Qatar_Circuit.png", insight: "Fast flowing." },
+            'abu_dhabi': { gp: "Abu Dhabi Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244983/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit.png", insight: "Season finale." }
         };
 
         const TEAM_COLORS = {
@@ -943,10 +970,17 @@
             "Abu Dhabi Grand Prix": { aero: "25-20", differential: "70 (On) - 55 (Off)", suspGeometry: "LLRL", suspension: "3-5-2-1-20-40", brakes: "100% / 53%", tiresQ: "23.8 PSI / 21.3 PSI", tiresR: "21.8 PSI / 19.8 PSI", notes: "Technical S3." }
         };
 
-        let allDrivers = [];
-        let activeTracks = []; // Loaded from Firebase
-        let currentSeason = 'season_1';
-        let unsubscribe = null;
+        // Separate data for Active Season vs Archive View
+        let mainSeasonId = 'season_1'; 
+        let archiveSeasonId = 'season_1';
+
+        let mainDrivers = [];
+        let mainTracks = [];
+        let archiveDrivers = [];
+        let archiveTracks = [];
+
+        let unsubscribeMain = null;
+        let unsubscribeArchive = null;
 
         const intelModal = document.getElementById('intel-modal-overlay');
         const intelTitle = document.getElementById('intel-title');
@@ -1045,59 +1079,96 @@
             gotoSlide(index);
         }
 
-        // --- FIREBASE LOGIC ---
-        async function loadSeasonData(seasonId) {
-            currentSeason = seasonId || "season_1";
-            console.log("Loading data for:", currentSeason);
+        // --- CORE APP LOGIC ---
+        
+        async function initAppLogic() {
+            console.log("Initializing App Logic...");
             
+            // 1. Detect if Season 2 is active (has tracks)
             try {
-                // 1. Fetch Track Config First (with error handling)
-                const seasonDoc = await getDoc(doc(db, "seasons", currentSeason));
-                if (seasonDoc.exists() && seasonDoc.data().trackConfig) {
-                    activeTracks = seasonDoc.data().trackConfig;
-                    activeTracks.sort((a, b) => new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31'));
-                } else {
-                    activeTracks = [];
-                }
-
-                // 2. Fetch Drivers & Render
-                if(unsubscribe) unsubscribe();
-                const q = query(collection(db, "seasons", currentSeason, "drivers"), orderBy("totalPoints", "desc"));
+                const s2Ref = doc(db, "seasons", "season_2");
+                const s2Snap = await getDoc(s2Ref);
                 
-                unsubscribe = onSnapshot(q, (snapshot) => {
-                    allDrivers = [];
-                    snapshot.forEach(doc => allDrivers.push(doc.data()));
-                    
-                    // Update views
-                    if(!seasonId) { // Main View (Season 1)
-                        renderCalendar();
-                        renderDrivers();
-                        renderConstructors();
-                        updateCountdown();
-                    }
-                    
-                    // Always update archives
-                    renderArchiveDrivers();
-                    renderArchiveTeams();
-                }, (error) => {
-                    console.error("Error fetching drivers:", error);
-                });
-
-            } catch (err) {
-                console.error("Error loading season:", err);
-                activeTracks = [];
-                renderArchiveDrivers(); // Clear table
+                if (s2Snap.exists() && s2Snap.data().trackConfig && s2Snap.data().trackConfig.length > 0) {
+                    mainSeasonId = "season_2";
+                } else {
+                    mainSeasonId = "season_1";
+                }
+            } catch (e) {
+                console.warn("Error detecting season, defaulting to 1", e);
+                mainSeasonId = "season_1";
             }
+
+            console.log("Main Season Set To:", mainSeasonId);
+            const label = document.getElementById("nav-season-label");
+            if(label) label.innerText = mainSeasonId.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+            // 2. Load Data Independently
+            loadMainData(mainSeasonId);
+            loadArchiveData('season_1'); // Default archive view
         }
 
+        // A. Load Main Data (Home, Calendar, Standings)
+        async function loadMainData(seasonId) {
+            try {
+                // Get Tracks
+                const sDoc = await getDoc(doc(db, "seasons", seasonId));
+                mainTracks = (sDoc.exists() && sDoc.data().trackConfig) ? sDoc.data().trackConfig : [];
+                mainTracks.sort((a, b) => new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31'));
+
+                // Get Drivers (Live Listener)
+                if(unsubscribeMain) unsubscribeMain();
+                const q = query(collection(db, "seasons", seasonId, "drivers"), orderBy("totalPoints", "desc"));
+                
+                unsubscribeMain = onSnapshot(q, (snapshot) => {
+                    mainDrivers = [];
+                    snapshot.forEach(doc => mainDrivers.push(doc.data()));
+                    
+                    // Render Main Views
+                    renderCalendar();
+                    renderDrivers();
+                    renderConstructors();
+                    updateCountdown();
+                });
+            } catch(e) { console.error("Main Data Load Error:", e); }
+        }
+
+        // B. Load Archive Data (Archive Section Only)
         window.setSeason = (sid) => {
-            // Update button styles
             document.querySelectorAll('.season-btn-group .tab-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if(btn.innerText.toLowerCase().replace(' ', '_') === sid) btn.classList.add('active');
             });
-            loadSeasonData(sid);
+            loadArchiveData(sid);
         };
+
+        async function loadArchiveData(seasonId) {
+            archiveSeasonId = seasonId;
+            console.log("Loading Archive:", seasonId);
+            
+            try {
+                // Get Tracks
+                const sDoc = await getDoc(doc(db, "seasons", seasonId));
+                archiveTracks = (sDoc.exists() && sDoc.data().trackConfig) ? sDoc.data().trackConfig : [];
+                archiveTracks.sort((a, b) => new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31'));
+
+                // Get Drivers (Snapshot for archives too, allows seamless switching)
+                if(unsubscribeArchive) unsubscribeArchive();
+                const q = query(collection(db, "seasons", seasonId, "drivers"), orderBy("totalPoints", "desc"));
+                
+                unsubscribeArchive = onSnapshot(q, (snapshot) => {
+                    archiveDrivers = [];
+                    snapshot.forEach(doc => archiveDrivers.push(doc.data()));
+                    
+                    // Render Archive Views
+                    renderArchiveDrivers();
+                    renderArchiveTeams();
+                    renderArchiveCalendar();
+                });
+            } catch(e) { console.error("Archive Load Error:", e); }
+        }
+
+        // --- RENDERERS ---
 
         // 1. DRIVER STANDINGS (Main)
         function renderDrivers() {
@@ -1105,7 +1176,7 @@
             if(!tbody) return;
             tbody.innerHTML = "";
             
-            const sortedDrivers = [...allDrivers].sort((a, b) => {
+            const sortedDrivers = [...mainDrivers].sort((a, b) => {
                 if (a.team === 'reserve' && b.team !== 'reserve') return 1;
                 if (a.team !== 'reserve' && b.team === 'reserve') return -1;
                 return b.totalPoints - a.totalPoints;
@@ -1137,7 +1208,7 @@
             const teamPoints = {};
             TEAMS.forEach(t => { if(t.id !== 'reserve') teamPoints[t.id] = 0; });
 
-            allDrivers.forEach(d => {
+            mainDrivers.forEach(d => {
                 const results = d.results || {};
                 Object.values(results).forEach(r => {
                     let pts = 0;
@@ -1163,22 +1234,16 @@
 
             grid.innerHTML = sortedTeams.map((c, i) => {
                 const color = TEAM_COLORS[c.id];
-                // REDESIGNED CARD HTML STRUCTURE
                 return `
                 <div class="constructor-card hover-target" style="--team-color: ${color}">
-                    <!-- SVG Pattern -->
                     <svg class="cc-pattern" viewBox="0 0 375 283" fill="none">
                         <rect x="159.52" y="175" width="152" height="152" rx="8" transform="rotate(-45 159.52 175)" fill="${color}"/>
                         <rect y="107.48" width="152" height="152" rx="8" transform="rotate(-45 0 107.48)" fill="${color}"/>
                     </svg>
-                    
-                    <!-- Image Area -->
                     <div class="cc-img-container">
                         <div class="cc-shadow-blob"></div>
                         <img src="${CAR_IMAGES[c.id] || 'https://placehold.co/300x100?text=Car'}" class="cc-car-img" alt="${c.name}">
                     </div>
-
-                    <!-- Content Area -->
                     <div class="cc-content">
                         <span class="cc-rank-label">POS ${String(i+1).padStart(2,'0')}</span>
                         <div class="cc-info-row">
@@ -1207,20 +1272,20 @@
             const container = document.getElementById("archives-drivers-container");
             if(!container) return;
             
-            if(!activeTracks || activeTracks.length === 0) {
+            if(!archiveTracks || archiveTracks.length === 0) {
                 container.innerHTML = `<div class="archive-loading">NO TRACK DATA FOR THIS SEASON</div>`;
                 return;
             }
 
             let html = `<table class="standings-table">`;
             html += `<thead><tr><th class="sticky-corner">DRIVER</th>`;
-            activeTracks.forEach(t => {
+            archiveTracks.forEach(t => {
                 const label = t.id ? t.id.substring(0, 3).toUpperCase() : "UNK"; 
                 html += `<th class="sticky-top" style="text-align:center">${label}</th>`;
             });
             html += `<th class="sticky-top" style="text-align:center">TOTAL</th></tr></thead><tbody>`;
 
-            const sortedDrivers = [...allDrivers].sort((a, b) => b.totalPoints - a.totalPoints);
+            const sortedDrivers = [...archiveDrivers].sort((a, b) => b.totalPoints - a.totalPoints);
 
             sortedDrivers.forEach(d => {
                 const results = d.results || {};
@@ -1229,7 +1294,7 @@
                 html += `<tr style="--team-color: ${tColor}">`;
                 html += `<td class="sticky-left" style="font-weight:700; background:var(--glass-bg); border-left:3px solid ${tColor}">${d.name}</td>`;
                 
-                activeTracks.forEach(t => {
+                archiveTracks.forEach(t => {
                     let pts = '-';
                     if (results[t.id]) {
                         const val = typeof results[t.id] === 'object' ? results[t.id].points : results[t.id];
@@ -1249,7 +1314,7 @@
             const container = document.getElementById("archives-teams-container");
             if(!container) return;
             
-            if(!activeTracks || activeTracks.length === 0) {
+            if(!archiveTracks || archiveTracks.length === 0) {
                 container.innerHTML = `<div class="archive-loading">NO TRACK DATA</div>`;
                 return;
             }
@@ -1258,14 +1323,13 @@
             TEAMS.forEach(t => {
                 if (t.id === 'reserve') return;
                 teamTrackPoints[t.id] = { total: 0 };
-                activeTracks.forEach(tr => teamTrackPoints[t.id][tr.id] = 0);
+                archiveTracks.forEach(tr => teamTrackPoints[t.id][tr.id] = 0);
             });
 
-            allDrivers.forEach(d => {
+            archiveDrivers.forEach(d => {
                 const results = d.results || {};
                 Object.keys(results).forEach(trackKey => {
-                    // Only count if track exists in current config
-                    if(!activeTracks.some(at => at.id === trackKey)) return;
+                    if(!archiveTracks.some(at => at.id === trackKey)) return;
                     
                     const r = results[trackKey];
                     let pts = 0, teamId = d.team;
@@ -1284,7 +1348,7 @@
 
             let html = `<table class="standings-table">`;
             html += `<thead><tr><th class="sticky-corner">TEAM</th>`;
-            activeTracks.forEach(t => {
+            archiveTracks.forEach(t => {
                 const label = t.id ? t.id.substring(0, 3).toUpperCase() : "UNK";
                 html += `<th class="sticky-top" style="text-align:center">${label}</th>`
             });
@@ -1297,7 +1361,7 @@
                 html += `<tr style="--team-color: ${tColor}">`;
                 html += `<td class="sticky-left" style="font-weight:700; background:var(--glass-bg); border-left:3px solid ${tColor}; text-transform:uppercase;">${tName}</td>`;
                 
-                activeTracks.forEach(t => {
+                archiveTracks.forEach(t => {
                     const pts = teamTrackPoints[tId][t.id];
                     html += `<td style="text-align:center; opacity:${pts === 0 ? 0.3 : 1}">${pts > 0 ? pts : '-'}</td>`;
                 });
@@ -1307,17 +1371,45 @@
             container.innerHTML = html;
         }
 
-        // --- CALENDAR & DOTD RENDERERS ---
+        // 5. ARCHIVE CALENDAR (New)
+        function renderArchiveCalendar() {
+            const grid = document.getElementById('archive-calendar-grid');
+            if(!grid) return;
+
+            if(!archiveTracks || archiveTracks.length === 0) {
+                grid.innerHTML = `<div class="archive-loading">CALENDAR EMPTY FOR THIS SEASON</div>`;
+                return;
+            }
+
+            grid.innerHTML = archiveTracks.map((r, i) => {
+                const meta = TRACK_METADATA[r.id] || { gp: r.name, insight: "Global Tour" };
+                const displayGP = meta.gp.replace(' Grand Prix', '').replace(' GP', '').toUpperCase();
+                
+                let dateDisplay = "TBD";
+                if(r.date) {
+                    const d = new Date(r.date);
+                    dateDisplay = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)}`;
+                }
+
+                return `<div class="cal-item">
+                    <span class="round">RD ${String(i+1).padStart(2,'0')}</span>
+                    <span class="gp">${displayGP}</span>
+                    <span class="date">${dateDisplay}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // --- CALENDAR RENDERER (Main) ---
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             if(!grid) return;
 
-            if(!activeTracks || activeTracks.length === 0) {
+            if(!mainTracks || mainTracks.length === 0) {
                 grid.innerHTML = `<div style="text-align:center; width:100%; color:#666;">SEASON CALENDAR NOT CONFIGURED</div>`;
                 return;
             }
 
-            grid.innerHTML = activeTracks.map((r, i) => {
+            grid.innerHTML = mainTracks.map((r, i) => {
                 const meta = TRACK_METADATA[r.id] || { gp: r.name, insight: "Global Tour" };
                 const displayGP = meta.gp.replace(' Grand Prix', '').replace(' GP', '').toUpperCase();
                 
@@ -1426,7 +1518,7 @@
             let nextRace = null;
             let nextRaceInfo = null;
 
-            for (const race of activeTracks) {
+            for (const race of mainTracks) {
                 if(!race.date) continue;
                 const raceDate = new Date(race.date + "T13:00:00");
                 if (raceDate > now) {
@@ -1497,13 +1589,22 @@
             // Normal Loader Logic
             gsap.to('#load-bar', { width: '100%', duration: 1, onComplete: () => {
                 gsap.to('#loader', { y: '-100%', duration: 0.8 });
-                loadSeasonData(null); 
+                
+                // --- AUTHENTICATION & DATA LOAD ---
+                signInAnonymously(auth)
+                    .then(() => {
+                        console.log("Signed in anonymously");
+                        initAppLogic(); 
+                    })
+                    .catch((error) => {
+                        console.warn("Auth warning, proceeding public access", error);
+                        initAppLogic(); 
+                    });
+
                 renderDOTD();
                 renderSeasonAwards();
                 
                 // Force Initial Home State
-                // Explicitly set the home slide (index 0) to be visible initially
-                // so the first navigation from Home doesn't start from a black screen.
                 const homeSlide = slides[0];
                 gsap.set(homeSlide, { zIndex: 10, autoAlpha: 1 });
                 homeSlide.classList.add('active');
