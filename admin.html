@@ -679,6 +679,15 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // --- AUTHORIZED ADMIN EMAILS ---
+        const ALLOWED_ADMINS = [
+            "harishwinner123@gmail.com",
+            "adminttrl@gmail.com",
+            "lokirahul242@gmail.com",
+            "mahesh822003@gmail.com",
+            "timothyabraham23@gmail.com" 
+        ];
         
         let currentSeason = "season_1"; 
         let unsubscribe = null; 
@@ -753,15 +762,45 @@
             const pass = document.getElementById("loginPass").value;
             signInWithEmailAndPassword(auth, email, pass).catch(e => document.getElementById("login-msg").innerText = "LOGIN FAILED");
         };
-        window.loginWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => console.error(e));
+        
+        // UPDATED GOOGLE LOGIN
+        window.loginWithGoogle = () => {
+            signInWithPopup(auth, new GoogleAuthProvider())
+                .then((result) => {
+                    const user = result.user;
+                    // CHECK: Is this email allowed?
+                    if (ALLOWED_ADMINS.includes(user.email)) {
+                        console.log("Admin Access Granted");
+                        // UI update handled by onAuthStateChanged
+                    } else {
+                        // Access Denied
+                        signOut(auth);
+                        alert("ACCESS DENIED: You are not authorized to access the TTRL Pitwall.");
+                    }
+                })
+                .catch(e => console.error(e));
+        };
+
         window.logout = () => signOut(auth).then(() => window.location.reload());
 
+        // UPDATED AUTH STATE LISTENER
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById("login-overlay").style.display = "none";
-                document.getElementById("main-interface").style.display = "flex";
-                document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
-                initApp();
+                // SECONDARY CHECK: Ensure the logged-in user is actually in the list
+                if (ALLOWED_ADMINS.includes(user.email)) {
+                    document.getElementById("login-overlay").style.display = "none";
+                    document.getElementById("main-interface").style.display = "flex";
+                    document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
+                    initApp();
+                } else {
+                    // Unauthorized user found in session
+                    console.warn("Unauthorized user session detected:", user.email);
+                    signOut(auth).then(() => {
+                        document.getElementById("login-msg").innerText = "UNAUTHORIZED ACCOUNT";
+                        document.getElementById("login-overlay").style.display = "flex";
+                        document.getElementById("main-interface").style.display = "none";
+                    });
+                }
             } else {
                 document.getElementById("login-overlay").style.display = "flex";
                 document.getElementById("main-interface").style.display = "none";
