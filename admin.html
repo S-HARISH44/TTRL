@@ -787,7 +787,7 @@
                     // Permission Denied or Network Error
                     console.warn("Access verification failed:", error);
                     signOut(auth).then(() => {
-                        document.getElementById("login-msg").innerText = "ACCESS DENIED: NOT IN DATABASE";
+                        document.getElementById("login-msg").innerText = "ACCESS DENIED";
                         document.getElementById("login-overlay").style.display = "flex";
                         document.getElementById("main-interface").style.display = "none";
                     });
