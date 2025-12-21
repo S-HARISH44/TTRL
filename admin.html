@@ -766,28 +766,39 @@
 
         window.logout = () => signOut(auth).then(() => window.location.reload());
 
-        // UPDATED AUTH STATE LISTENER - DB CHECK
+        // UPDATED AUTH STATE LISTENER - DB CHECK + CLEANUP
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // DYNAMIC CHECK: Ask Firestore if this user is an admin
                 try {
                     // We try to read our own document from the 'Admin' collection.
-                    // If we are allowed to read it, we are an admin.
-                    // If we are not in the list, Security Rules will block this read.
+                    // IMPORTANT: Document ID MUST match user.email exactly.
                     const adminDocRef = doc(db, "Admin", user.email);
-                    await getDoc(adminDocRef); 
+                    const docSnap = await getDoc(adminDocRef); 
 
-                    // If the line above didn't throw an error, we are authorized!
-                    document.getElementById("login-overlay").style.display = "none";
-                    document.getElementById("main-interface").style.display = "flex";
-                    document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
-                    initApp();
+                    // If we get here, rules allowed the read. Now check if doc actually exists.
+                    if (docSnap.exists()) {
+                        // AUTHORIZED
+                        document.getElementById("login-overlay").style.display = "none";
+                        document.getElementById("main-interface").style.display = "flex";
+                        document.getElementById("userName").innerText = (user.displayName || user.email.split('@')[0]).toUpperCase(); 
+                        initApp();
+                    } else {
+                        throw new Error("Doc ID match failed");
+                    }
 
                 } catch (error) {
-                    // Permission Denied or Network Error
+                    // Access Denied (Rule blocked it OR Doc didn't exist)
                     console.warn("Access verification failed:", error);
+                    
+                    // --- CLEANUP: DELETE UNAUTHORIZED USER ---
+                    // This removes them from the Firebase Auth list so it doesn't get cluttered.
+                    user.delete().then(() => {
+                        console.log("Unauthorized user removed from Auth list.");
+                    }).catch(err => console.error("Auto-delete failed:", err));
+
                     signOut(auth).then(() => {
-                        document.getElementById("login-msg").innerText = "ACCESS DENIED";
+                        document.getElementById("login-msg").innerText = "ACCESS DENIED: NOT AUTHORIZED";
                         document.getElementById("login-overlay").style.display = "flex";
                         document.getElementById("main-interface").style.display = "none";
                     });
