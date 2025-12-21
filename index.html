@@ -125,12 +125,27 @@
         }
         #vanta-bg canvas { width: 100% !important; height: 100% !important; }
 
+        /* --- UPDATED SLIDE LAYOUT --- */
         .slide-content {
-            position: relative; z-index: 3; max-width: 1400px; width: 100%; padding: 0 4vw;
+            position: relative; z-index: 3; 
+            width: 100%; 
+            padding: 0 1vw; /* Minimal padding to maximize width */
+            max-width: 100%; 
             display: flex; flex-direction: column; justify-content: center; height: 100%;
         }
         
-        #slide-2 .slide-content, #slide-5 .slide-content { justify-content: flex-start; padding-top: 6vh; }
+        /* Keep Home/Register/Paddock centered and constrained for readability */
+        #home .slide-content, #register .slide-content, #paddock .slide-content {
+            max-width: 1400px; margin: 0 auto; padding: 0 4vw;
+        }
+
+        /* Force Data Sections to use full width and align top */
+        #standings .slide-content, #archives .slide-content, #calendar .slide-content { 
+            justify-content: flex-start; 
+            padding-top: 8vh; 
+            max-width: 98vw;
+            margin: 0 auto;
+        }
 
         /* --- TYPOGRAPHY --- */
         .tech-font { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; line-height: 0.9; }
@@ -436,8 +451,11 @@
 
         /* --- CALENDAR GRID (GLOSSY CARDS FIXED) --- */
         .cal-grid { 
-            display: flex; flex-wrap: wrap; gap: 1.5rem; max-width: 1400px; margin-top: 2rem; 
-            justify-content: center; 
+            display: flex; flex-wrap: wrap; gap: 1.5rem; 
+            max-width: 100%; /* Full width allowed */
+            padding: 0 2rem;
+            margin-top: 2rem; 
+            justify-content: flex-start; /* Align left to fill row */
         }
         .cal-item {
             background: rgba(255, 255, 255, 0.05);
@@ -498,7 +516,7 @@
             gap: 1rem; /* Smaller gap */
             padding: 1rem;
             grid-auto-flow: dense; 
-            max-width: 1000px; /* Reduced max-width for more compact look */
+            max-width: 100%; /* Allow full width */
             margin: 0 auto;
         }
         
