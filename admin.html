@@ -32,8 +32,9 @@
         void main() {
             vec3 color = texture2D(u_map_tex, vUv).rgb;
             float gray = dot(color, vec3(0.299, 0.587, 0.114));
-            // Cyan Tech Tint
-            vec3 techColor = vec3(0.0, 0.94, 1.0) * gray * 1.5;
+            
+            // INCREASED BRIGHTNESS: Multiplied by 4.0 and added base luminance
+            vec3 techColor = vec3(0.5, 0.96, 1.0) * gray * 4.0;
             
             // Dot Shape
             color -= .2 * length(gl_PointCoord.xy - vec2(.5));
@@ -62,7 +63,7 @@
             // Fade out dots in back
             vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
             vOpacity = (1. / length(mvPosition.xyz) - .7);
-            vOpacity = clamp(vOpacity, .05, 1.);
+            vOpacity = clamp(vOpacity, .1, 1.); // Increased min opacity for brightness
 
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
         }
@@ -270,9 +271,9 @@
         /* --- DASHBOARD LAYOUT (SPLIT) --- */
         .dashboard-split {
             display: grid;
-            grid-template-columns: 400px 1fr; /* Fixed Width Stats | Flexible Globe */
+            grid-template-columns: 3fr 2fr; /* CHANGED: Left side 60%, Right Side 40% (Globe Smaller) */
             gap: 30px;
-            height: calc(100vh - 140px); /* Fill remaining height */
+            height: calc(100vh - 140px);
             min-height: 600px;
         }
 
@@ -286,7 +287,7 @@
 
         .dash-right {
             position: relative;
-            background: radial-gradient(circle at center, rgba(10,10,12,0.5), rgba(0,0,0,0.8));
+            background: rgba(0,0,0,0.4); /* Transparent to let bg texture show through */
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border-dim);
@@ -1263,7 +1264,7 @@
             const loader = new THREE.TextureLoader();
             loader.load('https://ksenia-k.com/img/earth-map-colored.png', (texture) => {
                 const material = new THREE.ShaderMaterial({
-                    uniforms: { u_map_tex: { type: 't', value: texture }, u_dot_size: { type: 'f', value: 3.0 }, u_time_since_click: { value: 0 }, u_pointer: { value: new THREE.Vector3() } },
+                    uniforms: { u_map_tex: { type: 't', value: texture }, u_dot_size: { type: 'f', value: 4.5 }, u_time_since_click: { value: 0 }, u_pointer: { value: new THREE.Vector3() } },
                     vertexShader: document.getElementById("vertex-shader-map").textContent,
                     fragmentShader: document.getElementById("fragment-shader-map").textContent,
                     transparent: true
