@@ -32,12 +32,12 @@
             overscroll-behavior: none;
         }
 
-        /* --- UPDATED CUSTOM CURSOR --- */
+        /* --- CUSTOM CURSOR --- */
         #cursor-follower { display: none; }
 
         #cursor, #cursor-follower {
             position: fixed; top: 0; left: 0; 
-            pointer-events: none !important; /* CRITICAL FIX: Ensures cursor doesn't block clicks */
+            pointer-events: none !important;
             z-index: 99999;
             transform: translate(-50%, -50%);
             will-change: transform, left, top;
@@ -121,25 +121,23 @@
         }
         #vanta-bg { 
             filter: brightness(1) grayscale(0); 
-            background: radial-gradient(circle at center, #111 0%, #050505 100%); /* Fallback for when WebGL fails */
+            background: radial-gradient(circle at center, #111 0%, #050505 100%); 
         }
         #vanta-bg canvas { width: 100% !important; height: 100% !important; }
 
-        /* --- UPDATED SLIDE LAYOUT --- */
+        /* --- SLIDE CONTENT --- */
         .slide-content {
             position: relative; z-index: 3; 
             width: 100%; 
-            padding: 0 1vw; /* Minimal padding to maximize width */
+            padding: 0 1vw; 
             max-width: 100%; 
             display: flex; flex-direction: column; justify-content: center; height: 100%;
         }
         
-        /* Keep Home/Register/Paddock centered and constrained for readability */
         #home .slide-content, #register .slide-content, #paddock .slide-content {
             max-width: 1400px; margin: 0 auto; padding: 0 4vw;
         }
 
-        /* Force Data Sections to use full width and align top */
         #standings .slide-content, #archives .slide-content, #calendar .slide-content { 
             justify-content: flex-start; 
             padding-top: 8vh; 
@@ -164,6 +162,7 @@
         }
         .text-outline { -webkit-text-stroke: 1px rgba(255,255,255,0.85); color: transparent; }
 
+        /* --- HOME SECTION --- */
         .home-design-container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100%; width: 100%; position: relative; z-index: 5; padding-top: 4rem; 
@@ -286,16 +285,16 @@
         .team-cell { display: flex; align-items: center; gap: 0.8rem; }
         .team-logo-mini { height: 20px; width: auto; max-width: 30px; object-fit: contain; }
 
-        /* --- GARAGE GRID (Redesigned & Fixed Alignment) --- */
+        /* --- GARAGE GRID --- */
         .garage-grid {
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Slightly wider for better fit */
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
             gap: 2rem; 
             height: 100%; 
             overflow-y: auto; 
             padding: 1rem 2rem 4rem 2rem;
             scrollbar-width: none;
-            align-items: stretch; /* Forces all cards in a row to be equal height */
+            align-items: stretch; 
         }
         .garage-grid::-webkit-scrollbar { display: none; }
         
@@ -309,14 +308,10 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            height: 100%; /* CRITICAL: Ensures card fills the grid cell */
-            min-height: 340px; /* Consistent minimum height */
-            transform-style: preserve-3d; /* Prepare for 3D tilt */
-            will-change: transform; /* Optimize rendering */
-        }
-        
-        /* Removed CSS hover transition for transform to prevent GSAP conflict */
-        .constructor-card {
+            height: 100%; 
+            min-height: 340px; 
+            transform-style: preserve-3d;
+            will-change: transform; 
             transition: box-shadow 0.3s ease, border-color 0.3s ease; 
         }
 
@@ -326,17 +321,15 @@
             z-index: 10;
         }
         
-        /* SVG Pattern */
         .cc-pattern {
             position: absolute; bottom: 0; left: 0; margin-bottom: 2rem;
             transform: scale(1.5); opacity: 0.15; pointer-events: none;
             width: 100%; height: auto;
         }
         
-        /* Image Area - FIXED HEIGHT FOR ALIGNMENT */
         .cc-img-container {
             position: relative;
-            height: 180px; /* Fixed height ensures all cars sit in same vertical space */
+            height: 180px; 
             padding: 1rem;
             display: flex;
             align-items: center;
@@ -358,16 +351,15 @@
             position: relative;
             width: 90%;
             height: 100%;
-            object-fit: contain; /* Ensures car fits without stretching */
+            object-fit: contain; 
             filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
             z-index: 2;
         }
 
-        /* Content Area */
         .cc-content {
             position: relative;
             padding: 1.5rem 2rem;
-            margin-top: auto; /* Pushes content to bottom of card */
+            margin-top: auto; 
             color: #fff;
             background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
             z-index: 5;
@@ -405,7 +397,7 @@
             min-width: 80px;
         }
 
-        /* --- DOTD (Accordion) --- */
+        /* --- DOTD --- */
         .dotd-accordion-container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 0; overflow: hidden; }
         @media (min-width: 768px) { .dotd-accordion-container { flex-direction: row; } }
         .dotd-panel {
@@ -449,119 +441,464 @@
         }
         .dotd-panel:hover .dotd-badge-icon { opacity: 1; transform: scale(1); }
 
-        /* --- CALENDAR GRID (GLOSSY CARDS FIXED) --- */
-        .cal-grid { 
-            display: flex; flex-wrap: wrap; gap: 1.5rem; 
-            max-width: 100%; /* Full width allowed */
-            padding: 0 2rem;
-            margin-top: 2rem; 
-            justify-content: flex-start; /* Align left to fill row */
+        /* --- CALENDAR MAP (BRIGHTER) --- */
+        .calendar-map-container {
+            width: 100%; max-width: 1400px; margin: 0 auto;
+            position: relative;
+            min-height: 400px; 
+            z-index: 20;
+            /* Lighter background for better contrast */
+            background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-        .cal-item {
+
+        .locations {
+            position: relative;
+            width: 100%;
+        }
+
+        .locations img {
+            width: 100%;
+            height: auto;
+            display: block;
+            /* EVEN BRIGHTER MAP: Invert creates white landmasses, increased brightness makes it glowing */
+            opacity: 0.95;
+            filter: grayscale(1) invert(1) brightness(2.5) contrast(1.1); 
+            position: relative;
+            z-index: 10;
+            pointer-events: none; 
+        }
+
+        .location_dot {
+            display: block;
+            width: 10px; height: 10px;
+            background-color: var(--accent-cyan);
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            z-index: 30; 
+            transition: all 0.3s;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            pointer-events: auto;
+        }
+        
+        .location_dot::before {
+            content: ""; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 30px; height: 30px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, transparent 70%);
+            border-radius: 50%; z-index: -1;
+            animation: pulse-cyan 2s infinite;
+        }
+        
+        .location_dot.active {
+            background-color: var(--accent-red);
+            box-shadow: 0 0 15px var(--accent-red);
+            transform: scale(1.5);
+            z-index: 40;
+        }
+        .location_dot.active::before {
+             background: radial-gradient(circle, rgba(255, 31, 75, 0.4) 0%, transparent 70%);
+             animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-cyan { 0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); } 50% { opacity: 0.2; transform: translate(-50%, -50%) scale(1.5); } 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); } }
+        @keyframes pulse-red { 0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); } 50% { opacity: 0.2; transform: translate(-50%, -50%) scale(1.5); } 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); } }
+
+        /* --- POPUP CARD (SMALL) --- */
+        .location_info {
+            display: none;
+            position: absolute;
+            /* Default: Pop Up, Centered */
+            bottom: 25px; left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 3px solid var(--accent-cyan);
+            width: 240px; 
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0,0,0,1);
+            backdrop-filter: blur(10px);
+            pointer-events: auto; 
+        }
+
+        /* SMART POSITIONING MODIFIERS */
+        .location_info.pop-down {
+            bottom: auto; 
+            top: 25px; 
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 3px solid var(--accent-cyan);
+        }
+        
+        .location_info.shift-left {
+            left: auto; 
+            right: -10px; 
+            transform: none;
+        }
+        
+        .location_info.shift-right {
+            left: -10px; 
+            right: auto; 
+            transform: none;
+        }
+        
+        .location_dot:hover .location_info, .location_dot.active .location_info {
+            display: flex; flex-direction: column; gap: 0.5rem;
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .location_info img {
+            width: 100% !important; 
+            height: 100px !important; 
+            object-fit: cover; border-radius: 3px; margin-bottom: 0.3rem;
+            filter: none !important; opacity: 1 !important; mask-image: none !important;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .li-gp { font-family: 'Rajdhani', sans-serif; font-weight: 800; font-size: 1.1rem; text-transform: uppercase; color: #fff; line-height: 1; }
+        .li-date { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent-cyan); }
+        
+        /* NEW INTEL BUTTON STYLE */
+        .btn-ai-intel-map {
+            margin-top: 0.3rem; 
+            padding: 0.5rem; 
+            background: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan); 
+            color: #000; 
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 800;
+            font-size: 0.8rem; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            text-transform: uppercase; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px;
+            width: 100%;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+        .btn-ai-intel-map:hover { 
+            background: #fff; 
+            color: #000; 
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        /* --- HORIZONTAL TRACK LIST (BOTTOM) --- */
+        .timeline-ui-wrapper {
+            position: relative;
+            width: 100%;
+            z-index: 60;
+            background: rgba(20, 20, 30, 0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .track-timeline-container {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 1rem 0;
+            scrollbar-width: none; /* Firefox */
+            scroll-behavior: smooth;
+        }
+        .track-timeline-container::-webkit-scrollbar { display: none; }
+        
+        .track-timeline-wrapper {
+            display: flex;
+            gap: 1rem;
+            padding: 0 3rem; /* Added padding for arrows */
+        }
+
+        .timeline-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px; height: 30px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 70;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        .timeline-nav-btn:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 10px var(--accent-cyan); }
+        .t-prev { left: 10px; }
+        .t-next { right: 10px; }
+
+        .timeline-card {
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 140px;
+            padding: 0.8rem 1rem;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            padding: 1.5rem; text-align: center;
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            display: flex; flex-direction: column; justify-content: space-between;
-            flex: 1 1 220px; max-width: 280px; min-height: 180px; 
-            border-radius: 12px; position: relative; overflow: hidden;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-        .cal-item::before {
-            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
-            background: var(--accent-cyan); transform: scaleX(0); transition: transform 0.3s ease;
-            transform-origin: left;
-        }
-        .cal-item:hover { 
-            transform: translateY(-5px); border-color: rgba(255,255,255,0.4); 
-            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.15);
-        }
-        .cal-item:hover::before { transform: scaleX(1); }
-        .cal-item.future-race { opacity: 0.7; }
-        .cal-item.next-race { 
-            opacity: 1; border: 1px solid var(--accent-cyan); 
-            background: rgba(0, 240, 255, 0.05); box-shadow: 0 0 30px rgba(0, 240, 255, 0.1); 
-        }
-        .cal-item.next-race .gp { color: var(--accent-cyan); text-shadow: 0 0 10px var(--accent-cyan); }
-        .round { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--accent-red); display: block; margin-bottom: 0.5rem; letter-spacing: 0.1em; font-weight: 700; }
-        .gp { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.4rem; color: #fff; line-height: 1.1; margin-bottom: 0.5rem; display: block; }
-        .date { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #aaa; display: block; margin-bottom: 1rem; }
-        
-        .btn-ai-intel {
-            margin-top: auto; padding: 0.6rem; background: rgba(255,255,255,0.05); 
-            border: 1px solid var(--accent-cyan); color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem; cursor: pointer; pointer-events: auto; transition: all 0.2s;
-            text-transform: uppercase; border-radius: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; letter-spacing: 0.1em;
-        }
-        .btn-ai-intel:hover { background: var(--accent-cyan); color: #000; font-weight: 700; }
-
-        /* --- ARCHIVE SECTION --- */
-        .archive-controls { margin-bottom: 1rem; display: flex; gap: 10px; }
-        .archive-loading { text-align: center; padding: 2rem; color: var(--accent-cyan); font-family: 'JetBrains Mono'; }
-        .season-btn-group {
-            display: flex; gap: 10px; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap;
-        }
-
-        /* Sticky Headers for Archive - FIXED OVERLAP */
-        .sticky-left { position: sticky; left: 0; z-index: 15; background: #050505; border-right: 1px solid rgba(255,255,255,0.1); }
-        .sticky-top { position: sticky; top: 0; z-index: 20; background: #000; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sticky-corner { position: sticky; left: 0; top: 0; z-index: 30; background: #000; border-right: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
-
-        /* --- SEASON AWARDS (BENTO GRID - COMPACT) --- */
-        .awards-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* Fixed 4 columns for tighter packing on desktop */
-            gap: 1rem; /* Smaller gap */
-            padding: 1rem;
-            grid-auto-flow: dense; 
-            max-width: 100%; /* Allow full width */
-            margin: 0 auto;
-        }
-        
-        /* Fallback for smaller screens */
-        @media (max-width: 1024px) { .awards-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .awards-grid { grid-template-columns: 1fr; } }
-        
-        .award-card {
-            background: #111; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px; overflow: hidden; position: relative;
-            transition: transform 0.3s;
-            display: flex; flex-direction: column;
+            border-radius: 4px;
             cursor: pointer;
-            height: 180px; /* Fixed base height for cards */
+            transition: all 0.2s ease;
         }
-        .award-card:hover { transform: scale(1.03); border-color: var(--accent-cyan); z-index: 5; }
-        
-        .award-img { 
-            width: 100%; height: 100%; object-fit: cover; 
-            transition: opacity 0.3s; opacity: 0.7;
+        .timeline-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
         }
-        .award-card:hover .award-img { opacity: 1; }
-        
-        .award-info {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            padding: 0.8rem; 
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-            z-index: 2;
+        .timeline-card.active {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.1);
         }
-        .award-title { color: var(--accent-cyan); font-family: 'Rajdhani'; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 0.1rem; text-shadow: 0 2px 4px #000; }
-        .award-winner { color: #fff; font-family: 'JetBrains Mono'; font-size: 0.8rem; font-weight: 700; text-shadow: 0 2px 4px #000; }
         
-        /* Grid Spans for Bento Layout */
-        .span-2-row { grid-row: span 2; height: 376px; } /* 180*2 + 16(gap) */
-        .span-2-col { grid-column: span 2; }
-        .span-2-both { grid-column: span 2; grid-row: span 2; height: 376px; }
-        .span-full { grid-column: 1 / -1; }
+        .tl-round { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #aaa; margin-bottom: 4px; }
+        .tl-gp { font-family: 'Rajdhani'; font-weight: 700; font-size: 1rem; color: #fff; text-transform: uppercase; line-height: 1.1; }
+        .tl-date { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--accent-cyan); margin-top: 4px; }
 
-        /* --- IMAGE MODAL (LIGHTBOX) --- */
+        /* --- MASONRY ARCHIVE GRID (FIXED GAP-LESS) --- */
+        /* Variables adapted to CSS Custom Properties */
+        :root {
+            --spacing-medium: 1rem;
+            --spacing-small: 0.5rem;
+            --spacing-large: 2rem;
+            --box-size: 12rem; /* approx 200px */
+        }
+
+        .grid-container {
+            display: grid;
+            grid-gap: 0; /* NO GAP as requested */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-auto-rows: 200px;
+            grid-auto-flow: dense;
+            width: 100%;
+            padding: 0; /* Remove padding */
+            margin: 0;
+        }
+
+        .archive-card { /* Renamed from .card to avoid conflicts */
+            grid-row: auto / span 1;
+            grid-column: auto / span 1;
+            background-color: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border */
+            /* Removed radius for seamless look */
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .archive-card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+            transform: scale(1.02); /* Slight scale instead of Y-translation */
+            z-index: 5;
+        }
+
+        .archive-card h3, .archive-card p {
+            margin-top: 0;
+            font-weight: normal;
+        }
+
+        .archive-card__image {
+            height: 100%;
+            width: 100%;
+            display: flex;
+        }
+
+        .archive-card__image img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            filter: brightness(0.8);
+            transition: filter 0.3s ease, transform 0.5s ease;
+        }
+
+        .archive-card:hover .archive-card__image img {
+            filter: brightness(1);
+            transform: scale(1.05);
+        }
+
+        .archive-card__content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+            pointer-events: none;
+        }
+        
+        .archive-card__content h3 {
+            color: var(--accent-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+        
+        .archive-card__content p {
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        /* Layout Modifiers */
+        .archive-card--featured {
+            grid-row: span 2;
+            grid-column: span 2;
+        }
+        
+        .archive-card--2x {
+            grid-row: span 2;
+            grid-column: span 2;
+        }
+        
+        .archive-card--vertical {
+            grid-row: span 2;
+        }
+        
+        .archive-card--horizontal {
+            grid-column: span 2;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                grid-auto-rows: 250px;
+            }
+            .archive-card {
+                min-height: 250px;
+                grid-column: auto !important;
+                grid-row: auto !important;
+            }
+        }
+        
+        @media (min-width: 601px) and (max-width: 1024px) {
+             .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* --- STRATEGY INTEL CARD (BIG) --- */
+        /* Modals */
+        .modal-overlay {
+            position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.1); 
+            backdrop-filter: blur(2px); 
+            z-index: 9990; 
+            display: block; 
+            opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        
+        .intel-modal {
+            /* BIGGER STRATEGY INTEL CARD */
+            width: 90%; 
+            max-width: 600px;
+            background: #000; 
+            border: 1px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 2rem; 
+            position: fixed; 
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex; flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(0, 240, 255, 0.15);
+            z-index: 9991;
+            max-height: 85vh;
+            overflow: hidden;
+        }
+
+        .intel-title { 
+            color: var(--accent-cyan); 
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 2rem; 
+            margin-bottom: 1rem; 
+            text-transform: uppercase; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.8rem;
+        }
+        
+        .intel-content-layout {
+            display: flex; 
+            flex-direction: column; 
+            gap: 1.5rem; 
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        
+        .intel-content-layout::-webkit-scrollbar { width: 4px; }
+        .intel-content-layout::-webkit-scrollbar-track { background: #111; }
+        .intel-content-layout::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 2px; }
+
+        .intel-left-column { 
+            width: 100%; 
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        
+        .intel-map-container { 
+            width: 100%; 
+            height: 0; 
+            padding-bottom: 50%; 
+            position: relative; 
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .intel-map-container img { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            object-fit: contain; 
+            filter: brightness(1.2) contrast(1.1);
+            padding: 10px;
+        }
+        
+        .ai-briefing { 
+            font-family: 'JetBrains Mono', monospace; 
+            line-height: 1.5; 
+            font-size: 0.9rem;
+            color: #ccc; 
+            background: transparent;
+            padding: 0;
+            border: none;
+        }
+        
+        .intel-stat-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0.5rem 0;
+            font-size: 1rem;
+        }
+        
+        .intel-section { margin-top: 1rem; }
+        .intel-section-title { font-family:'Rajdhani'; font-weight:700; color:#fff; text-transform:uppercase; margin-bottom:0.3rem; letter-spacing:1px; font-size: 1rem; color: var(--accent-red); }
+        .intel-section-text { font-size:0.9rem; color:#aaa; line-height:1.4; }
+
+        .close-modal { cursor: pointer; font-size: 1.5rem; color: #fff; transition: color 0.2s; float: right; margin-top: -5px;}
+        .close-modal:hover { color: var(--accent-cyan); }
+
+        /* --- IMAGE MODAL --- */
         #img-modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             z-index: 20000; display: flex; justify-content: center; align-items: center;
             opacity: 0; visibility: hidden; transition: 0.3s;
         }
-        #img-modal-overlay.active { opacity: 1; visibility: visible; }
+        #img-modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; } /* Ensure pointer events auto when active */
         .img-modal-content {
             max-width: 90vh; max-height: 90vh;
             display: flex; flex-direction: column;
@@ -585,7 +922,6 @@
         }
         .close-img-modal:hover { color: var(--accent-cyan); }
 
-
         /* Other UI */
         .btn-tech {
             pointer-events: auto; display: inline-block; padding: 0.8rem 2.5rem;
@@ -604,41 +940,12 @@
         }
         .contact-item:hover { background: #fff; color: #000; transform: translateY(-5px); }
 
-        /* Modals */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            backdrop-filter: blur(10px); z-index: 9990; display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; pointer-events: none; transition: all 0.3s ease;
-        }
-        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
-        
-        .intel-modal {
-            width: 90%; max-width: 800px; background: #000; border: 1px solid var(--accent-cyan);
-            padding: 2rem; position: relative; clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
-            display: flex; flex-direction: column;
-        }
-        .intel-title { color: var(--accent-cyan); font-family: 'Rajdhani', sans-serif; font-size: 2rem; margin-bottom: 1rem; text-transform: uppercase; }
-        .intel-content-layout {
-            display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; flex-grow: 1; max-height: 55vh; overflow: hidden;
-        }
-        .intel-left-column, .intel-right-column { overflow-y: auto; padding-right: 10px; }
-        .intel-map-container { flex-shrink: 0; width: 100%; height: 0; padding-bottom: 56.25%; position: relative; }
-        .intel-map-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8) contrast(1.1); }
-        .ai-briefing { font-family: 'JetBrains Mono', monospace; line-height: 1.6; color: #ccc; }
-        .close-modal { cursor: pointer; font-size: 1.5rem; color: #fff; transition: color 0.2s; float: right; }
-        .close-modal:hover { color: var(--accent-cyan); }
-        .setup-display { margin-bottom: 1.5rem; border: 1px solid var(--accent-red); padding: 1rem; background: rgba(255, 31, 75, 0.05); }
-        .setup-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
-        .setup-table td { padding: 0.4rem 0.5rem; border-bottom: 1px dashed rgba(255,255,255,0.1); }
-        .setup-table td:first-child { color: var(--accent-cyan); font-weight: 700; width: 50%; }
-        .setup-table td:last-child { text-align: right; color: #fff; font-weight: 500; }
-
         @media (max-width: 768px) {
             .fixed-ui { padding: 1rem; }
             .top-nav { display: none; }
             .slide-title { font-size: 3rem; }
             .garage-grid { grid-template-columns: 1fr; }
-            .intel-content-layout { grid-template-columns: 1fr; }
+            .intel-modal { width: 95%; max-height: 80vh; padding: 1.5rem; }
         }
     </style>
 </head>
@@ -666,28 +973,25 @@
         </div>
     </div>
 
-    <!-- INTEL MODAL -->
+    <!-- INTEL MODAL (UPDATED TO BE BIG) -->
     <div class="modal-overlay" id="intel-modal-overlay">
-        <div class="intel-modal">
-            <div style="margin-bottom:1rem; overflow:hidden;">
+        <div class="intel-modal" onclick="event.stopPropagation()">
+            <div style="overflow:hidden;">
                 <span class="close-modal hover-target" onclick="closeIntel()">&times;</span>
-                <span style="color:var(--accent-cyan); font-family:'Rajdhani'; font-weight:700;">TACTICAL BRIEFING</span>
+                <span style="color:#666; font-family:'JetBrains Mono'; font-size: 0.8rem; letter-spacing: 2px;">STRATEGY CENTER</span>
             </div>
             <div class="intel-title" id="intel-title">GP NAME</div>
             <div class="intel-content-layout">
                 <div class="intel-left-column">
                     <div class="intel-map-container"><img id="intel-map" src="" alt="Map"></div>
-                    <div id="ai-briefing" class="ai-briefing" style="margin-top:1rem;"></div>
-                </div>
-                <div class="intel-right-column">
-                    <div id="setup-display" class="setup-display mono-font"></div>
+                    <div id="ai-briefing" class="ai-briefing"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- IMAGE EXPAND MODAL -->
-    <div class="modal-overlay" id="img-modal-overlay" onclick="closeImgModal()">
+    <div class="modal-overlay" id="img-modal-overlay" onclick="closeImgModal()" style="opacity: 0; visibility: hidden;">
         <div class="img-modal-content" onclick="event.stopPropagation()">
             <span class="close-img-modal" onclick="closeImgModal()">&times;</span>
             <img id="img-modal-src" src="" alt="Award Poster">
@@ -747,13 +1051,30 @@
             </div>
         </section>
 
-        <!-- SLIDE 1: CALENDAR -->
+        <!-- SLIDE 1: CALENDAR (UPDATED MAP) -->
         <section class="slide" id="calendar">
-            <div class="slide-bg" style="background-image: url('https://raw.githubusercontent.com/S-HARISH44/TTRL/577532eaacf8de58ca32f2b9e5d0112cf71a3689/RESOURCES/Belgium.avif')"></div>
+            <div class="slide-bg"></div> 
             <div class="slide-content">
                 <div class="slide-tag">02 // GLOBAL TOUR</div>
-                <h2 class="slide-title tech-font">RACE <span class="text-outline">CALENDAR</span></h2>
-                <div id="calendar-grid" class="cal-grid mono-font"></div>
+                <h2 class="slide-title tech-font">RACE <span class="text-outline">MAP</span></h2>
+                
+                <div class="calendar-map-container" id="calendar-map-root">
+                     <div class="overflowHidden_onmobile">
+                        <div class="locations" id="map-locations">
+                             <img src="https://i.ibb.co/QpYG5f2/offices-world-map-e2cc096.png" alt="World Map">
+                        </div>
+                     </div>
+                </div>
+
+                <!-- NEW: Horizontal Track Timeline with Arrows -->
+                <div class="timeline-ui-wrapper">
+                    <button class="timeline-nav-btn t-prev" id="tl-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="track-timeline-container" id="timeline-scroll-area">
+                        <div class="track-timeline-wrapper" id="track-timeline">
+                        </div>
+                    </div>
+                    <button class="timeline-nav-btn t-next" id="tl-next"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
             </div>
         </section>
 
@@ -876,7 +1197,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
 
     <script type="module">
-        // UPDATE TO FIREBASE 11.6.1 (Matching Admin Panel)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -921,7 +1241,8 @@
             'belgium': { gp: "Belgian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244983/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Belgium_Circuit.png", insight: "Longest track on calendar." },
             'netherlands': { gp: "Dutch Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244984/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Netherlands_Circuit.png", insight: "Banked corners." },
             'italy': { gp: "Italian Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244986/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Italy_Circuit.png", insight: "Temple of Speed." },
-            'azerbaijan': { gp: "Azerbaijan Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244983/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Azerbaijan_Circuit.png", insight: "Castle section." },
+            'azerbaijan': { gp: "Azerbaijan Grand Prix", mapUrl: "https://media.formula1.com/image/upload/c_lfill,w_3392/q_auto/v1740000000/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Baku_Circuit.webp", insight: "Castle section." },
+            'baku': { gp: "Azerbaijan Grand Prix", mapUrl: "https://media.formula1.com/image/upload/c_lfill,w_3392/q_auto/v1740000000/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Baku_Circuit.webp", insight: "Castle section." }, // Alias
             'singapore': { gp: "Singapore Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244986/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Singapore_Circuit.png", insight: "Night race endurance." },
             'usa': { gp: "United States Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244987/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit.png", insight: "Elevation changes." },
             'mexico': { gp: "Mexico City Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Mexico_Circuit.png", insight: "High altitude." },
@@ -929,6 +1250,67 @@
             'las_vegas': { gp: "Las Vegas Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Las_Vegas_Circuit.png", insight: "High speed street fight." },
             'qatar': { gp: "Qatar Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244985/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Qatar_Circuit.png", insight: "Fast flowing." },
             'abu_dhabi': { gp: "Abu Dhabi Grand Prix", mapUrl: "https://media.formula1.com/image/upload/f_auto/q_auto/v1677244983/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit.png", insight: "Season finale." }
+        };
+        
+        // Detailed Track Intel (Turns, 50% Laps, Fact, Overtake, ERS)
+        const TRACK_INTEL = {
+            "azerbaijan": {
+                turns: 20,
+                laps50: 26,
+                fact: "Features the narrowest section on the calendar (7.6m wide past the old city walls) and the longest full-throttle section (2.2km).",
+                overtake: "Turn 1 is the primary spot after the massive 2.2km straight. Turn 3 is also possible with DRS.",
+                ers: "Crucial for the main straight. Save heavily in sector 2 to deploy fully from Turn 16 to Turn 1."
+            },
+            "bahrain": {
+                turns: 15,
+                laps50: 29,
+                fact: "The track surface is made of Graywacke aggregate, shipped from England, offering high grip but high tyre degradation.",
+                overtake: "Turn 1 and Turn 4 are the best spots. DRS zones on the main straight and the run to Turn 4 are powerful.",
+                ers: "Deploy early on the main straight and the back straight. Harvest in the twisty middle sector."
+            },
+            "saudi_arabia": {
+                turns: 27,
+                laps50: 25,
+                fact: "The fastest street circuit on the calendar with average speeds exceeding 250km/h.",
+                overtake: "Turn 1 and Turn 27 (final corner run). DRS is very potent here.",
+                ers: "Continuous deployment is needed due to high speeds. Harvest in the few braking zones available."
+            },
+            "australia": {
+                turns: 14,
+                laps50: 29,
+                fact: "A street circuit in a park. Recent changes have made it much faster, removing the chicane in Sector 2.",
+                overtake: "Turn 1 and Turn 11. With 4 DRS zones, staying within 1 second is vital.",
+                ers: "Balanced usage. Save for the blasts down the start/finish and the lakeside drive."
+            },
+            // Add other tracks similarly or use generic fallback
+        };
+
+        const TRACK_COORDINATES = {
+            'bahrain': { top: 42, left: 62 },
+            'saudi_arabia': { top: 44, left: 60 },
+            'australia': { top: 75, left: 88 },
+            'japan': { top: 36, left: 86 },
+            'china': { top: 38, left: 78 },
+            'miami': { top: 42, left: 24 },
+            'emilia_romagna': { top: 32, left: 52 },
+            'monaco': { top: 33, left: 51 },
+            'canada': { top: 30, left: 24 },
+            'spain': { top: 34, left: 49 },
+            'austria': { top: 31, left: 53 },
+            'uk': { top: 27, left: 49 },
+            'hungary': { top: 31, left: 54 },
+            'belgium': { top: 29, left: 51 },
+            'netherlands': { top: 28, left: 51 },
+            'italy': { top: 32, left: 52 },
+            'azerbaijan': { top: 34, left: 63 }, 
+            'baku': { top: 34, left: 63 }, 
+            'singapore': { top: 55, left: 78 },
+            'usa': { top: 40, left: 18 },
+            'mexico': { top: 45, left: 18 },
+            'brazil': { top: 65, left: 32 },
+            'las_vegas': { top: 37, left: 14 },
+            'qatar': { top: 43, left: 61 },
+            'abu_dhabi': { top: 44, left: 63 }
         };
 
         const TEAM_COLORS = {
@@ -975,19 +1357,6 @@
             { title: "Emerging Driver", winner: "Vibin", img: "https://raw.githubusercontent.com/S-HARISH44/TTRL/907c39d6dbfaf2ff3e019a34d213152d20a4859b/RESOURCES/Awards/emerging%20driver.png" }
         ];
 
-        const f125SetupData = {
-            "Australian Grand Prix": { aero: "13-9 (Q) / 9-3 (R)", differential: "100 (On) - 20 (Off)", suspGeometry: "LLLL", suspension: "41-3-7-16-21-40", brakes: "100% / 54%", tiresQ: "27.0 PSI / 23.5 PSI", tiresR: "27.5 PSI / 23.5 PSI", notes: "High deg." },
-            "Bahrain Grand Prix": { aero: "20-15", differential: "80 (On) - 50 (Off)", suspGeometry: "RLRL", suspension: "5-3-9-3-20-40", brakes: "100% / 50%", tiresQ: "23.2 PSI / 21.0 PSI", tiresR: "21.2 PSI / 19.0 PSI", notes: "Rear traction focus." },
-            "Emilia Romagna Grand Prix": { aero: "35-30", differential: "50 (On) - 50 (Off)", suspGeometry: "LLLR", suspension: "7-8-3-1-30-40", brakes: "100% / 52%", tiresQ: "24.0 PSI / 21.5 PSI", tiresR: "22.0 PSI / 20.0 PSI", notes: "High downforce." },
-            "Spanish Grand Prix": { aero: "38-30", differential: "60 (On) - 55 (Off)", suspGeometry: "RRRR", suspension: "3-8-4-1-20-40", brakes: "100% / 55%", tiresQ: "24.2 PSI / 21.8 PSI", tiresR: "22.2 PSI / 20.8 PSI", notes: "Turn 3 kills tires." },
-            "Great Britain Grand Prix": { aero: "20-15", differential: "90 (On) - 60 (Off)", suspGeometry: "LLRL", suspension: "10-1-5-1-15-30", brakes: "100% / 53%", tiresQ: "23.5 PSI / 21.0 PSI", tiresR: "21.5 PSI / 19.5 PSI", notes: "Aerodynamic efficiency." },
-            "Las Vegas Grand Prix": { aero: "10-5", differential: "100 (On) - 20 (Off)", suspGeometry: "LLLL", suspension: "1-1-1-1-30-40", brakes: "100% / 50%", tiresQ: "23.0 PSI / 21.0 PSI", tiresR: "21.0 PSI / 19.0 PSI", notes: "Min drag." },
-            "Belgian Grand Prix": { aero: "15-10", differential: "90 (On) - 60 (Off)", suspGeometry: "RRRL", suspension: "1-1-1-1-25-30", brakes: "100% / 50%", tiresQ: "22.8 PSI / 20.8 PSI", tiresR: "20.8 PSI / 18.8 PSI", notes: "Low drag." },
-            "Austrian Grand Prix": { aero: "20-15", differential: "95 (On) - 65 (Off)", suspGeometry: "LLLR", suspension: "5-1-4-1-20-30", brakes: "100% / 54%", tiresQ: "23.0 PSI / 21.0 PSI", tiresR: "21.0 PSI / 19.0 PSI", notes: "Traction out of slow corners." },
-            "São Paulo Grand Prix": { aero: "30-25", differential: "50 (On) - 50 (Off)", suspGeometry: "RRRR", suspension: "7-8-3-1-25-40", brakes: "100% / 52%", tiresQ: "24.0 PSI / 21.5 PSI", tiresR: "22.0 PSI / 20.0 PSI", notes: "Rotation needed." },
-            "Abu Dhabi Grand Prix": { aero: "25-20", differential: "70 (On) - 55 (Off)", suspGeometry: "LLRL", suspension: "3-5-2-1-20-40", brakes: "100% / 53%", tiresQ: "23.8 PSI / 21.3 PSI", tiresR: "21.8 PSI / 19.8 PSI", notes: "Technical S3." }
-        };
-
         // Separate data for Active Season vs Archive View
         let mainSeasonId = 'season_1'; 
         let archiveSeasonId = 'season_1';
@@ -1003,7 +1372,6 @@
         const intelModal = document.getElementById('intel-modal-overlay');
         const intelTitle = document.getElementById('intel-title');
         const intelMap = document.getElementById('intel-map');
-        const setupDisplay = document.getElementById('setup-display');
         const aiBriefing = document.getElementById('ai-briefing');
 
         function closeIntel() { intelModal.classList.remove('active'); }
@@ -1031,41 +1399,72 @@
             
             modal.classList.add('active');
         }
-
-        function displaySetupData(setup) {
-            if (!setup) {
-                setupDisplay.innerHTML = "<h4>Baseline Setup Prediction</h4><p>No specific data available.</p>";
-                return;
-            }
-            setupDisplay.innerHTML = `
-                <h4>F1 25 Baseline Setup</h4>
-                <table class="setup-table">
-                    <tr><td>Aero (F/R)</td><td>${setup.aero}</td></tr>
-                    <tr><td>Differential</td><td>${setup.differential}</td></tr>
-                    <tr><td>Suspension</td><td>${setup.suspension}</td></tr>
-                    <tr><td>Brakes</td><td>${setup.brakes}</td></tr>
-                    <tr><td>Tires (Q/R)</td><td>${setup.tiresQ} / ${setup.tiresR}</td></tr>
-                </table>
-            `;
-        }
+        
+        // --- CLOSE MODALS ON OVERLAY CLICK ---
+        document.getElementById('intel-modal-overlay').addEventListener('click', (e) => {
+             // If the click target IS the overlay (meaning not the card inside it), close.
+             if(e.target.id === 'intel-modal-overlay') {
+                 closeIntel();
+             }
+        });
+        document.getElementById('img-modal-overlay').addEventListener('click', (e) => {
+             if(e.target.id === 'img-modal-overlay') {
+                 closeImgModal();
+             }
+        });
 
         async function fetchTrackIntel(trackId) {
+            // 1. Activate Overlay
             intelModal.classList.add('active');
+            
+            // 2. Reset Position
+            const card = document.querySelector('.intel-modal');
+            // Ensure card is reset to CSS defaults in case JS modified it previously
+            card.style.position = '';
+            card.style.top = '';
+            card.style.left = '';
+            card.style.transform = '';
+            
+            // 3. Populate Data
+            // FIX: Normalize ID to lowercase to ensure matching works even if data is capitalized (e.g. "Azerbaijan")
+            const normalizedId = (trackId || "").toLowerCase().replace(" grand prix", "").replace(" gp", "").trim().replace(/\s+/g, '_');
+            const lookupId = Object.keys(TRACK_INTEL).find(k => normalizedId.includes(k)) || "azerbaijan";
+
             requestAnimationFrame(async () => {
-                const meta = TRACK_METADATA[trackId] || { gp: trackId.toUpperCase(), mapUrl: 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND', insight: "No data." };
-                const gpName = meta.gp;
+                const meta = TRACK_METADATA[normalizedId] || TRACK_METADATA[lookupId] || TRACK_METADATA['baku'] || { gp: trackId.toUpperCase(), mapUrl: 'https://placehold.co/768x432/111111/FFFFFF?text=MAP+NOT+FOUND', insight: "No specific intelligence data available for this circuit." };
+                const intel = TRACK_INTEL[lookupId] || TRACK_INTEL["azerbaijan"]; 
                 
-                // Fallback for setup data matching
-                const setupKey = Object.keys(f125SetupData).find(k => k.toLowerCase().includes(gpName.toLowerCase()) || gpName.toLowerCase().includes(k.toLowerCase()));
-                const setup = f125SetupData[setupKey];
+                const gpName = meta.gp || "GRAND PRIX";
                 
                 intelTitle.innerText = gpName.toUpperCase();
                 intelMap.src = meta.mapUrl;
-                displaySetupData(setup);
                 
                 aiBriefing.innerHTML = `
-                    <div style="color: #fff; font-family: 'Rajdhani'; font-weight: bold; margin-bottom: 5px;">TRACK INSIGHT</div>
-                    <div style="color: #ccc; font-size: 0.9rem;">${meta.insight}</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; margin-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:1rem;">
+                        <div>
+                            <div style="color:#666; font-size:0.75rem; letter-spacing:1px;">TURNS</div>
+                            <div style="color:#fff; font-weight:700; font-size: 1.2rem;">${intel.turns}</div>
+                        </div>
+                        <div>
+                            <div style="color:#666; font-size:0.75rem; letter-spacing:1px;">50% LAPS</div>
+                            <div style="color:var(--accent-red); font-weight:700; font-size: 1.2rem;">${intel.laps50}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="intel-section">
+                        <div class="intel-section-title">CIRCUIT FACT</div>
+                        <div class="intel-section-text">${intel.fact}</div>
+                    </div>
+
+                    <div class="intel-section">
+                        <div class="intel-section-title">OVERTAKING</div>
+                        <div class="intel-section-text">${intel.overtake}</div>
+                    </div>
+
+                    <div class="intel-section">
+                        <div class="intel-section-title">ERS STRATEGY</div>
+                        <div class="intel-section-text">${intel.ers}</div>
+                    </div>
                 `;
             });
         }
@@ -1417,33 +1816,160 @@
             }).join('');
         }
 
-        // --- CALENDAR RENDERER (Main) ---
+        // --- CALENDAR RENDERER (UPDATED: MAP + TIMELINE) ---
         function renderCalendar() {
-            const grid = document.getElementById('calendar-grid');
-            if(!grid) return;
+            const container = document.getElementById('map-locations');
+            const timelineContainer = document.getElementById('track-timeline');
 
+            if(!container) return;
+            
+            // Clear existing elements
+            container.querySelectorAll('.location_dot').forEach(d => d.remove());
+            if(timelineContainer) timelineContainer.innerHTML = '';
+            
             if(!mainTracks || mainTracks.length === 0) {
-                grid.innerHTML = `<div style="text-align:center; width:100%; color:#666;">SEASON CALENDAR NOT CONFIGURED</div>`;
+                // Show fallback message
+                const msg = document.createElement('div');
+                msg.innerHTML = "SEASON DATA LOADING...";
+                msg.className = "archive-loading";
+                msg.style.position = "absolute"; msg.style.top = "50%"; msg.style.left="50%"; msg.style.transform="translate(-50%,-50%)";
+                container.appendChild(msg);
                 return;
             }
 
-            grid.innerHTML = mainTracks.map((r, i) => {
-                const meta = TRACK_METADATA[r.id] || { gp: r.name, insight: "Global Tour" };
-                const displayGP = meta.gp.replace(' Grand Prix', '').replace(' GP', '').toUpperCase();
+            // Find next race for highlighting
+            const now = new Date();
+            let nextRaceIndex = -1;
+            for(let i=0; i<mainTracks.length; i++) {
+                if(mainTracks[i].date && new Date(mainTracks[i].date) >= now) {
+                    nextRaceIndex = i;
+                    break;
+                }
+            }
+
+            mainTracks.forEach((r, i) => {
+                // Normalize ID to lowercase and check for alias
+                const trackId = (r.id || '').toLowerCase();
+                const meta = TRACK_METADATA[trackId] || TRACK_METADATA['baku'] || { gp: r.name || 'Unknown GP', insight: "Global Tour", mapUrl: "" };
+                
+                const coords = TRACK_COORDINATES[trackId] || TRACK_COORDINATES['baku'] || { top: 50, left: 50 }; 
                 
                 let dateDisplay = "TBD";
                 if(r.date) {
                     const d = new Date(r.date);
-                    dateDisplay = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)}`;
+                    const month = d.toLocaleString('default', { month: 'short' }).toUpperCase();
+                    dateDisplay = `${String(d.getDate()).padStart(2,'0')} ${month}`;
                 }
 
-                return `<div class="cal-item hover-target">
-                    <span class="round">RD ${String(i+1).padStart(2,'0')}</span>
-                    <span class="gp">${displayGP}</span>
-                    <span class="date">${dateDisplay}</span>
-                    <button class="btn-ai-intel hover-target" onclick="fetchTrackIntel('${r.id}')"><i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY</button>
-                </div>`;
-            }).join('');
+                // DETERMINE SMART POSITIONING CLASSES
+                let posClasses = '';
+                // If dot is in top 30%, pop DOWN instead of up
+                if (coords.top < 30) posClasses += ' pop-down';
+                // If dot is far right (> 80%), shift LEFT
+                if (coords.left > 80) posClasses += ' shift-left';
+                // If dot is far left (< 20%), shift RIGHT
+                else if (coords.left < 20) posClasses += ' shift-right';
+
+                // 1. MAP DOTS
+                const dot = document.createElement('div');
+                dot.className = `location_dot hover-target ${i === nextRaceIndex ? 'active' : ''}`;
+                dot.style.top = `${coords.top}%`;
+                dot.style.left = `${coords.left}%`;
+                dot.setAttribute('data-track-id', r.id); 
+                
+                // Info Popup with Dynamic Classes
+                const info = document.createElement('div');
+                info.className = `location_info${posClasses}`;
+                info.innerHTML = `
+                    <img src="${meta.mapUrl}" alt="Track Map">
+                    <div class="li-gp">${meta.gp.replace(' Grand Prix', '').toUpperCase()}</div>
+                    <div class="li-date">ROUND ${i+1} // ${dateDisplay}</div>
+                    <button class="btn-ai-intel-map hover-target" onclick="fetchTrackIntel('${r.id}')">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> STRATEGY INTEL
+                    </button>
+                `;
+                
+                dot.appendChild(info);
+                container.appendChild(dot);
+                
+                // Interaction Logic
+                dot.addEventListener('click', (e) => {
+                     e.stopPropagation(); 
+                     if(e.target.closest('.location_info')) return;
+
+                     const wasActive = dot.classList.contains('active');
+                     
+                     // Close others
+                     document.querySelectorAll('.location_dot').forEach(d => d.classList.remove('active'));
+                     document.querySelectorAll('.timeline-card').forEach(c => c.classList.remove('active'));
+
+                     if(!wasActive) {
+                         dot.classList.add('active');
+                         // Highlight timeline card
+                         const tCard = document.querySelector(`.timeline-card[data-track-id="${r.id}"]`);
+                         if(tCard) {
+                             tCard.classList.add('active');
+                             tCard.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'});
+                         }
+                     }
+                });
+
+                // 2. HORIZONTAL TIMELINE ITEMS
+                if(timelineContainer) {
+                    const card = document.createElement('div');
+                    card.className = `timeline-card hover-target ${i === nextRaceIndex ? 'active' : ''}`;
+                    card.setAttribute('data-track-id', r.id);
+                    card.innerHTML = `
+                        <span class="tl-round">ROUND ${String(i+1).padStart(2,'0')}</span>
+                        <span class="tl-gp">${meta.gp.replace(' Grand Prix', '').replace(' GP', '')}</span>
+                        <span class="tl-date">${dateDisplay}</span>
+                    `;
+                    card.onclick = (e) => {
+                        e.stopPropagation();
+                        // 1. Reset all actives
+                        document.querySelectorAll('.timeline-card').forEach(c => c.classList.remove('active'));
+                        document.querySelectorAll('.location_dot').forEach(d => d.classList.remove('active'));
+                        
+                        // 2. Set Active
+                        card.classList.add('active');
+                        
+                        // 3. Activate Dot
+                        const targetDot = document.querySelector(`.location_dot[data-track-id="${r.id}"]`);
+                        if(targetDot) {
+                            targetDot.classList.add('active');
+                        }
+                    };
+                    timelineContainer.appendChild(card);
+                }
+            });
+            
+            // Scroll Arrows Logic
+            const scrollArea = document.getElementById('timeline-scroll-area');
+            const btnPrev = document.getElementById('tl-prev');
+            const btnNext = document.getElementById('tl-next');
+            
+            if(scrollArea && btnPrev && btnNext) {
+                // Clear old listeners by cloning (simple way to avoid duplicates if re-rendered)
+                const newPrev = btnPrev.cloneNode(true);
+                const newNext = btnNext.cloneNode(true);
+                btnPrev.parentNode.replaceChild(newPrev, btnPrev);
+                btnNext.parentNode.replaceChild(newNext, btnNext);
+                
+                newPrev.addEventListener('click', () => {
+                    scrollArea.scrollBy({ left: -200, behavior: 'smooth' });
+                });
+                newNext.addEventListener('click', () => {
+                    scrollArea.scrollBy({ left: 200, behavior: 'smooth' });
+                });
+            }
+            
+            // Global Click to close
+            document.addEventListener('click', (e) => {
+                if(!e.target.closest('.location_dot') && !e.target.closest('.timeline-card')) {
+                    document.querySelectorAll('.location_dot').forEach(d => d.classList.remove('active'));
+                    document.querySelectorAll('.timeline-card').forEach(c => c.classList.remove('active'));
+                }
+            });
         }
 
         function renderDOTD() {
@@ -1466,24 +1992,41 @@
         }
 
         function renderSeasonAwards() {
-            const gridConfig = [
-                "span-2-both", "span-2-col", "span-2-row", "", "", "span-2-col", "", "", "span-2-col", "span-full"
+            const container = document.getElementById('season-awards-grid');
+            if (!container) return;
+
+            // Map the layout classes from your request to the data indices
+            const layouts = [
+                'archive-card--featured',   // 0: Driver Champ (Big Highlight)
+                'archive-card--vertical',   // 1: Driver Season (Tall)
+                'archive-card',             // 2: Team Champ
+                'archive-card',             // 3: Team Season
+                'archive-card--horizontal', // 4: Cleanest (Wide)
+                'archive-card--2x',         // 5: Super Sub (Big Square)
+                'archive-card',             // 6: Rain Master
+                'archive-card--vertical',   // 7: Underdog
+                'archive-card',             // 8: Consistent
+                'archive-card--horizontal'  // 9: Emerging
             ];
-            const g = document.getElementById('season-awards-grid');
-            if(g) {
-                g.innerHTML = SEASON_AWARDS.map((a, index) => {
-                    let cardClass = gridConfig[index] || "";
-                    return `
-                        <div class="award-card hover-target ${cardClass}" onclick="openImageModal('${a.img}', '${a.title}', '${a.winner}')">
-                            <img src="${a.img}" class="award-img" alt="${a.title}">
-                            <div class="award-info">
-                                <div class="award-title">${a.title}</div>
-                                <div class="award-winner">${a.winner}</div>
-                            </div>
+
+            // Apply the new class name
+            container.className = 'grid-container';
+
+            container.innerHTML = SEASON_AWARDS.map((a, index) => {
+                const layoutClass = layouts[index] || 'archive-card'; // Default to normal card if data exceeds layout map
+                
+                return `
+                    <div class="archive-card ${layoutClass} hover-target" onclick="openImageModal('${a.img}', '${a.title}', '${a.winner}')">
+                        <div class="archive-card__image">
+                            <img src="${a.img}" alt="${a.title}">
                         </div>
-                    `;
-                }).join('');
-            }
+                        <div class="archive-card__content">
+                            <h3>${a.title}</h3>
+                            <p>${a.winner}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // --- ANIMATIONS & INIT ---
