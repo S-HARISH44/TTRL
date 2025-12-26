@@ -161,6 +161,17 @@
 
         .nav-links { flex: 1; padding: 20px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
 
+        .nav-group-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 15px 16px 5px;
+            letter-spacing: 1px;
+            font-family: var(--font-data);
+            opacity: 0.7;
+        }
+        .sidebar.collapsed .nav-group-label { display: none; }
+
         .nav-btn {
             display: flex;
             align-items: center;
@@ -421,15 +432,22 @@
                 <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="logo-img" alt="Logo">
                 <div class="logo-text">PITWALL</div>
             </div>
+            
             <div class="nav-links">
+                <!-- GROUP 1: MONITORING -->
+                <div class="nav-group-label">OVERVIEW</div>
                 <a class="nav-btn active" onclick="switchTab('dashboard')"><i class="fas fa-gauge-high"></i> <span>DASHBOARD</span></a>
-                <a class="nav-btn" onclick="switchTab('season-setup')"><i class="fas fa-route"></i> <span>SEASON CONFIG</span></a>
-                <a class="nav-btn" onclick="switchTab('manage-drivers')"><i class="fas fa-users-gear"></i> <span>MANAGE GRID</span></a>
-                <a class="nav-btn" onclick="switchTab('race-director')"><i class="fas fa-flag-checkered"></i> <span>RACE DIRECTOR</span></a>
-                <a class="nav-btn" onclick="switchTab('driver-editor')"><i class="fas fa-pen-to-square"></i> <span>DRIVER EDITOR</span></a>
                 <a class="nav-btn" onclick="switchTab('live-view')"><i class="fas fa-tower-broadcast"></i> <span>LIVE TELEMETRY</span></a>
                 <a class="nav-btn" onclick="switchTab('driver-stats')"><i class="fas fa-chart-pie"></i> <span>ANALYTICS</span></a>
+
+                <!-- GROUP 2: MANAGEMENT -->
+                <div class="nav-group-label">OPERATIONS</div>
+                <a class="nav-btn" onclick="switchTab('season-setup')"><i class="fas fa-calendar-days"></i> <span>CALENDAR EDITOR</span></a>
+                <a class="nav-btn" onclick="switchTab('manage-drivers')"><i class="fas fa-user-plus"></i> <span>DRIVER ONBOARD</span></a>
+                <a class="nav-btn" onclick="switchTab('driver-editor')"><i class="fas fa-user-pen"></i> <span>DRIVER EDITOR</span></a>
+                <a class="nav-btn" onclick="switchTab('race-director')"><i class="fas fa-flag-checkered"></i> <span>RACE EDITOR</span></a>
             </div>
+
             <div class="user-panel">
                 <div class="user-panel-row">
                     <div class="user-name" id="userName">OPERATOR</div>
@@ -686,7 +704,7 @@
                                 <div class="panel" style="margin:0; min-height: 300px;"><div class="panel-title" style="font-size: 0.9rem;">RACE RESULTS</div><div style="position: relative; height: 250px; width: 100%;"><canvas id="barChart"></canvas></div></div>
                             </div>
                             <div class="panel-title">SEASON HISTORY</div>
-                            <table class="tech-table"><thead><tr><th>TRACK</th><th>TEAM</th><th style="text-align:right;">PTS</th></tr></thead><tbody id="statsHistoryBody"></tbody></table>
+                            <table class="tech-table"><thead><tr><th>TRACK</th><th>POS</th><th>TEAM</th><th style="text-align:right;">PTS</th></tr></thead><tbody id="statsHistoryBody"></tbody></table>
                         </div>
                     </div>
                 </div>
@@ -1155,9 +1173,22 @@
             const res = data.results || {};
             let teamOpts = `<optgroup label="Teams">` + TEAMS.map(tm => `<option value="${tm.id}">${tm.name}</option>`).join('') + `</optgroup>`;
             activeTracks.forEach(t => {
-                let pts = 0, raceTeam = data.team; 
-                if(res[t.id]) { if(typeof res[t.id] === 'object') { pts = res[t.id].points || 0; raceTeam = res[t.id].team || data.team; } else { pts = res[t.id]; } }
-                grid.innerHTML += `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:15px; border-radius:6px;"><label class="input-label">${t.name}</label><div style="display:flex; gap:10px;"><input type="number" class="pts-in form-control" style="width:80px; text-align:center; font-weight:bold; color:var(--accent-cyan);" data-track="${t.id}" value="${pts}" oninput="calcTotal()"><select class="tm-in form-control" id="tm-${t.id}">${teamOpts}</select></div></div>`;
+                let pts = 0, raceTeam = data.team, pos = ""; 
+                if(res[t.id]) { 
+                    if(typeof res[t.id] === 'object') { 
+                        pts = res[t.id].points || 0; 
+                        raceTeam = res[t.id].team || data.team; 
+                        pos = res[t.id].position || "";
+                    } else { pts = res[t.id]; } 
+                }
+                grid.innerHTML += `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:15px; border-radius:6px;">
+                    <label class="input-label">${t.name}</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" class="pos-in form-control" style="width:60px; text-align:center;" placeholder="POS" value="${pos}">
+                        <input type="number" class="pts-in form-control" style="width:80px; text-align:center; font-weight:bold; color:var(--accent-cyan);" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
+                        <select class="tm-in form-control" id="tm-${t.id}">${teamOpts}</select>
+                    </div>
+                </div>`;
                 document.getElementById(`tm-${t.id}`).value = raceTeam;
             });
             calcTotal();
@@ -1167,9 +1198,19 @@
         window.calcTotal = () => { let s = 0; document.querySelectorAll(".pts-in").forEach(i => s += Number(i.value)||0); document.getElementById("calculatedTotal").innerText = s; };
         window.saveAllChanges = async () => {
             const id = document.getElementById("editorDriverIdHidden").value; if(!id) return;
-            const ptsIns = document.querySelectorAll(".pts-in"); const tmIns = document.querySelectorAll(".tm-in");
+            const ptsIns = document.querySelectorAll(".pts-in"); 
+            const tmIns = document.querySelectorAll(".tm-in");
+            const posIns = document.querySelectorAll(".pos-in");
             let newResults = {}, total = 0;
-            ptsIns.forEach((p, idx) => { const val = Number(p.value); if(val > 0) { newResults[p.dataset.track] = { points: val, team: tmIns[idx].value }; total += val; } });
+            ptsIns.forEach((p, idx) => { 
+                const val = Number(p.value); 
+                const posVal = posIns[idx].value.trim();
+                // Save entry if points > 0 OR if a position is entered (e.g. DNF with 0 points)
+                if(val > 0 || posVal !== "") { 
+                    newResults[p.dataset.track] = { points: val, position: posVal, team: tmIns[idx].value }; 
+                    total += val; 
+                } 
+            });
             await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { results: newResults, totalPoints: total }); showToast("Driver Updated");
         };
 
@@ -1217,15 +1258,54 @@
         window.loadRaceGrid = () => {
             const tid = document.getElementById("raceDirectorTrackSelect").value; const con = document.getElementById("raceInputsContainer"); const wrap = document.getElementById("raceDirectorGrid"); if(!tid) { wrap.style.display="none"; return; } wrap.style.display="block"; con.innerHTML = "";
             [...allDrivers].sort((a,b)=>a.name.localeCompare(b.name)).forEach(d => {
-                const r = d.results || {}; const pts = (r[tid] && typeof r[tid]==='object') ? r[tid].points : (r[tid] || 0); const team = (r[tid] && typeof r[tid]==='object') ? r[tid].team : d.team; const teamColor = TEAM_COLORS[team] || '#555'; const hasPoints = pts > 0 ? 'border-color:var(--accent-cyan); box-shadow:0 0 10px rgba(0,240,255,0.2);' : '';
-                con.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}; ${hasPoints}"><div style="display:flex; flex-direction:column;"><span style="font-weight:bold;">${d.name}</span><span style="font-size:0.75rem; color:#888;">${team.toUpperCase()}</span></div><input type="number" class="rc-points-input form-control" style="width:70px; text-align:center; font-weight:bold;" data-did="${d.id}" value="${pts}"></div>`;
+                const r = d.results || {}; 
+                const pts = (r[tid] && typeof r[tid]==='object') ? r[tid].points : (r[tid] || 0); 
+                const pos = (r[tid] && typeof r[tid]==='object') ? r[tid].position : "";
+                const team = (r[tid] && typeof r[tid]==='object') ? r[tid].team : d.team; 
+                const teamColor = TEAM_COLORS[team] || '#555'; 
+                const hasPoints = pts > 0 ? 'border-color:var(--accent-cyan); box-shadow:0 0 10px rgba(0,240,255,0.2);' : '';
+                con.innerHTML += `
+                    <div class="driver-card" style="--team-color:${teamColor}; ${hasPoints}">
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-weight:bold;">${d.name}</span>
+                            <span style="font-size:0.75rem; color:#888;">${team.toUpperCase()}</span>
+                        </div>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" class="rc-pos-input form-control" style="width:50px; text-align:center; padding:5px; font-size:0.8rem;" placeholder="POS" value="${pos || ''}">
+                            <input type="number" class="rc-points-input form-control" style="width:60px; text-align:center; padding:5px; font-weight:bold;" placeholder="PTS" data-did="${d.id}" value="${pts}">
+                        </div>
+                    </div>`;
             });
         };
 
         window.saveRaceResults = async () => {
-            const tid = document.getElementById("raceDirectorTrackSelect").value; if(!tid) return; const inps = document.querySelectorAll(".rc-points-input"); const batch = writeBatch(db); let changes = 0;
-            inps.forEach(inp => { const did = inp.dataset.did; const newP = Number(inp.value); const d = driversCache[did]; const oldRes = d.results || {}; const oldP = (oldRes[tid] && typeof oldRes[tid]==='object') ? oldRes[tid].points : (oldRes[tid]||0);
-                if(oldP !== newP) { const newTot = d.totalPoints - oldP + newP; const resUpd = { ...oldRes }; let tRace = d.team; if(oldRes[tid] && oldRes[tid].team) tRace = oldRes[tid].team; if(newP > 0) resUpd[tid] = { points: newP, team: tRace }; else delete resUpd[tid]; batch.update(doc(db, "seasons", currentSeason, "drivers", did), { results: resUpd, totalPoints: newTot }); changes++; }
+            const tid = document.getElementById("raceDirectorTrackSelect").value; if(!tid) return; 
+            const ptsInps = document.querySelectorAll(".rc-points-input"); 
+            const posInps = document.querySelectorAll(".rc-pos-input");
+            const batch = writeBatch(db); let changes = 0;
+            
+            ptsInps.forEach((inp, idx) => { 
+                const did = inp.dataset.did; 
+                const newP = Number(inp.value); 
+                const newPos = posInps[idx].value.trim();
+                const d = driversCache[did]; 
+                const oldRes = d.results || {}; 
+                const oldP = (oldRes[tid] && typeof oldRes[tid]==='object') ? oldRes[tid].points : (oldRes[tid]||0);
+                const oldPos = (oldRes[tid] && typeof oldRes[tid]==='object') ? oldRes[tid].position : "";
+                
+                if(oldP !== newP || oldPos !== newPos) { 
+                    const newTot = d.totalPoints - oldP + newP; 
+                    const resUpd = { ...oldRes }; 
+                    let tRace = d.team; 
+                    if(oldRes[tid] && oldRes[tid].team) tRace = oldRes[tid].team; 
+                    
+                    if(newP > 0 || newPos !== "") {
+                        resUpd[tid] = { points: newP, position: newPos, team: tRace }; 
+                    } else delete resUpd[tid]; 
+                    
+                    batch.update(doc(db, "seasons", currentSeason, "drivers", did), { results: resUpd, totalPoints: newTot }); 
+                    changes++; 
+                }
             });
             if(changes > 0) { await batch.commit(); showToast("Results Saved"); } else showToast("No Changes");
         };
@@ -1233,10 +1313,53 @@
         window.viewDriverStats = () => {
             const id = document.getElementById("statsDriverSelect").value; const disp = document.getElementById("statsDisplay"); if(!id) { disp.style.display="none"; return; } disp.style.display="block";
             const d = driversCache[id]; document.getElementById("statsDriverName").innerText = d.name.toUpperCase(); document.getElementById("statsTeamName").innerText = TEAMS.find(t=>t.id===d.team)?.name.toUpperCase() || d.team; document.getElementById("statPoints").innerHTML = `${d.totalPoints} <span style="font-size:1rem; color:#888;">PTS</span>`;
-            let w=0, p=0, r=0, entries=0, best=0, dnf=0, hHTML=""; const labels = [], dataPoints = [], barData = []; let cumulative = 0;
-            activeTracks.forEach(t => { const res = d.results ? d.results[t.id] : null; const pt = (res && typeof res === 'object') ? res.points : (res || 0); if(res) { entries++; if(pt > 0) { r++; cumulative += pt; if(pt > best) best = pt; if(pt>=25) w++; if(pt>=15) p++; const tm = (typeof res === 'object') ? res.team : d.team; const tName = TEAMS.find(x=>x.id===tm)?.name || tm; hHTML += `<tr><td>${t.name.toUpperCase()}</td><td style="color:#888;">${tName}</td><td style="text-align:right; font-weight:bold; color:var(--accent-cyan);">${pt}</td></tr>`; } labels.push(t.id.substring(0,3).toUpperCase()); dataPoints.push(cumulative); barData.push(pt); } });
-            let avg = r > 0 ? d.totalPoints / r : 0; let variance = 0; if(r > 0) { barData.forEach(pt => { if(pt>0) variance += Math.pow(pt - avg, 2); }); variance = Math.sqrt(variance / r).toFixed(1); }
-            document.getElementById("statWins").innerText = w; document.getElementById("statPodiums").innerText = p; document.getElementById("statAvg").innerText = avg.toFixed(1); document.getElementById("statConsistency").innerText = variance; document.getElementById("statsHistoryBody").innerHTML = hHTML || `<tr><td colspan="3" style="text-align:center;">NO DATA</td></tr>`;
+            
+            let w=0, p=0, r=0, entries=0, best=0, dnf=0, hHTML=""; 
+            const labels = [], dataPoints = [], barData = []; let cumulative = 0;
+            let totalPos = 0, finishedRaces = 0;
+
+            activeTracks.forEach(t => { 
+                const res = d.results ? d.results[t.id] : null; 
+                const pt = (res && typeof res === 'object') ? res.points : (res || 0); 
+                const pos = (res && typeof res === 'object') ? res.position : "-";
+                
+                if(res) { 
+                    entries++; 
+                    // Calculate stats
+                    if(pt > 0) { 
+                        r++; cumulative += pt; 
+                        if(pt > best) best = pt; 
+                        if(pt>=25) w++; 
+                        if(pt>=15) p++; 
+                    }
+                    
+                    // Track finishes for Avg
+                    const numPos = parseInt(pos);
+                    if(!isNaN(numPos)) {
+                        totalPos += numPos;
+                        finishedRaces++;
+                    }
+
+                    const tm = (typeof res === 'object') ? res.team : d.team; 
+                    const tName = TEAMS.find(x=>x.id===tm)?.name || tm; 
+                    hHTML += `<tr><td>${t.name.toUpperCase()}</td><td style="color:var(--accent-yellow); font-weight:bold;">${pos}</td><td style="color:#888;">${tName}</td><td style="text-align:right; font-weight:bold; color:var(--accent-cyan);">${pt}</td></tr>`; 
+                    
+                    labels.push(t.id.substring(0,3).toUpperCase()); 
+                    dataPoints.push(cumulative); 
+                    barData.push(pt); 
+                } 
+            });
+            
+            let avg = finishedRaces > 0 ? totalPos / finishedRaces : 0; 
+            let variance = 0; // Consistency based on points variance for now
+            if(r > 0) { barData.forEach(pt => { if(pt>0) variance += Math.pow(pt - (d.totalPoints/r), 2); }); variance = Math.sqrt(variance / r).toFixed(1); }
+            
+            document.getElementById("statWins").innerText = w; 
+            document.getElementById("statPodiums").innerText = p; 
+            document.getElementById("statAvg").innerText = avg > 0 ? "P" + avg.toFixed(1) : "-"; 
+            document.getElementById("statConsistency").innerText = variance; 
+            document.getElementById("statsHistoryBody").innerHTML = hHTML || `<tr><td colspan="4" style="text-align:center;">NO DATA</td></tr>`;
+            
             renderChart(labels, dataPoints, barData);
         };
 
