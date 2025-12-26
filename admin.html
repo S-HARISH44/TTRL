@@ -1131,19 +1131,26 @@
             document.getElementById("editorMainTeam").value = data.team;
             document.getElementById("editorDriverIdHidden").value = id;
             const grid = document.getElementById("trackGrid"); grid.innerHTML = "";
-            if(activeTracks.length === 0) { grid.innerHTML = "No Tracks Configured"; return; }
+            
+            if(activeTracks.length === 0) { grid.innerHTML = "<div style='color:var(--text-muted); padding:10px;'>No Tracks Configured</div>"; return; }
+            
             const res = data.results || {};
             let teamOpts = `<optgroup label="Teams">` + TEAMS.map(tm => `<option value="${tm.id}">${tm.name}</option>`).join('') + `</optgroup>`;
+            
+            // BUG FIX: Build all HTML string first, THEN inject, THEN set values.
+            // Previous loop using innerHTML += was resetting select values to default on every iteration.
+            let rowsHTML = "";
+            
             activeTracks.forEach(t => {
-                let pts = 0, raceTeam = data.team, pos = ""; 
+                let pts = 0, pos = ""; 
                 if(res[t.id]) { 
                     if(typeof res[t.id] === 'object') { 
                         pts = res[t.id].points || 0; 
-                        raceTeam = res[t.id].team || data.team; 
                         pos = res[t.id].position || "";
                     } else { pts = res[t.id]; } 
                 }
-                grid.innerHTML += `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:16px; border-radius:8px; box-shadow:var(--shadow-sm);">
+                
+                rowsHTML += `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:16px; border-radius:8px; box-shadow:var(--shadow-sm);">
                     <label class="input-label">${t.name}</label>
                     <div style="display:flex; gap:12px;">
                         <input type="text" class="pos-in form-control" style="width:70px; text-align:center;" placeholder="POS" value="${pos}">
@@ -1151,8 +1158,20 @@
                         <select class="tm-in form-control" id="tm-${t.id}">${teamOpts}</select>
                     </div>
                 </div>`;
-                document.getElementById(`tm-${t.id}`).value = raceTeam;
             });
+
+            grid.innerHTML = rowsHTML;
+
+            // Set Select Values after HTML is stable
+            activeTracks.forEach(t => {
+                let raceTeam = data.team;
+                if(res[t.id] && typeof res[t.id] === 'object' && res[t.id].team) {
+                    raceTeam = res[t.id].team;
+                }
+                const el = document.getElementById(`tm-${t.id}`);
+                if(el) el.value = raceTeam;
+            });
+            
             calcTotal();
         };
         window.closeDriverEditor = () => { document.getElementById("editor-area").style.display = "none"; document.getElementById("editorSelectionGrid").style.display = "grid"; document.getElementById("editorDriverIdHidden").value = ""; };
