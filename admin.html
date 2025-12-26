@@ -21,7 +21,7 @@
 
     <style>
         :root {
-            /* --- COLOR PALETTE --- */
+            /* --- COLOR PALETTE (VIBRANT LIGHT) --- */
             --bg-body: #e2e8f0;      /* Darker Grey-Blue for contrast */
             --bg-panel: #ffffff;
             --bg-header: #f8fafc;    /* Light grey for panel headers */
@@ -295,19 +295,48 @@
 
         /* --- GRID/LIST VIEWS --- */
         .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        
         .driver-card { 
-            background: #fff; border: 1px solid var(--border-dim); 
-            border-left: 4px solid var(--team-color, #94a3b8); 
-            border-radius: 8px; padding: 16px 20px; 
+            background: #fff; 
+            /* UPDATED: Full Border instead of Left Strip */
+            border: 2px solid var(--team-color, #94a3b8); 
+            border-radius: 8px; 
+            padding: 16px 20px; 
             display: flex; align-items: center; justify-content: space-between; 
-            transition: all 0.2s; box-shadow: var(--shadow-sm);
+            transition: all 0.2s; 
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
         }
+        
+        /* REMOVED: Gradient Glow for Team Color (Cleanup) */
+        /* .driver-card::after { ... } */
+
         .driver-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .driver-info { position: relative; z-index: 2; }
         .driver-info h4 { font-family: var(--font-display); font-size: 1.1rem; margin: 0; font-weight: 700; color: var(--text-primary); }
-        .driver-info p { font-family: var(--font-ui); font-size: 0.8rem; color: var(--text-secondary); margin: 4px 0 0; text-transform: uppercase; font-weight: 600; }
-        .icon-btn { background: none; border: 1px solid var(--border-dim); color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
+        .driver-info p { 
+            font-family: var(--font-ui); 
+            font-size: 0.8rem; 
+            color: var(--team-color); 
+            filter: brightness(0.8);
+            margin: 4px 0 0; 
+            text-transform: uppercase; 
+            font-weight: 800; 
+        }
+        .icon-btn { position: relative; z-index: 2; background: none; border: 1px solid var(--border-dim); color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
         .icon-btn:hover { background: #f1f5f9; color: var(--text-primary); }
         .icon-btn.delete:hover { background: #fef2f2; border-color: #fecaca; color: var(--accent-red); }
+        
+        /* TEAM STRIP FOR EDITOR ROWS */
+        .team-strip {
+            width: 8px;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--team-color, #ccc);
+        }
 
         /* --- TABLES --- */
         .tech-table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: var(--font-ui); font-size: 0.9rem; }
@@ -324,7 +353,7 @@
         /* --- LOGIN SCREEN (Light) --- */
         #login-screen { position: fixed; inset: 0; z-index: 999; background: #f1f5f9; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
         .login-card { width: 420px; padding: 48px; background: #fff; border: 1px solid var(--border-dim); border-top: 4px solid var(--accent-cyan); box-shadow: var(--shadow-lg); border-radius: 12px; text-align: center; }
-        .login-logo { height: 64px; margin-bottom: 24px; /* Default colors */ }
+        .login-logo { height: 64px; margin-bottom: 24px; }
 
         /* Toast */
         .toast { position: fixed; bottom: 30px; right: 30px; background: #fff; border: 1px solid var(--border-dim); border-left: 4px solid var(--accent-cyan); padding: 16px 24px; color: var(--text-primary); transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 200; font-family: var(--font-ui); font-weight: 600; box-shadow: var(--shadow-lg); border-radius: 8px; }
@@ -748,18 +777,34 @@
         let activeTracks = []; 
         try { knownSeasons = JSON.parse(localStorage.getItem('ttrl_seasons')) || ['season_1']; } catch(e) { knownSeasons = ['season_1']; }
 
-        const TEAMS = [
-            {id:'red-bull-racing', name:'Red Bull'}, {id:'ferrari', name:'Ferrari'}, {id:'mercedes', name:'Mercedes'},
-            {id:'mclaren', name:'McLaren'}, {id:'aston-martin', name:'Aston Martin'}, {id:'alpine', name:'Alpine'},
-            {id:'williams', name:'Williams'}, {id:'racing-bulls', name:'Racing Bulls'}, {id:'kick-sauber', name:'Kick Sauber'},
-            {id:'haas', name:'Haas'}, {id:'reserve', name:'Reserve'}
-        ];
-
+        // UPDATED: HIGH-ACCURACY F1 TEAM COLORS (Visually matched to 2024/25 Liveries)
         const TEAM_COLORS = {
-            "red-bull-racing": "#3671C6", "ferrari": "#E80020", "mercedes": "#27F4D2", "mclaren": "#FF8000",
-            "aston-martin": "#229971", "alpine": "#0093CC", "williams": "#64C4FF", "racing-bulls": "#6692FF",
-            "kick-sauber": "#52E252", "haas": "#B6BABD", "reserve": "#666666"
+            "red-bull-racing": "#3671C6", // Oracle Navy/Blue
+            "ferrari": "#E80020",         // Ferrari Scarlet Red
+            "mercedes": "#27F4D2",        // Petronas Teal
+            "mclaren": "#FF8000",         // Papaya Orange
+            "aston-martin": "#229971",    // British Racing Green
+            "alpine": "#0093CC",          // Alpine Blue
+            "williams": "#64C4FF",        // Williams Electric Blue
+            "racing-bulls": "#1634CB",    // VCARB Blue (Vibrant)
+            "kick-sauber": "#52E252",     // Kick Neon Green
+            "haas": "#5B5B5B",            // Haas Dark Grey (adjusted for visibility on white)
+            "reserve": "#666666"          // Generic Grey
         };
+
+        const TEAMS = [
+            {id:'red-bull-racing', name:'Red Bull Racing'}, 
+            {id:'ferrari', name:'Ferrari'}, 
+            {id:'mercedes', name:'Mercedes-AMG'},
+            {id:'mclaren', name:'McLaren'}, 
+            {id:'aston-martin', name:'Aston Martin'}, 
+            {id:'alpine', name:'Alpine'},
+            {id:'williams', name:'Williams'}, 
+            {id:'racing-bulls', name:'Visa Cash App RB'}, 
+            {id:'kick-sauber', name:'Kick Sauber'},
+            {id:'haas', name:'Haas F1 Team'}, 
+            {id:'reserve', name:'Reserve Driver'}
+        ];
 
         const MASTER_TRACK_LIST = [
             { id: "bahrain", name: "Bahrain GP" }, { id: "saudi_arabia", name: "Saudi Arabian GP" }, { id: "australia", name: "Australian GP" },
@@ -1041,27 +1086,76 @@
             });
         };
 
-        // --- DRIVER DATA & OTHER FUNCTIONS (Standard) ---
+        // --- DRIVER DATA ---
         function initListener() {
             if(unsubscribe) unsubscribe();
-            const q = query(collection(db, "seasons", currentSeason, "drivers"), orderBy("totalPoints", "desc"));
+            const q = query(collection(db, "seasons", currentSeason, "drivers")); 
+            
             unsubscribe = onSnapshot(q, (snap) => {
                 const list = document.getElementById("driverList");
                 const statSel = document.getElementById("statsDriverSelect");
                 const grid = document.getElementById("editorSelectionGrid");
-                list.innerHTML = ""; statSel.innerHTML = '<option value="">-- SELECT DRIVER --</option>'; grid.innerHTML = ""; allDrivers = [];
-                if(snap.empty) { list.innerHTML = `<div style="padding:20px; color:var(--text-muted);">GRID EMPTY</div>`; grid.innerHTML = `<div style="padding:20px; color:var(--text-muted);">NO DRIVERS FOUND</div>`; }
+                
+                list.innerHTML = ""; 
+                statSel.innerHTML = '<option value="">-- SELECT DRIVER --</option>'; 
+                grid.innerHTML = ""; 
+                allDrivers = [];
+
+                if(snap.empty) { 
+                    list.innerHTML = `<div style="padding:20px; color:var(--text-muted);">GRID EMPTY</div>`; 
+                    grid.innerHTML = `<div style="padding:20px; color:var(--text-muted);">NO DRIVERS FOUND</div>`; 
+                }
+
                 snap.forEach(d => {
-                    const data = d.data(); data.id = d.id; driversCache[d.id] = data; allDrivers.push(data);
-                    const teamColor = TEAM_COLORS[data.team] || '#94a3b8';
-                    statSel.innerHTML += `<option value="${d.id}">${data.name.toUpperCase()}</option>`;
-                    list.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}"><div style="display:flex; align-items:center; gap:12px;"><input type="checkbox" class="driver-checkbox" value="${d.id}" style="transform:scale(1.2);"><div class="driver-info"><h4>${data.name}</h4><p style="color:var(--text-secondary);">${data.team}</p></div></div><button class="icon-btn delete" onclick="deleteDriver('${d.id}')"><i class="fas fa-trash"></i></button></div>`;
-                    grid.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}; cursor:pointer;" onclick="loadDriverData('${d.id}')"><div class="driver-info"><h4>${data.name}</h4><p>${data.team}</p></div><div style="font-family:var(--font-display); font-size:1.2rem; color:var(--accent-cyan); font-weight:800;">${data.totalPoints} PTS</div></div>`;
+                    const data = d.data(); 
+                    data.id = d.id; 
+                    driversCache[d.id] = data; 
+                    allDrivers.push(data);
                 });
-                updateLiveTables(); updateDashboard();
+
+                // SORTING: Team first, then Name
+                allDrivers.sort((a, b) => {
+                    const idxA = TEAMS.findIndex(t => t.id === a.team);
+                    const idxB = TEAMS.findIndex(t => t.id === b.team);
+                    if (idxA !== -1 && idxB !== -1 && idxA !== idxB) return idxA - idxB;
+                    return a.name.localeCompare(b.name);
+                });
+
+                allDrivers.forEach(data => {
+                    const teamColor = TEAM_COLORS[data.team] || '#94a3b8';
+                    const teamName = TEAMS.find(t => t.id === data.team)?.name || data.team;
+
+                    statSel.innerHTML += `<option value="${data.id}">${data.name.toUpperCase()}</option>`;
+
+                    list.innerHTML += `
+                        <div class="driver-card" style="--team-color:${teamColor}">
+                            <div style="display:flex; align-items:center; gap:12px; position:relative; z-index:2;">
+                                <input type="checkbox" class="driver-checkbox" value="${data.id}" style="transform:scale(1.2);">
+                                <div class="driver-info">
+                                    <h4>${data.name}</h4>
+                                    <p>${teamName}</p>
+                                </div>
+                            </div>
+                            <button class="icon-btn delete" onclick="deleteDriver('${data.id}')"><i class="fas fa-trash"></i></button>
+                        </div>`;
+
+                    grid.innerHTML += `
+                        <div class="driver-card" style="--team-color:${teamColor}; cursor:pointer;" onclick="loadDriverData('${data.id}')">
+                            <div class="driver-info">
+                                <h4>${data.name}</h4>
+                                <p>${teamName}</p>
+                            </div>
+                            <div style="position:relative; z-index:2; font-family:var(--font-display); font-size:1.2rem; color:var(--accent-cyan); font-weight:800;">${data.totalPoints} PTS</div>
+                        </div>`;
+                });
+                
+                updateLiveTables(); 
+                updateDashboard();
                 if(document.getElementById("raceDirectorGrid").style.display === "block") loadRaceGrid();
+                
                 const currentEditId = document.getElementById("editorDriverIdHidden").value;
                 if(document.getElementById("editor-area").style.display === "block" && currentEditId && driversCache[currentEditId]) loadDriverData(currentEditId);
+                
                 if(document.getElementById("statsDisplay").style.display === "block") viewDriverStats();
             });
         }
@@ -1097,7 +1191,7 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast("Export Started");
         };
 
-        // --- MIGRATION & EDITOR (Standard) ---
+        // --- MIGRATION & EDITOR ---
         window.openMigrationModal = () => { document.getElementById('migrationModal').style.display = 'flex'; document.getElementById('migrationStatus').innerText = ''; };
         window.performMigration = async () => {
             const source = document.getElementById('migrateSource').value.trim();
@@ -1123,6 +1217,18 @@
             } catch(e) { status.innerText = "Failed: " + e.message; }
         };
 
+        // Helper: Get Team Color Robustly
+        function getTeamColor(teamId) {
+            if(!teamId) return '#94a3b8';
+            if(TEAM_COLORS[teamId]) return TEAM_COLORS[teamId];
+            const lower = teamId.toLowerCase();
+            if(TEAM_COLORS[lower]) return TEAM_COLORS[lower];
+            const teamObj = TEAMS.find(t => t.name.toLowerCase() === lower || t.id === lower);
+            if(teamObj && TEAM_COLORS[teamObj.id]) return TEAM_COLORS[teamObj.id];
+            return '#94a3b8';
+        }
+
+        // --- UPDATED: DRIVER EDITOR (With Team Color Strip for every race) ---
         window.loadDriverData = (id) => {
             if(!id) return;
             document.getElementById("editorSelectionGrid").style.display = "none"; document.getElementById("editor-area").style.display = "block";
@@ -1130,39 +1236,41 @@
             document.getElementById("editorDriverNameDisplay").innerText = data.name.toUpperCase();
             document.getElementById("editorMainTeam").value = data.team;
             document.getElementById("editorDriverIdHidden").value = id;
-            const grid = document.getElementById("trackGrid"); grid.innerHTML = "";
+            const grid = document.getElementById("trackGrid"); 
             
             if(activeTracks.length === 0) { grid.innerHTML = "<div style='color:var(--text-muted); padding:10px;'>No Tracks Configured</div>"; return; }
             
             const res = data.results || {};
-            let teamOpts = `<optgroup label="Teams">` + TEAMS.map(tm => `<option value="${tm.id}">${tm.name}</option>`).join('') + `</optgroup>`;
+            // Generate options once
+            const teamOpts = `<optgroup label="Teams">` + TEAMS.map(tm => `<option value="${tm.id}">${tm.name}</option>`).join('') + `</optgroup>`;
             
-            // BUG FIX: Build all HTML string first, THEN inject, THEN set values.
-            // Previous loop using innerHTML += was resetting select values to default on every iteration.
             let rowsHTML = "";
-            
             activeTracks.forEach(t => {
-                let pts = 0, pos = ""; 
+                let pts = 0, pos = "", raceTeam = data.team; 
                 if(res[t.id]) { 
                     if(typeof res[t.id] === 'object') { 
                         pts = res[t.id].points || 0; 
                         pos = res[t.id].position || "";
+                        if(res[t.id].team) raceTeam = res[t.id].team;
                     } else { pts = res[t.id]; } 
                 }
-                
-                rowsHTML += `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:16px; border-radius:8px; box-shadow:var(--shadow-sm);">
-                    <label class="input-label">${t.name}</label>
+
+                // Use robust color getter
+                const raceTeamColor = getTeamColor(raceTeam);
+
+                rowsHTML += `<div class="race-row" id="row-${t.id}" style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:16px 16px 16px 24px; border-radius:8px; box-shadow:var(--shadow-sm); position:relative; overflow:hidden;">
+                    <div class="team-strip" id="strip-${t.id}" style="background:${raceTeamColor};"></div>
+                    <label class="input-label" style="margin-bottom:8px;">${t.name}</label>
                     <div style="display:flex; gap:12px;">
-                        <input type="text" class="pos-in form-control" style="width:70px; text-align:center;" placeholder="POS" value="${pos}">
+                        <input type="text" class="pos-in form-control" style="width:70px; text-align:center; font-weight:700;" placeholder="POS" value="${pos}">
                         <input type="number" class="pts-in form-control" style="width:90px; text-align:center; font-weight:bold; color:var(--accent-cyan);" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
-                        <select class="tm-in form-control" id="tm-${t.id}">${teamOpts}</select>
+                        <select class="tm-in form-control" id="tm-${t.id}" onchange="updateRowColor('${t.id}', this.value)">${teamOpts}</select>
                     </div>
                 </div>`;
             });
 
             grid.innerHTML = rowsHTML;
 
-            // Set Select Values after HTML is stable
             activeTracks.forEach(t => {
                 let raceTeam = data.team;
                 if(res[t.id] && typeof res[t.id] === 'object' && res[t.id].team) {
@@ -1174,21 +1282,35 @@
             
             calcTotal();
         };
+
+        window.updateRowColor = (trackId, teamId) => {
+            const color = getTeamColor(teamId);
+            const strip = document.getElementById(`strip-${trackId}`);
+            if(strip) strip.style.background = color;
+        };
+
         window.closeDriverEditor = () => { document.getElementById("editor-area").style.display = "none"; document.getElementById("editorSelectionGrid").style.display = "grid"; document.getElementById("editorDriverIdHidden").value = ""; };
         window.updateMainTeam = async () => { const id = document.getElementById("editorDriverIdHidden").value; if(!id) return; const team = document.getElementById("editorMainTeam").value; await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { team }); showToast("Main Contract Updated"); };
         window.calcTotal = () => { let s = 0; document.querySelectorAll(".pts-in").forEach(i => s += Number(i.value)||0); document.getElementById("calculatedTotal").innerText = s; };
+        
         window.saveAllChanges = async () => {
             const id = document.getElementById("editorDriverIdHidden").value; if(!id) return;
             const ptsIns = document.querySelectorAll(".pts-in"); 
             const tmIns = document.querySelectorAll(".tm-in");
             const posIns = document.querySelectorAll(".pos-in");
             let newResults = {}, total = 0;
+            
+            // Get main team to check for deviations
+            const mainTeam = document.getElementById("editorMainTeam").value;
+
             ptsIns.forEach((p, idx) => { 
                 const val = Number(p.value); 
                 const posVal = posIns[idx].value.trim();
-                // Save entry if points > 0 OR if a position is entered (e.g. DNF with 0 points)
-                if(val > 0 || posVal !== "") { 
-                    newResults[p.dataset.track] = { points: val, position: posVal, team: tmIns[idx].value }; 
+                const selectedTeam = tmIns[idx].value;
+                
+                // SAVE IF: Points > 0 OR Position Set OR Team is different from Main Team
+                if(val > 0 || posVal !== "" || selectedTeam !== mainTeam) { 
+                    newResults[p.dataset.track] = { points: val, position: posVal, team: selectedTeam }; 
                     total += val; 
                 } 
             });
@@ -1236,27 +1358,50 @@
             Object.keys(teamPts).map(k => ({id:k, p:teamPts[k]})).sort((a,b) => b.p - a.p).forEach((x,i) => { const tn = TEAMS.find(t=>t.id===x.id)?.name || x.id; tC.innerHTML += `<tr><td style="color:var(--text-secondary); font-weight:600;">${String(i+1).padStart(2,'0')}</td><td style="font-weight:700; color:var(--text-primary); text-transform:uppercase; font-size:0.95rem;">${tn}</td><td style="text-align:right; font-weight:800; color:var(--accent-red); font-size:1.1rem;">${x.p}</td></tr>`; });
         }
 
+        // --- UPDATED: RACE GRID (With Robust Color Logic) ---
         window.loadRaceGrid = () => {
-            const tid = document.getElementById("raceDirectorTrackSelect").value; const con = document.getElementById("raceInputsContainer"); const wrap = document.getElementById("raceDirectorGrid"); if(!tid) { wrap.style.display="none"; return; } wrap.style.display="block"; con.innerHTML = "";
-            [...allDrivers].sort((a,b)=>a.name.localeCompare(b.name)).forEach(d => {
+            const tid = document.getElementById("raceDirectorTrackSelect").value; 
+            const con = document.getElementById("raceInputsContainer"); 
+            const wrap = document.getElementById("raceDirectorGrid"); 
+            if(!tid) { wrap.style.display="none"; return; } 
+            wrap.style.display="block"; 
+            con.innerHTML = "";
+            
+            // Build the HTML string first
+            let gridHTML = "";
+            
+            // allDrivers is already sorted by Team in initListener
+            allDrivers.forEach(d => {
                 const r = d.results || {}; 
                 const pts = (r[tid] && typeof r[tid]==='object') ? r[tid].points : (r[tid] || 0); 
                 const pos = (r[tid] && typeof r[tid]==='object') ? r[tid].position : "";
-                const team = (r[tid] && typeof r[tid]==='object') ? r[tid].team : d.team; 
-                const teamColor = TEAM_COLORS[team] || '#94a3b8'; 
-                const hasPoints = pts > 0 ? 'border-color:var(--accent-cyan); box-shadow:0 0 0 3px rgba(37, 99, 235, 0.1);' : '';
-                con.innerHTML += `
+                
+                // CRITICAL FIX: Robust Team Determination
+                let team = d.team;
+                if (r[tid] && typeof r[tid] === 'object' && r[tid].team) {
+                    team = r[tid].team;
+                }
+                
+                const teamColor = getTeamColor(team);
+                const teamName = TEAMS.find(t => t.id === team)?.name || team;
+                
+                // FIXED: Removed the blue tint background for cards with points
+                const hasPoints = '';
+                
+                gridHTML += `
                     <div class="driver-card" style="--team-color:${teamColor}; ${hasPoints}">
-                        <div style="display:flex; flex-direction:column;">
-                            <span style="font-weight:700; color:var(--text-primary);">${d.name}</span>
-                            <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">${team.toUpperCase()}</span>
+                        <div class="driver-info">
+                            <span style="display:block; font-weight:700; color:var(--text-primary); font-size:1.05rem;">${d.name}</span>
+                            <span style="display:block; font-size:0.75rem; color:${teamColor}; font-weight:700; text-transform:uppercase; margin-top:2px;">${teamName}</span>
                         </div>
-                        <div style="display:flex; gap:5px;">
-                            <input type="text" class="rc-pos-input form-control" style="width:50px; text-align:center; padding:5px; font-size:0.8rem;" placeholder="POS" value="${pos || ''}">
-                            <input type="number" class="rc-points-input form-control" style="width:60px; text-align:center; padding:5px; font-weight:bold;" placeholder="PTS" data-did="${d.id}" value="${pts}">
+                        <div style="display:flex; gap:5px; position:relative; z-index:2;">
+                            <input type="text" class="rc-pos-input form-control" style="width:60px; text-align:center; padding:5px; font-size:0.9rem; font-weight:700; text-transform:uppercase;" placeholder="POS" value="${pos || ''}">
+                            <input type="number" class="rc-points-input form-control" style="width:70px; text-align:center; padding:5px; font-weight:800; color:var(--accent-cyan);" placeholder="PTS" data-did="${d.id}" value="${pts}">
                         </div>
                     </div>`;
             });
+            
+            con.innerHTML = gridHTML;
         };
 
         window.saveRaceResults = async () => {
@@ -1340,7 +1485,6 @@
         };
 
         function renderChart(labels, lineData, barData) {
-            // Updated Colors for Light Mode Chart
             const gridColor = 'rgba(0,0,0,0.05)';
             const textColor = '#64748b';
 
