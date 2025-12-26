@@ -5,100 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TTRL | Mission Control</title>
     
-    <!-- Fonts: Tech & Data -->
+    <!-- Fonts: Clean & Professional -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Three.js for Globe -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- GSAP for Animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
-    <!-- SHADERS FOR DOTTED GLOBE -->
-    <script type="x-shader/x-fragment" id="fragment-shader-map">
-        uniform sampler2D u_map_tex;
-        varying float vOpacity;
-        varying vec2 vUv;
-
-        void main() {
-            vec3 color = texture2D(u_map_tex, vUv).rgb;
-            float gray = dot(color, vec3(0.299, 0.587, 0.114));
-            
-            // INCREASED BRIGHTNESS: Multiplied by 4.0 and added base luminance
-            vec3 techColor = vec3(0.5, 0.96, 1.0) * gray * 4.0;
-            
-            // Dot Shape
-            color -= .2 * length(gl_PointCoord.xy - vec2(.5));
-            float dot = 1. - smoothstep(.38, .4, length(gl_PointCoord.xy - vec2(.5)));
-            if (dot < 0.5) discard;
-            
-            gl_FragColor = vec4(techColor, dot * vOpacity);
-        }
-    </script>
-
-    <script type="x-shader/x-vertex" id="vertex-shader-map">
-        uniform sampler2D u_map_tex;
-        uniform float u_dot_size;
-        uniform float u_time_since_click;
-        uniform vec3 u_pointer;
-
-        varying float vOpacity;
-        varying vec2 vUv;
-
-        void main() {
-            vUv = uv;
-            // Mask with texture brightness (Land vs Sea)
-            float visibility = step(.2, texture2D(u_map_tex, uv).r);
-            gl_PointSize = visibility * u_dot_size;
-
-            // Fade out dots in back
-            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-            vOpacity = (1. / length(mvPosition.xyz) - .7);
-            vOpacity = clamp(vOpacity, .1, 1.); // Increased min opacity for brightness
-
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
-        }
-    </script>
-
     <style>
         :root {
             /* --- COLOR PALETTE --- */
-            --bg-body: #050505;
-            --bg-panel: #0f1012;
-            --bg-panel-hover: #16171a;
-            --bg-sidebar: #09090b;
+            --bg-body: #e2e8f0;      /* Darker Grey-Blue for contrast */
+            --bg-panel: #ffffff;
+            --bg-header: #f8fafc;    /* Light grey for panel headers */
             
-            --border-dim: rgba(255, 255, 255, 0.08);
-            --border-light: rgba(255, 255, 255, 0.15);
+            /* Sidebar is now dark for contrast */
+            --sidebar-bg: #0f172a;   
+            --sidebar-text: #94a3b8;
+            --sidebar-text-active: #ffffff;
             
-            --accent-cyan: #00f0ff;
-            --accent-red: #ff3b3b;
-            --accent-green: #00ff9d;
-            --accent-yellow: #fcee0a;
-            --accent-purple: #bd00ff;
+            --border-dim: #e2e8f0;
+            --border-light: #cbd5e1;
             
-            --text-primary: #ffffff;
-            --text-secondary: #9ca3af;
-            --text-muted: #4b5563;
+            /* Stronger Accents */
+            --accent-cyan: #0ea5e9;  /* Sky Blue */
+            --accent-red: #ef4444;   /* Racing Red */
+            --accent-green: #10b981; /* Emerald */
+            --accent-yellow: #f59e0b; /* Amber */
+            --accent-purple: #8b5cf6; /* Violet */
+            
+            --text-primary: #1e293b;  /* Slate 800 */
+            --text-secondary: #475569; /* Slate 600 */
+            --text-muted: #94a3b8;    /* Slate 400 */
 
             /* --- FONTS --- */
-            --font-display: 'Chakra Petch', sans-serif;
-            --font-ui: 'Rajdhani', sans-serif;
+            --font-display: 'Manrope', sans-serif; 
+            --font-ui: 'Inter', sans-serif;
             --font-data: 'JetBrains Mono', monospace;
 
             /* --- DIMENSIONS --- */
-            --sidebar-width: 240px;
+            --sidebar-width: 260px;
             --sidebar-width-collapsed: 72px;
             --header-height: 70px;
+            
+            /* --- SHADOWS --- */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
         /* --- GLOBAL RESET --- */
@@ -110,39 +70,36 @@
             font-family: var(--font-ui);
             height: 100vh;
             overflow: hidden;
-            /* Updated Background to match Login Screen with overlay for readability */
-            background-image: 
-                linear-gradient(rgba(5, 5, 7, 0.92), rgba(5, 5, 7, 0.98)),
-                url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            /* Subtle Pattern Background */
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
         }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-body); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* --- LAYOUT --- */
         .app-layout {
             display: flex;
             height: 100vh;
             width: 100vw;
-            opacity: 0; /* Hidden until auth */
+            opacity: 0;
             transition: opacity 0.5s ease;
         }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR (Updated to Dark Navy for Contrast) --- */
         .sidebar {
             width: var(--sidebar-width);
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border-dim);
+            background: var(--sidebar-bg);
+            border-right: 1px solid #1e293b;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 50;
+            box-shadow: var(--shadow-md);
         }
         .sidebar.collapsed { width: var(--sidebar-width-collapsed); }
 
@@ -150,25 +107,26 @@
             height: var(--header-height);
             display: flex;
             align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid var(--border-dim);
+            padding: 0 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             gap: 12px;
             overflow: hidden;
+            background: rgba(0,0,0,0.2);
         }
-        .logo-img { height: 32px; width: auto; object-fit: contain; }
-        .logo-text { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; letter-spacing: 1px; white-space: nowrap; color: #fff; }
+        .logo-img { height: 36px; width: auto; object-fit: contain; }
+        .logo-text { font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; white-space: nowrap; color: #fff; }
         .sidebar.collapsed .logo-text { opacity: 0; pointer-events: none; }
 
-        .nav-links { flex: 1; padding: 20px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .nav-links { flex: 1; padding: 20px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
 
         .nav-group-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
             font-weight: 700;
-            padding: 15px 16px 5px;
+            padding: 16px 16px 8px;
             letter-spacing: 1px;
-            font-family: var(--font-data);
-            opacity: 0.7;
+            font-family: var(--font-ui);
+            text-transform: uppercase;
         }
         .sidebar.collapsed .nav-group-label { display: none; }
 
@@ -176,33 +134,40 @@
             display: flex;
             align-items: center;
             padding: 12px 16px;
-            color: var(--text-secondary);
+            color: var(--sidebar-text);
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
             transition: all 0.2s;
             cursor: pointer;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            font-weight: 500;
+            font-size: 0.9rem;
             position: relative;
             overflow: hidden;
+            font-family: var(--font-ui);
         }
         .nav-btn i { width: 24px; text-align: center; font-size: 1.1rem; margin-right: 12px; transition: color 0.2s; }
         .nav-btn span { white-space: nowrap; transition: opacity 0.2s; }
         .sidebar.collapsed .nav-btn span { opacity: 0; width: 0; }
         .sidebar.collapsed .nav-btn i { margin-right: 0; }
-        .nav-btn:hover { background: var(--bg-panel-hover); color: #fff; }
-        .nav-btn.active { background: rgba(0, 240, 255, 0.08); color: var(--accent-cyan); border: 1px solid rgba(0, 240, 255, 0.2); }
-        .nav-btn.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
+        
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-btn.active { background: var(--accent-cyan); color: #fff; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4); }
+        .nav-btn.active i { color: #fff; }
 
         .user-panel {
             padding: 20px;
-            border-top: 1px solid var(--border-dim);
+            border-top: 1px solid rgba(255,255,255,0.1);
             background: rgba(0,0,0,0.2);
         }
         .user-panel-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .user-name { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: #fff; white-space: nowrap; }
-        .user-role { font-size: 0.7rem; color: var(--accent-green); font-family: var(--font-data); }
+        .user-name { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: #fff; white-space: nowrap; }
+        .user-role { font-size: 0.7rem; color: var(--accent-cyan); font-family: var(--font-data); font-weight: 600; background: rgba(14, 165, 233, 0.2); padding: 2px 6px; border-radius: 4px; }
         .sidebar.collapsed .user-panel-row { display: none; }
+        
+        /* Fix for disconnect button text hiding */
+        .sidebar.collapsed .user-panel .btn { justify-content: center; padding: 10px; }
+        .sidebar.collapsed .user-panel .btn span { display: none; }
+        .sidebar.collapsed .user-panel .btn i { margin: 0; }
 
         /* --- MAIN CONTENT --- */
         .main-wrapper {
@@ -220,181 +185,163 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(10px);
+            padding: 0 32px;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
             z-index: 40;
         }
-        .toggle-sidebar { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; }
-        .toggle-sidebar:hover { color: #fff; }
+        .toggle-sidebar { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
+        .toggle-sidebar:hover { color: var(--accent-cyan); transform: scale(1.1); }
 
         .season-control {
             display: flex;
             align-items: center;
-            gap: 15px;
-            background: var(--bg-panel);
-            padding: 5px 15px;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 6px 16px;
             border: 1px solid var(--border-dim);
-            border-radius: 4px;
+            border-radius: 8px;
         }
-        .season-label { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-muted); font-weight: 700; }
-        .season-input { background: none; border: none; color: var(--accent-cyan); font-family: var(--font-display); font-weight: 700; font-size: 1rem; text-transform: uppercase; width: 100px; text-align: center; }
-        .season-input:focus { border-bottom: 1px solid var(--accent-cyan); }
+        .season-label { font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .season-input { background: none; border: none; color: var(--text-primary); font-family: var(--font-display); font-weight: 800; font-size: 1rem; text-transform: uppercase; width: 100px; text-align: center; }
+        .season-input:focus { color: var(--accent-cyan); }
 
-        .action-cluster { display: flex; gap: 10px; }
+        .action-cluster { display: flex; gap: 12px; }
         
         .btn {
-            background: var(--bg-panel); border: 1px solid var(--border-dim); color: var(--text-secondary);
-            padding: 8px 16px; font-family: var(--font-ui); font-weight: 700; font-size: 0.8rem;
-            text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;
-            border-radius: 4px; display: inline-flex; align-items: center; gap: 8px;
+            background: #fff; border: 1px solid var(--border-dim); color: var(--text-secondary);
+            padding: 8px 16px; font-family: var(--font-ui); font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm);
+            border-radius: 6px; display: inline-flex; align-items: center; gap: 8px;
         }
-        .btn:hover { border-color: var(--text-secondary); color: #fff; background: var(--bg-panel-hover); }
-        .btn-primary { background: var(--accent-cyan); color: #000; border: none; }
-        .btn-primary:hover { background: #fff; box-shadow: 0 0 15px var(--accent-cyan); }
-        .btn-danger { color: var(--accent-red); border-color: rgba(255, 59, 59, 0.3); background: rgba(255, 59, 59, 0.05); }
-        .btn-danger:hover { background: var(--accent-red); color: #fff; }
-        .btn-success { color: var(--accent-green); border-color: rgba(0, 255, 157, 0.3); background: rgba(0, 255, 157, 0.05); }
-        .btn-success:hover { background: var(--accent-green); color: #000; }
+        .btn:hover { border-color: var(--border-light); color: var(--text-primary); background: #f8fafc; transform: translateY(-1px); }
+        
+        .btn-primary { background: var(--accent-cyan); color: #fff; border: 1px solid var(--accent-cyan); }
+        .btn-primary:hover { background: #0284c7; color: #fff; border-color: #0284c7; box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.4); }
+        
+        .btn-danger { color: var(--accent-red); border-color: #fecaca; background: #fef2f2; }
+        .btn-danger:hover { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+        
+        .btn-success { color: var(--accent-green); border-color: #a7f3d0; background: #ecfdf5; }
+        .btn-success:hover { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
 
         /* --- WORKSPACE --- */
-        .workspace { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
-        .section { display: none; animation: slideUp 0.3s ease-out; }
+        .workspace { flex: 1; padding: 32px; overflow-y: auto; position: relative; }
+        .section { display: none; animation: fadeIn 0.4s ease-out; }
         .section.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- CARDS & PANELS --- */
         .panel {
-            background: var(--bg-panel); border: 1px solid var(--border-dim); border-radius: 8px;
-            padding: 24px; margin-bottom: 24px; position: relative;
-        }
-        .panel::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background: #fff; border: 1px solid var(--border-dim); border-radius: 12px;
+            margin-bottom: 24px; position: relative; overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
         .panel-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-dim); padding-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center; 
+            background: var(--bg-header); padding: 16px 24px;
+            border-bottom: 1px solid var(--border-dim);
         }
-        .panel-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; }
-        .panel-title i { color: var(--text-muted); font-size: 0.9rem; }
-
-        /* --- DASHBOARD LAYOUT (SPLIT) --- */
-        .dashboard-split {
-            display: grid;
-            grid-template-columns: 3fr 2fr; /* CHANGED: Left side 60%, Right Side 40% (Globe Smaller) */
-            gap: 30px;
-            height: calc(100vh - 140px);
-            min-height: 600px;
-        }
-
-        .dash-left {
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding-right: 5px;
-        }
-
-        .dash-right {
-            position: relative;
-            background: rgba(0,0,0,0.4); /* Transparent to let bg texture show through */
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-dim);
-        }
-
-        #globeContainer { width: 100%; height: 100%; }
-
-        /* STAT CARDS */
-        .stat-grid-compact {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-        }
+        .panel-body { padding: 24px; }
         
-        .stat-card {
-            background: linear-gradient(145deg, #0e0f11, #09090b); border: 1px solid var(--border-dim);
-            padding: 20px; border-radius: 8px; position: relative; overflow: hidden; transition: transform 0.2s;
-        }
-        .stat-card:hover { transform: translateY(-2px); border-color: var(--border-light); }
-        .stat-icon { position: absolute; right: -10px; top: -10px; font-size: 4rem; opacity: 0.05; transform: rotate(15deg); }
-        .stat-label { font-family: var(--font-data); font-size: 0.7rem; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-        .stat-value { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: #fff; line-height: 1; }
-        .stat-footer { margin-top: 10px; font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-        .stat-footer.positive { color: var(--accent-green); }
-        .stat-footer.highlight { color: var(--accent-cyan); }
+        .panel-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .panel-title i { color: var(--accent-cyan); font-size: 1.1rem; }
 
-        /* GLOBE TOOLTIP CARD */
-        #globe-tooltip {
-            position: absolute;
-            top: 0; left: 0;
-            background: rgba(8, 8, 10, 0.9);
-            border: 1px solid var(--accent-cyan);
-            border-left: 4px solid var(--accent-cyan);
-            padding: 15px;
-            border-radius: 0 4px 4px 0;
-            pointer-events: none;
-            display: none;
-            z-index: 100;
-            width: 220px;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
-            backdrop-filter: blur(8px);
+        /* --- NEW DASHBOARD LAYOUT (Full Grid) --- */
+        .dashboard-grid-full {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
         }
-        #globe-tooltip h3 { margin: 0 0 5px 0; font-family: var(--font-display); font-size: 1.1rem; color: #fff; text-transform: uppercase; }
-        #globe-tooltip p { margin: 0; font-family: var(--font-data); font-size: 0.8rem; color: var(--accent-cyan); }
-        #globe-tooltip .coords { margin-top: 5px; font-size: 0.7rem; color: #666; font-family: var(--font-data); }
+
+        /* STAT CARDS - NOW WITH GRADIENTS */
+        .stat-card {
+            background: #fff; border: 1px solid var(--border-dim);
+            padding: 24px; border-radius: 12px; position: relative; overflow: hidden; transition: transform 0.2s;
+            box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .stat-icon { position: absolute; right: -10px; top: -10px; font-size: 6rem; opacity: 0.1; transform: rotate(15deg); color: var(--text-primary); }
+        
+        .stat-label { font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; }
+        .stat-value { font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+        .stat-footer { margin-top: 12px; font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-family: var(--font-ui); font-weight: 600; }
+        
+        /* Colored Backgrounds for Cards */
+        .card-accent-blue { background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%); border-top: 4px solid var(--accent-cyan); }
+        .card-accent-blue .stat-icon { color: var(--accent-cyan); }
+        
+        .card-accent-red { background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%); border-top: 4px solid var(--accent-red); }
+        .card-accent-red .stat-icon { color: var(--accent-red); }
+        
+        .card-accent-green { background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-top: 4px solid var(--accent-green); }
+        .card-accent-green .stat-icon { color: var(--accent-green); }
+        
+        .card-accent-purple { background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%); border-top: 4px solid var(--accent-purple); }
+        .card-accent-purple .stat-icon { color: var(--accent-purple); }
 
         /* --- FORMS & INPUTS --- */
-        .input-group { margin-bottom: 15px; }
-        .input-label { display: block; font-family: var(--font-data); font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; }
-        .form-control { width: 100%; background: #050505; border: 1px solid var(--border-dim); color: #fff; padding: 10px 14px; font-family: var(--font-ui); font-size: 0.95rem; border-radius: 4px; transition: border 0.2s; }
-        .form-control:focus { border-color: var(--accent-cyan); }
+        .input-group { margin-bottom: 16px; }
+        .input-label { display: block; font-family: var(--font-ui); font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
+        .form-control { 
+            width: 100%; background: #f8fafc; 
+            border: 1px solid var(--border-dim); color: var(--text-primary); 
+            padding: 10px 14px; font-family: var(--font-ui); font-size: 0.95rem; 
+            border-radius: 6px; transition: all 0.2s; font-weight: 500; 
+        }
+        .form-control:focus { border-color: var(--accent-cyan); background: #fff; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
 
         /* --- GRID/LIST VIEWS --- */
-        .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-        .driver-card { background: var(--bg-panel); border: 1px solid var(--border-dim); border-left: 4px solid var(--team-color, #333); border-radius: 6px; padding: 16px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; }
-        .driver-card:hover { background: var(--bg-panel-hover); }
-        .driver-info h4 { font-family: var(--font-display); font-size: 1.1rem; margin: 0; }
-        .driver-info p { font-family: var(--font-data); font-size: 0.75rem; color: var(--text-secondary); margin: 4px 0 0; text-transform: uppercase; }
-        .icon-btn { background: none; border: 1px solid var(--border-dim); color: var(--text-secondary); width: 28px; height: 28px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: 0.2s; }
-        .icon-btn:hover { border-color: #fff; color: #fff; }
-        .icon-btn.delete:hover { border-color: var(--accent-red); color: var(--accent-red); }
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .driver-card { 
+            background: #fff; border: 1px solid var(--border-dim); 
+            border-left: 4px solid var(--team-color, #94a3b8); 
+            border-radius: 8px; padding: 16px 20px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            transition: all 0.2s; box-shadow: var(--shadow-sm);
+        }
+        .driver-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .driver-info h4 { font-family: var(--font-display); font-size: 1.1rem; margin: 0; font-weight: 700; color: var(--text-primary); }
+        .driver-info p { font-family: var(--font-ui); font-size: 0.8rem; color: var(--text-secondary); margin: 4px 0 0; text-transform: uppercase; font-weight: 600; }
+        .icon-btn { background: none; border: 1px solid var(--border-dim); color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
+        .icon-btn:hover { background: #f1f5f9; color: var(--text-primary); }
+        .icon-btn.delete:hover { background: #fef2f2; border-color: #fecaca; color: var(--accent-red); }
 
         /* --- TABLES --- */
         .tech-table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: var(--font-ui); font-size: 0.9rem; }
-        .tech-table th { text-align: left; padding: 12px 16px; color: var(--text-secondary); font-family: var(--font-data); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border-dim); }
-        .tech-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #e5e5e5; }
-        .tech-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .tech-table th { text-align: left; padding: 16px 20px; color: var(--text-secondary); font-family: var(--font-ui); font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--border-dim); font-weight: 800; letter-spacing: 0.5px; background: #f8fafc; }
+        .tech-table td { padding: 14px 20px; border-bottom: 1px solid var(--border-dim); color: var(--text-primary); font-weight: 500; }
+        .tech-table tr:hover td { background: #f8fafc; }
+        .tech-table tr:last-child td { border-bottom: none; }
 
         /* --- MODALS --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 100; display: none; align-items: center; justify-content: center; }
-        .modal-box { background: #0e0f11; border: 1px solid var(--border-light); width: 90%; max-width: 450px; padding: 30px; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; }
-        .modal-title { font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 10px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; }
+        .modal-box { background: #fff; border: 1px solid var(--border-dim); width: 90%; max-width: 480px; padding: 32px; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; }
+        .modal-title { font-family: var(--font-display); font-size: 1.5rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; }
 
-        /* --- LOGIN SCREEN --- */
-        #login-screen { position: fixed; inset: 0; z-index: 999; background: #000; display: flex; align-items: center; justify-content: center; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/f1-cars-race-track-3840x2160-13489.jpg'); background-size: cover; background-position: center; }
-        .login-card { width: 400px; padding: 40px; background: rgba(10, 10, 12, 0.95); border: 1px solid var(--border-light); border-top: 2px solid var(--accent-cyan); backdrop-filter: blur(20px); box-shadow: 0 0 50px rgba(0,0,0,0.8); border-radius: 8px; text-align: center; }
-        .login-logo { height: 60px; margin-bottom: 20px; }
+        /* --- LOGIN SCREEN (Light) --- */
+        #login-screen { position: fixed; inset: 0; z-index: 999; background: #f1f5f9; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
+        .login-card { width: 420px; padding: 48px; background: #fff; border: 1px solid var(--border-dim); border-top: 4px solid var(--accent-cyan); box-shadow: var(--shadow-lg); border-radius: 12px; text-align: center; }
+        .login-logo { height: 64px; margin-bottom: 24px; /* Default colors */ }
 
         /* Toast */
-        .toast { position: fixed; bottom: 30px; right: 30px; background: #111; border: 1px solid var(--accent-cyan); border-left-width: 4px; padding: 15px 25px; color: #fff; transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 200; font-family: var(--font-data); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #fff; border: 1px solid var(--border-dim); border-left: 4px solid var(--accent-cyan); padding: 16px 24px; color: var(--text-primary); transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 200; font-family: var(--font-ui); font-weight: 600; box-shadow: var(--shadow-lg); border-radius: 8px; }
         .toast.show { transform: translateY(0); opacity: 1; }
 
         /* --- RESPONSIVE --- */
-        @media (max-width: 1100px) {
-            .dashboard-split { grid-template-columns: 1fr; height: auto; }
-            .dash-right { height: 500px; order: -1; /* Globe on top for mobile */ }
-        }
         @media (max-width: 900px) {
             .app-layout { flex-direction: column; height: auto; min-height: 100vh; }
             .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-dim); }
             .sidebar.collapsed .nav-links { display: none; }
             .main-wrapper { height: auto; overflow: visible; }
-            .top-bar { padding: 0 15px; flex-direction: column; height: auto; padding-bottom: 15px; gap: 10px; }
+            .top-bar { padding: 0 20px; flex-direction: column; height: auto; padding-bottom: 15px; gap: 12px; }
             .action-cluster { flex-wrap: wrap; justify-content: center; }
-            .nav-links { flex-direction: row; overflow-x: auto; padding: 10px; }
+            .nav-links { flex-direction: row; overflow-x: auto; padding: 12px; }
             .nav-btn span { display: none; } 
             .nav-btn i { margin: 0; font-size: 1.2rem; }
-            .workspace { padding: 15px; }
+            .workspace { padding: 20px; }
         }
     </style>
 </head>
@@ -404,22 +351,22 @@
     <div id="login-screen">
         <div class="login-card">
             <img src="https://raw.githubusercontent.com/S-HARISH44/TTRL/452f1b2138a6e81e13d957a448e4de317d9f8201/RESOURCES/image.png" class="login-logo" alt="TTRL">
-            <h2 class="modal-title">SYSTEM UPLINK</h2>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 30px;">PITWALL CONTROL INTERFACE</p>
-            <button class="btn btn-primary" onclick="loginWithGoogle()" style="width: 100%; justify-content: center; margin-bottom: 20px; font-size: 1rem;">
+            <h2 class="modal-title">PITWALL ACCESS</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 32px; font-weight: 500;">Secure Management Console</p>
+            <button class="btn btn-primary" onclick="loginWithGoogle()" style="width: 100%; justify-content: center; margin-bottom: 20px; font-size: 1rem; padding: 12px;">
                 <i class="fab fa-google"></i> AUTHENTICATE WITH GOOGLE
             </button>
-            <div style="display: flex; align-items: center; gap: 10px; margin: 20px 0;">
+            <div style="display: flex; align-items: center; gap: 12px; margin: 24px 0;">
                 <div style="flex:1; height:1px; background:var(--border-dim)"></div>
-                <span style="font-size:0.7rem; color:var(--text-muted)">OR MANUAL OVERRIDE</span>
+                <span style="font-size:0.75rem; color:var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">OR MANUAL LOGIN</span>
                 <div style="flex:1; height:1px; background:var(--border-dim)"></div>
             </div>
-            <input type="email" id="loginEmail" class="form-control" placeholder="OPERATOR ID" style="margin-bottom: 10px; text-align:center;">
-            <input type="password" id="loginPass" class="form-control" placeholder="ACCESS KEY" style="margin-bottom: 20px; text-align:center;">
-            <button class="btn" onclick="checkLogin()" style="width: 100%; justify-content: center; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+            <input type="email" id="loginEmail" class="form-control" placeholder="Operator ID" style="margin-bottom: 12px; text-align:center;">
+            <input type="password" id="loginPass" class="form-control" placeholder="Access Key" style="margin-bottom: 24px; text-align:center;">
+            <button class="btn" onclick="checkLogin()" style="width: 100%; justify-content: center; background: #fff; color: var(--text-primary); border: 1px solid var(--border-light); padding: 12px;">
                 INITIALIZE CONNECTION
             </button>
-            <div id="login-msg" style="margin-top: 15px; color: var(--accent-red); font-size: 0.8rem; font-family: var(--font-data);"></div>
+            <div id="login-msg" style="margin-top: 16px; color: var(--accent-red); font-size: 0.85rem; font-family: var(--font-ui); font-weight: 600;"></div>
         </div>
     </div>
 
@@ -453,8 +400,8 @@
                     <div class="user-name" id="userName">OPERATOR</div>
                     <div class="user-role">ADMIN</div>
                 </div>
-                <button class="btn btn-danger" onclick="logout()" style="width: 100%; justify-content: center; font-size: 0.7rem;">
-                    <i class="fas fa-power-off"></i> DISCONNECT
+                <button class="btn btn-danger" onclick="logout()" style="width: 100%; justify-content: center; font-size: 0.75rem;">
+                    <i class="fas fa-power-off"></i> <span>DISCONNECT</span>
                 </button>
             </div>
         </nav>
@@ -471,7 +418,7 @@
                         <input type="text" id="seasonInput" class="season-input" value="season_1" onchange="changeSeason()">
                         <button class="icon-btn" onclick="changeSeason()"><i class="fas fa-sync-alt"></i></button>
                     </div>
-                    <div id="knownSeasonsList" style="font-family: var(--font-data); font-size: 0.7rem; color: var(--text-muted);"></div>
+                    <div id="knownSeasonsList" style="font-family: var(--font-data); font-size: 0.75rem; color: var(--text-muted);"></div>
                 </div>
                 <div class="action-cluster">
                     <button class="btn" onclick="openMigrationModal()"><i class="fas fa-exchange-alt"></i> MIGRATE</button>
@@ -486,199 +433,225 @@
                 
                 <!-- 1. DASHBOARD -->
                 <div id="dashboard" class="section active">
-                    <div class="panel-header" style="border:none; margin-bottom: 10px;">
-                        <div class="panel-title" style="font-size: 1.5rem;">MISSION OVERVIEW</div>
-                        <span class="user-role" id="dashNextDate">SEASON ACTIVE</span>
+                    <!-- MISSION OVERVIEW HEADER -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                        <div>
+                            <h2 style="font-family:var(--font-display); font-weight:800; font-size:1.8rem; color:var(--text-primary); margin:0;">MISSION OVERVIEW</h2>
+                            <div style="font-family:var(--font-ui); color:var(--text-secondary); font-size:0.9rem;" id="dashNextDate">SEASON ACTIVE</div>
+                        </div>
                     </div>
 
-                    <!-- SPLIT LAYOUT -->
-                    <div class="dashboard-split">
+                    <!-- STATS ROW 1 -->
+                    <div class="dashboard-grid-full">
+                        <div class="stat-card card-accent-blue">
+                            <i class="fas fa-users stat-icon"></i>
+                            <div class="stat-label">GRID SIZE</div>
+                            <div class="stat-value" id="dashDriverCount">0</div>
+                            <div class="stat-footer positive"><i class="fas fa-check"></i> Active Drivers</div>
+                        </div>
                         
-                        <!-- LEFT COLUMN: STATS -->
-                        <div class="dash-left">
-                            <div class="stat-grid-compact">
-                                <!-- Drivers -->
-                                <div class="stat-card">
-                                    <i class="fas fa-users stat-icon"></i>
-                                    <div class="stat-label">GRID SIZE</div>
-                                    <div class="stat-value" id="dashDriverCount">0</div>
-                                    <div class="stat-footer positive"><i class="fas fa-check"></i> Active</div>
+                        <div class="stat-card card-accent-green">
+                            <i class="fas fa-map-location-dot stat-icon"></i>
+                            <div class="stat-label">CALENDAR</div>
+                            <div class="stat-value" id="dashTrackCount">0</div>
+                            <div class="stat-footer"><i class="fas fa-flag"></i> Scheduled Races</div>
+                        </div>
+
+                        <div class="stat-card card-accent-purple">
+                            <i class="fas fa-trophy stat-icon" style="color: var(--accent-purple); opacity: 0.1;"></i>
+                            <div class="stat-label">LEADER</div>
+                            <div class="stat-value" id="dashLeader" style="font-size:1.5rem;">--</div>
+                            <div class="stat-footer highlight" id="dashLeaderPts" style="color:var(--accent-purple);">0 PTS</div>
+                        </div>
+
+                        <div class="stat-card card-accent-red">
+                            <i class="fas fa-cogs stat-icon" style="color: var(--accent-red); opacity: 0.1;"></i>
+                            <div class="stat-label">TOP TEAM</div>
+                            <div class="stat-value" id="dashTeamLeader" style="font-size:1.5rem;">--</div>
+                            <div class="stat-footer highlight" style="color: var(--accent-red);" id="dashTeamPts">0 PTS</div>
+                        </div>
+                    </div>
+
+                    <!-- RACE CONTROL METRICS (Replaced Globe) -->
+                    <div class="dashboard-grid-full" style="grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="stat-card" style="background:#fff; border-left: 4px solid var(--accent-yellow);">
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <div style="font-size:2.5rem; color:var(--accent-yellow);"><i class="fas fa-stopwatch"></i></div>
+                                <div>
+                                    <div class="stat-label" style="margin:0;">FASTEST LAP</div>
+                                    <div style="font-size:1.2rem; font-weight:800; color:var(--text-primary);">N/A</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card" style="background:#fff; border-left: 4px solid var(--accent-cyan);">
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <div style="font-size:2.5rem; color:var(--accent-cyan);"><i class="fas fa-cloud-sun"></i></div>
+                                <div>
+                                    <div class="stat-label" style="margin:0;">CONDITIONS</div>
+                                    <div style="font-size:1.2rem; font-weight:800; color:var(--text-primary);">DRY</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card" style="background:#fff; border-left: 4px solid var(--accent-green);">
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <div style="font-size:2.5rem; color:var(--accent-green);"><i class="fas fa-flag-checkered"></i></div>
+                                <div>
+                                    <div class="stat-label" style="margin:0;">STATUS</div>
+                                    <div style="font-size:1.2rem; font-weight:800; color:var(--text-primary);">GREEN</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress & Schedule -->
+                    <div class="dashboard-grid-full" style="grid-template-columns: 2fr 1fr;">
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div class="panel-title"><i class="fas fa-chart-line"></i> SEASON PROGRESS</div>
+                            </div>
+                            <div class="panel-body">
+                                <div style="display:flex; justify-content:space-between; align-items:end; margin-bottom:12px;">
+                                    <div class="stat-value" id="dashProgressPct" style="font-size:3rem;">0%</div>
+                                    <div class="stat-footer" id="dashRacesDone" style="font-size:1rem;">0 / 0 RACES</div>
+                                </div>
+                                <div style="width:100%; height:12px; background:#f1f5f9; border-radius:6px; overflow:hidden;">
+                                    <div id="dashProgressBar" style="width:0%; height:100%; background:var(--accent-green); transition: width 1s ease;"></div>
                                 </div>
                                 
-                                <!-- Tracks -->
-                                <div class="stat-card">
-                                    <i class="fas fa-map-location-dot stat-icon"></i>
-                                    <div class="stat-label">CALENDAR</div>
-                                    <div class="stat-value" id="dashTrackCount">0</div>
-                                    <div class="stat-footer highlight"><i class="fas fa-flag"></i> Races</div>
-                                </div>
-
-                                <!-- Leader -->
-                                <div class="stat-card" style="border-color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0,240,255,0.05);">
-                                    <i class="fas fa-trophy stat-icon" style="color: var(--accent-cyan); opacity: 0.1;"></i>
-                                    <div class="stat-label" style="color: var(--accent-cyan);">LEADER</div>
-                                    <div class="stat-value" id="dashLeader" style="font-size:1.5rem;">--</div>
-                                    <div class="stat-footer highlight" id="dashLeaderPts">0 PTS</div>
-                                </div>
-
-                                <!-- Constructors -->
-                                <div class="stat-card" style="border-color: var(--accent-red); box-shadow: 0 0 20px rgba(255,59,59,0.05);">
-                                    <i class="fas fa-cogs stat-icon" style="color: var(--accent-red); opacity: 0.1;"></i>
-                                    <div class="stat-label" style="color: var(--accent-red);">TOP TEAM</div>
-                                    <div class="stat-value" id="dashTeamLeader" style="font-size:1.5rem;">--</div>
-                                    <div class="stat-footer highlight" style="color: var(--accent-red);" id="dashTeamPts">0 PTS</div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:30px;">
+                                    <div class="stat-card" style="box-shadow:none; border:1px solid var(--border-dim); background:#f8fafc;">
+                                        <div class="stat-label">NEXT EVENT</div>
+                                        <div class="stat-value" id="dashNextRace" style="font-size: 1.2rem;">--</div>
+                                        <div class="stat-footer"><i class="far fa-clock"></i> Scheduled</div>
+                                    </div>
+                                    <div class="stat-card" style="box-shadow:none; border:1px solid var(--border-dim); background:#f8fafc;">
+                                        <div class="stat-label">LATEST VICTOR</div>
+                                        <div class="stat-value" id="dashLastWinner" style="font-size: 1.2rem;">--</div>
+                                        <div class="stat-footer" id="dashLastGP">WAITING</div>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Progress -->
-                            <div class="stat-card">
-                                <div class="stat-label">SEASON PROGRESS</div>
-                                <div style="display:flex; justify-content:space-between; align-items:end; margin-bottom:10px;">
-                                    <div class="stat-value" id="dashProgressPct">0%</div>
-                                    <div class="stat-footer" id="dashRacesDone">0 / 0 RACES</div>
-                                </div>
-                                <div style="width:100%; height:6px; background:#222; border-radius:4px; overflow:hidden;">
-                                    <div id="dashProgressBar" style="width:0%; height:100%; background:var(--accent-green); box-shadow: 0 0 10px var(--accent-green); transition: width 1s ease;"></div>
-                                </div>
-                            </div>
-
-                            <!-- Next Race / Last Winner -->
-                            <div class="stat-grid-compact">
-                                <div class="stat-card">
-                                    <div class="stat-label">NEXT EVENT</div>
-                                    <div class="stat-value" id="dashNextRace" style="font-size: 1.2rem;">--</div>
-                                    <div class="stat-footer"><i class="far fa-clock"></i> Scheduled</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-label">LATEST VICTOR</div>
-                                    <div class="stat-value" id="dashLastWinner" style="font-size: 1.2rem;">--</div>
-                                    <div class="stat-footer" id="dashLastGP">WAITING</div>
-                                </div>
-                            </div>
-
-                            <!-- Calendar List -->
-                            <div class="panel" style="flex:1; margin:0; display:flex; flex-direction:column; min-height:200px;">
+                        <!-- Calendar List -->
+                        <div class="panel" style="display:flex; flex-direction:column; min-height:400px;">
+                            <div class="panel-header">
                                 <div class="panel-title"><i class="far fa-calendar-alt"></i> SCHEDULE</div>
-                                <div id="dashCalendarList" style="flex:1; margin-top: 15px; overflow-y: auto; font-family: var(--font-data); font-size: 0.8rem;"></div>
                             </div>
+                            <div id="dashCalendarList" style="flex:1; overflow-y: auto; padding:0 24px 24px;"></div>
                         </div>
-
-                        <!-- RIGHT COLUMN: GLOBE -->
-                        <div class="dash-right">
-                            <div id="globeContainer"></div>
-                            <!-- Tooltip Card -->
-                            <div id="globe-tooltip">
-                                <h3 id="gt-title">TRACK NAME</h3>
-                                <p id="gt-status">STATUS</p>
-                                <div class="coords" id="gt-coords">LAT: 00.00 | LON: 00.00</div>
-                            </div>
-                            <div style="position:absolute; bottom:20px; right:20px; font-size:0.7rem; color:var(--text-muted); font-family: var(--font-data);">
-                                [ SYSTEM: ONLINE ]<br>
-                                ROTATE: DRAG<br>
-                                INSPECT: HOVER
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
-                <!-- 2. SEASON CONFIG -->
+                <!-- 2. CALENDAR EDITOR -->
                 <div id="season-setup" class="section">
                     <div class="panel">
                         <div class="panel-header">
-                            <div class="panel-title"><i class="fas fa-route"></i> CALENDAR CONFIGURATION</div>
+                            <div class="panel-title"><i class="fas fa-calendar-days"></i> CALENDAR EDITOR</div>
                             <div class="action-cluster">
                                 <button class="btn" onclick="toggleTrackSelectAll()">SELECT ALL</button>
                                 <button class="btn btn-danger" onclick="deleteSelectedTracks()">DELETE</button>
                             </div>
                         </div>
                         
-                        <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 15px; margin-bottom: 25px; align-items: end;">
-                            <div>
-                                <label class="input-label">SELECT CIRCUIT</label>
-                                <select id="trackSelector" class="form-control"><option>LOADING...</option></select>
+                        <div class="panel-body">
+                            <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 20px; margin-bottom: 25px; align-items: end;">
+                                <div>
+                                    <label class="input-label">SELECT CIRCUIT</label>
+                                    <select id="trackSelector" class="form-control"><option>LOADING...</option></select>
+                                </div>
+                                <div>
+                                    <label class="input-label">RACE DATE</label>
+                                    <input type="date" id="newTrackDate" class="form-control">
+                                </div>
+                                <button class="btn btn-primary" onclick="addTrackConfig()" style="height: 46px;"><i class="fas fa-plus"></i></button>
                             </div>
-                            <div>
-                                <label class="input-label">RACE DATE</label>
-                                <input type="date" id="newTrackDate" class="form-control">
-                            </div>
-                            <button class="btn btn-primary" onclick="addTrackConfig()" style="height: 42px;"><i class="fas fa-plus"></i></button>
-                        </div>
 
-                        <div id="trackConfigList" style="max-height: 500px; overflow-y: auto;"></div>
+                            <div id="trackConfigList" style="max-height: 500px; overflow-y: auto;"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 3. MANAGE GRID -->
+                <!-- 3. DRIVER ONBOARD -->
                 <div id="manage-drivers" class="section">
                     <div class="panel">
                         <div class="panel-header">
-                            <div class="panel-title"><i class="fas fa-users"></i> ACTIVE GRID</div>
+                            <div class="panel-title"><i class="fas fa-user-plus"></i> DRIVER ONBOARDING</div>
                             <div class="action-cluster">
                                 <button class="btn" onclick="toggleSelectAll()">SELECT ALL</button>
                                 <button class="btn btn-danger" onclick="deleteSelectedDrivers()">DELETE SELECTED</button>
                             </div>
                         </div>
-                        <div style="margin-bottom:20px; display:flex; gap:10px;">
-                            <input type="text" id="newDriverName" class="form-control" placeholder="DRIVER NAME">
-                            <select id="newDriverTeam" class="form-control"></select>
-                            <button class="btn btn-primary" onclick="registerDriver()">ADD</button>
-                        </div>
-                        <div id="driverList" class="data-grid"></div>
-                    </div>
-                </div>
-
-                <!-- 4. RACE DIRECTOR -->
-                <div id="race-director" class="section">
-                    <div class="panel">
-                        <div class="panel-header"><div class="panel-title"><i class="fas fa-flag-checkered"></i> RACE CONTROL</div></div>
-                        <div style="max-width: 400px; margin-bottom: 30px;">
-                            <label class="input-label">SELECT EVENT TO GRADE</label>
-                            <select id="raceDirectorTrackSelect" class="form-control" onchange="loadRaceGrid()"><option>Loading...</option></select>
-                        </div>
-                        <div id="raceDirectorGrid" style="display:none;">
-                            <div class="data-grid" id="raceInputsContainer"></div>
-                            <div style="margin-top: 30px; border-top: 1px solid var(--border-dim); padding-top: 20px; text-align: right;">
-                                <button class="btn btn-success" onclick="saveRaceResults()"><i class="fas fa-save"></i> COMMIT RESULTS</button>
+                        <div class="panel-body">
+                            <div style="margin-bottom:24px; display:flex; gap:12px;">
+                                <input type="text" id="newDriverName" class="form-control" placeholder="DRIVER NAME">
+                                <select id="newDriverTeam" class="form-control"></select>
+                                <button class="btn btn-primary" onclick="registerDriver()">ADD</button>
                             </div>
+                            <div id="driverList" class="data-grid"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 5. DRIVER EDITOR -->
+                <!-- 4. DRIVER EDITOR -->
                 <div id="driver-editor" class="section">
                     <div class="panel">
-                        <div class="panel-title" style="margin-bottom: 20px;"><i class="fas fa-pen-to-square"></i> INDIVIDUAL ADJUSTMENT</div>
-                        <div id="editorSelectionGrid" class="data-grid"></div>
-                        <div id="editor-area" style="display:none;">
-                            <div style="display:flex; align-items:center; gap: 20px; margin-bottom: 30px;">
-                                <button class="btn" onclick="closeDriverEditor()"><i class="fas fa-arrow-left"></i> BACK</button>
-                                <h2 id="editorDriverNameDisplay" style="font-family: var(--font-display); margin:0;">DRIVER</h2>
-                            </div>
-                            <div style="max-width: 400px; margin-bottom: 30px;">
-                                <label class="input-label">MAIN TEAM CONTRACT</label>
-                                <select id="editorMainTeam" class="form-control" onchange="updateMainTeam()"></select>
-                                <input type="hidden" id="editorDriverIdHidden">
-                            </div>
-                            <div id="trackGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;"></div>
-                            <div style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                <div style="font-size: 1.2rem; font-weight: bold;">TOTAL: <span id="calculatedTotal" style="color: var(--accent-cyan);">0</span> PTS</div>
-                                <button class="btn btn-primary" onclick="saveAllChanges()">SAVE CHANGES</button>
+                        <div class="panel-header">
+                            <div class="panel-title"><i class="fas fa-user-pen"></i> INDIVIDUAL ADJUSTMENT</div>
+                        </div>
+                        <div class="panel-body">
+                            <div id="editorSelectionGrid" class="data-grid"></div>
+                            <div id="editor-area" style="display:none;">
+                                <div style="display:flex; align-items:center; gap: 20px; margin-bottom: 30px;">
+                                    <button class="btn" onclick="closeDriverEditor()"><i class="fas fa-arrow-left"></i> BACK</button>
+                                    <h2 id="editorDriverNameDisplay" style="font-family: var(--font-display); margin:0; color: var(--text-primary);">DRIVER</h2>
+                                </div>
+                                <div style="max-width: 400px; margin-bottom: 30px;">
+                                    <label class="input-label">MAIN TEAM CONTRACT</label>
+                                    <select id="editorMainTeam" class="form-control" onchange="updateMainTeam()"></select>
+                                    <input type="hidden" id="editorDriverIdHidden">
+                                </div>
+                                <div id="trackGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;"></div>
+                                <div style="margin-top: 32px; padding: 24px; background: #f8fafc; border: 1px solid var(--border-dim); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">TOTAL: <span id="calculatedTotal" style="color: var(--accent-cyan);">0</span> PTS</div>
+                                    <button class="btn btn-primary" onclick="saveAllChanges()">SAVE CHANGES</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 6. LIVE VIEW -->
+                <!-- 5. RACE EDITOR -->
+                <div id="race-director" class="section">
+                    <div class="panel">
+                        <div class="panel-header"><div class="panel-title"><i class="fas fa-flag-checkered"></i> RACE EDITOR</div></div>
+                        <div class="panel-body">
+                            <div style="max-width: 400px; margin-bottom: 30px;">
+                                <label class="input-label">SELECT EVENT TO GRADE</label>
+                                <select id="raceDirectorTrackSelect" class="form-control" onchange="loadRaceGrid()"><option>Loading...</option></select>
+                            </div>
+                            <div id="raceDirectorGrid" style="display:none;">
+                                <div class="data-grid" id="raceInputsContainer"></div>
+                                <div style="margin-top: 30px; border-top: 1px solid var(--border-dim); padding-top: 24px; text-align: right;">
+                                    <button class="btn btn-success" onclick="saveRaceResults()"><i class="fas fa-save"></i> COMMIT RESULTS</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. LIVE TELEMETRY -->
                 <div id="live-view" class="section">
-                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="dashboard-grid-full" style="grid-template-columns: 1fr 1fr;">
                         <div class="panel">
-                            <div class="panel-title" style="color: var(--accent-cyan);"><i class="fas fa-trophy"></i> DRIVERS CHAMPIONSHIP</div>
-                            <div style="margin-top: 20px;"><table class="tech-table"><thead><tr><th>POS</th><th>DRIVER</th><th style="text-align:right;">PTS</th></tr></thead><tbody id="liveDriversBody"></tbody></table></div>
+                            <div class="panel-header"><div class="panel-title" style="color: var(--accent-cyan);"><i class="fas fa-trophy"></i> DRIVERS CHAMPIONSHIP</div></div>
+                            <div class="panel-body"><table class="tech-table"><thead><tr><th>POS</th><th>DRIVER</th><th style="text-align:right;">PTS</th></tr></thead><tbody id="liveDriversBody"></tbody></table></div>
                         </div>
                         <div class="panel">
-                            <div class="panel-title" style="color: var(--accent-red);"><i class="fas fa-wrench"></i> CONSTRUCTORS CHAMPIONSHIP</div>
-                            <div style="margin-top: 20px;"><table class="tech-table"><thead><tr><th>POS</th><th>TEAM</th><th style="text-align:right;">PTS</th></tr></thead><tbody id="liveConstructorsBody"></tbody></table></div>
+                            <div class="panel-header"><div class="panel-title" style="color: var(--accent-red);"><i class="fas fa-wrench"></i> CONSTRUCTORS CHAMPIONSHIP</div></div>
+                            <div class="panel-body"><table class="tech-table"><thead><tr><th>POS</th><th>TEAM</th><th style="text-align:right;">PTS</th></tr></thead><tbody id="liveConstructorsBody"></tbody></table></div>
                         </div>
                     </div>
                 </div>
@@ -687,24 +660,26 @@
                 <div id="driver-stats" class="section">
                     <div class="panel">
                         <div class="panel-header"><div class="panel-title"><i class="fas fa-chart-line"></i> PERFORMANCE ANALYTICS</div></div>
-                        <div style="max-width: 400px; margin-bottom: 30px;"><select id="statsDriverSelect" class="form-control" onchange="viewDriverStats()"></select></div>
-                        <div id="statsDisplay" style="display:none;">
-                            <div style="display:flex; justify-content:space-between; align-items: flex-end; margin-bottom: 30px;">
-                                <div><h1 id="statsDriverName" style="font-family: var(--font-display); font-size: 2.5rem; margin:0;">NAME</h1><div id="statsTeamName" style="color: var(--accent-cyan); font-family: var(--font-data);">TEAM</div></div>
-                                <div class="stat-value" id="statPoints" style="color: var(--accent-yellow);">0 <span style="font-size: 1rem; color: #888;">PTS</span></div>
+                        <div class="panel-body">
+                            <div style="max-width: 400px; margin-bottom: 30px;"><select id="statsDriverSelect" class="form-control" onchange="viewDriverStats()"></select></div>
+                            <div id="statsDisplay" style="display:none;">
+                                <div style="display:flex; justify-content:space-between; align-items: flex-end; margin-bottom: 32px;">
+                                    <div><h1 id="statsDriverName" style="font-family: var(--font-display); font-size: 2.5rem; margin:0; font-weight:800; color:var(--text-primary);">NAME</h1><div id="statsTeamName" style="color: var(--accent-cyan); font-family: var(--font-data); font-weight:600;">TEAM</div></div>
+                                    <div class="stat-value" id="statPoints" style="color: var(--accent-yellow);">0 <span style="font-size: 1.2rem; color: var(--text-secondary);">PTS</span></div>
+                                </div>
+                                <div class="dashboard-grid-full" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 32px;">
+                                    <div class="stat-card" style="padding: 16px;"><div class="stat-label">WINS</div><div class="stat-value" id="statWins">0</div></div>
+                                    <div class="stat-card" style="padding: 16px;"><div class="stat-label">PODIUMS</div><div class="stat-value" id="statPodiums">0</div></div>
+                                    <div class="stat-card" style="padding: 16px;"><div class="stat-label">AVG FINISH</div><div class="stat-value" id="statAvg">0</div></div>
+                                    <div class="stat-card" style="padding: 16px;"><div class="stat-label">CONSISTENCY</div><div class="stat-value" id="statConsistency">0</div></div>
+                                </div>
+                                <div class="dashboard-grid-full" style="grid-template-columns: 1fr 1fr; margin-bottom: 32px;">
+                                    <div class="panel" style="margin:0; min-height: 350px;"><div class="panel-header"><div class="panel-title" style="font-size: 0.95rem;">CUMULATIVE POINTS</div></div><div class="panel-body"><div style="position: relative; height: 300px; width: 100%;"><canvas id="pointsChart"></canvas></div></div></div>
+                                    <div class="panel" style="margin:0; min-height: 350px;"><div class="panel-header"><div class="panel-title" style="font-size: 0.95rem;">RACE RESULTS</div></div><div class="panel-body"><div style="position: relative; height: 300px; width: 100%;"><canvas id="barChart"></canvas></div></div></div>
+                                </div>
+                                <div class="panel-title" style="margin-bottom:15px;">SEASON HISTORY</div>
+                                <table class="tech-table"><thead><tr><th>TRACK</th><th>POS</th><th>TEAM</th><th style="text-align:right;">PTS</th></tr></thead><tbody id="statsHistoryBody"></tbody></table>
                             </div>
-                            <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 30px;">
-                                <div class="stat-card" style="padding: 15px;"><div class="stat-label">WINS</div><div class="stat-value" id="statWins">0</div></div>
-                                <div class="stat-card" style="padding: 15px;"><div class="stat-label">PODIUMS</div><div class="stat-value" id="statPodiums">0</div></div>
-                                <div class="stat-card" style="padding: 15px;"><div class="stat-label">AVG FINISH</div><div class="stat-value" id="statAvg">0</div></div>
-                                <div class="stat-card" style="padding: 15px;"><div class="stat-label">CONSISTENCY</div><div class="stat-value" id="statConsistency">0</div></div>
-                            </div>
-                            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px;">
-                                <div class="panel" style="margin:0; min-height: 300px;"><div class="panel-title" style="font-size: 0.9rem;">CUMULATIVE POINTS</div><div style="position: relative; height: 250px; width: 100%;"><canvas id="pointsChart"></canvas></div></div>
-                                <div class="panel" style="margin:0; min-height: 300px;"><div class="panel-title" style="font-size: 0.9rem;">RACE RESULTS</div><div style="position: relative; height: 250px; width: 100%;"><canvas id="barChart"></canvas></div></div>
-                            </div>
-                            <div class="panel-title">SEASON HISTORY</div>
-                            <table class="tech-table"><thead><tr><th>TRACK</th><th>POS</th><th>TEAM</th><th style="text-align:right;">PTS</th></tr></thead><tbody id="statsHistoryBody"></tbody></table>
                         </div>
                     </div>
                 </div>
@@ -713,9 +688,11 @@
                 <div id="import-preview" class="section">
                     <div class="panel">
                         <div class="panel-header"><div class="panel-title" style="color: var(--accent-green);">IMPORT PREVIEW</div></div>
-                        <div style="margin-bottom: 20px; font-family: var(--font-data);">DETECTED TRACKS: <span id="detectedTracksList" style="color: var(--accent-green);"></span></div>
-                        <div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-dim); margin-bottom: 20px;"><table class="tech-table"><thead><tr><th>DRIVER</th><th>TEAM</th><th>PTS</th><th>STATUS</th></tr></thead><tbody id="importTableBody"></tbody></table></div>
-                        <div class="action-cluster" style="justify-content: flex-end;"><button class="btn" onclick="cancelImport()">CANCEL</button><button class="btn btn-success" onclick="commitImport()">CONFIRM IMPORT</button></div>
+                        <div class="panel-body">
+                            <div style="margin-bottom: 24px; font-family: var(--font-data);">DETECTED TRACKS: <span id="detectedTracksList" style="color: var(--accent-green); font-weight:700;"></span></div>
+                            <div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-dim); margin-bottom: 24px;"><table class="tech-table"><thead><tr><th>DRIVER</th><th>TEAM</th><th>PTS</th><th>STATUS</th></tr></thead><tbody id="importTableBody"></tbody></table></div>
+                            <div class="action-cluster" style="justify-content: flex-end;"><button class="btn" onclick="cancelImport()">CANCEL</button><button class="btn btn-success" onclick="commitImport()">CONFIRM IMPORT</button></div>
+                        </div>
                     </div>
                 </div>
 
@@ -727,20 +704,20 @@
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-title" style="color: var(--accent-red);">CONFIRM ACTION</div>
-            <p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 25px;">Are you sure?</p>
-            <div style="display: flex; gap: 15px; justify-content: center;"><button id="btnConfirmYes" class="btn btn-danger">PROCEED</button><button onclick="closeModal()" class="btn">CANCEL</button></div>
+            <p id="modalMessage" style="color: var(--text-secondary); margin-bottom: 28px;">Are you sure?</p>
+            <div style="display: flex; gap: 16px; justify-content: center;"><button id="btnConfirmYes" class="btn btn-danger">PROCEED</button><button onclick="closeModal()" class="btn">CANCEL</button></div>
         </div>
     </div>
 
     <div id="migrationModal" class="modal-overlay">
-        <div class="modal-box" style="border-color: var(--accent-cyan);">
+        <div class="modal-box" style="border-top: 4px solid var(--accent-cyan);">
             <div class="modal-title" style="color: var(--accent-cyan);">DATA MIGRATION</div>
-            <p style="color: var(--text-secondary); margin-bottom: 20px;">Transfer data between seasons.</p>
-            <div style="text-align: left; margin-bottom: 15px;"><label class="input-label">SOURCE (COPY FROM)</label><input type="text" id="migrateSource" class="form-control" placeholder="e.g. season_1"></div>
-            <div style="text-align: left; margin-bottom: 20px;"><label class="input-label">TARGET (PASTE TO)</label><input type="text" id="migrateTarget" class="form-control" placeholder="e.g. season_2"></div>
-            <div style="text-align: left; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;"><input type="checkbox" id="migrateDelete"><label for="migrateDelete" style="font-size: 0.8rem; color: #fff;">DELETE SOURCE AFTER COPY</label></div>
-            <div style="display: flex; gap: 15px; justify-content: center;"><button onclick="performMigration()" class="btn btn-primary">TRANSFER</button><button onclick="document.getElementById('migrationModal').style.display='none'" class="btn">CANCEL</button></div>
-            <div id="migrationStatus" style="margin-top: 15px; color: var(--accent-cyan); font-family: var(--font-data); font-size: 0.8rem;"></div>
+            <p style="color: var(--text-secondary); margin-bottom: 24px;">Transfer data between seasons.</p>
+            <div style="text-align: left; margin-bottom: 16px;"><label class="input-label">SOURCE (COPY FROM)</label><input type="text" id="migrateSource" class="form-control" placeholder="e.g. season_1"></div>
+            <div style="text-align: left; margin-bottom: 24px;"><label class="input-label">TARGET (PASTE TO)</label><input type="text" id="migrateTarget" class="form-control" placeholder="e.g. season_2"></div>
+            <div style="text-align: left; margin-bottom: 28px; display: flex; align-items: center; gap: 12px;"><input type="checkbox" id="migrateDelete"><label for="migrateDelete" style="font-size: 0.85rem; color: var(--text-primary); font-weight:600;">DELETE SOURCE AFTER COPY</label></div>
+            <div style="display: flex; gap: 16px; justify-content: center;"><button onclick="performMigration()" class="btn btn-primary">TRANSFER</button><button onclick="document.getElementById('migrationModal').style.display='none'" class="btn">CANCEL</button></div>
+            <div id="migrationStatus" style="margin-top: 16px; color: var(--accent-cyan); font-family: var(--font-data); font-size: 0.85rem; font-weight:700;"></div>
         </div>
     </div>
 
@@ -795,28 +772,12 @@
             { id: "las_vegas", name: "Las Vegas GP" }, { id: "qatar", name: "Qatar GP" }, { id: "abu_dhabi", name: "Abu Dhabi GP" }
         ];
 
-        // --- COORDINATES FOR GLOBE ---
-        const TRACK_COORDS = {
-            "bahrain": {lat: 26.03, lon: 50.51}, "saudi_arabia": {lat: 21.54, lon: 39.17}, "australia": {lat: -37.84, lon: 144.96},
-            "japan": {lat: 34.84, lon: 136.54}, "china": {lat: 31.33, lon: 121.22}, "miami": {lat: 25.95, lon: -80.23},
-            "emilia_romagna": {lat: 44.34, lon: 11.71}, "monaco": {lat: 43.73, lon: 7.42}, "canada": {lat: 45.50, lon: -73.52},
-            "spain": {lat: 41.57, lon: 2.26}, "austria": {lat: 47.21, lon: 14.76}, "uk": {lat: 52.07, lon: -1.01},
-            "hungary": {lat: 47.58, lon: 19.24}, "belgium": {lat: 50.43, lon: 5.97}, "netherlands": {lat: 52.38, lon: 4.54},
-            "italy": {lat: 45.62, lon: 9.28}, "azerbaijan": {lat: 40.37, lon: 49.85}, "singapore": {lat: 1.29, lon: 103.85},
-            "usa": {lat: 30.13, lon: -97.64}, "mexico": {lat: 19.40, lon: -99.09}, "brazil": {lat: -23.70, lon: -46.69},
-            "las_vegas": {lat: 36.11, lon: -115.17}, "qatar": {lat: 25.48, lon: 51.45}, "abu_dhabi": {lat: 24.46, lon: 54.60}
-        };
-
         let driversCache = {};
         let allDrivers = [];
         let pendingImportData = [];
         let pendingImportTracks = new Set();
         let statsChart = null;
         let barChart = null;
-
-        let scene, camera, renderer, globe, controls, globeMarkers = [];
-        const globeContainer = document.getElementById('globeContainer');
-        let clock = new THREE.Clock();
 
         window.showToast = (msg) => {
             const t = document.getElementById('toast');
@@ -865,7 +826,6 @@
             renderKnownSeasons();
             populateDropdowns();
             changeSeason();
-            initGlobe(); 
         }
 
         function populateDropdowns() {
@@ -951,13 +911,16 @@
             if (calList) {
                 calList.innerHTML = "";
                 activeTracks.forEach((t, i) => {
-                    let statusColor = "#666", statusIcon = "";
+                    let statusColor = "var(--text-secondary)", statusIcon = "";
                     if(t.date) {
                         const d = new Date(t.date);
                         if(d < now) { racesDone++; statusColor = "var(--accent-green)"; statusIcon = `<i class="fas fa-check"></i>`; } 
                         else if (!nextRace) { nextRace = t; statusColor = "var(--accent-cyan)"; statusIcon = `<i class="fas fa-flag"></i>`; }
                     }
-                    calList.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); color:${statusColor}"><span>${String(i+1).padStart(2,'0')} ${t.name}</span><span>${t.date || 'TBD'} ${statusIcon}</span></div>`;
+                    calList.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border-dim); color:var(--text-secondary);">
+                        <span style="font-weight:600; color:${statusColor}">${String(i+1).padStart(2,'0')} ${t.name}</span>
+                        <span style="font-size:0.85rem; font-family:var(--font-data);">${t.date || 'TBD'} ${statusIcon}</span>
+                    </div>`;
                 });
             } else {
                 activeTracks.forEach((t) => { if(t.date && new Date(t.date) < now) racesDone++; else if(t.date && !nextRace) nextRace = t; });
@@ -996,7 +959,6 @@
             }
             safeSet('dashLastWinner', lastWinnerName.toUpperCase());
             safeSet('dashLastGP', lastWinnerGP);
-            updateGlobeMarkers();
         }
 
         async function loadTrackConfig() {
@@ -1008,9 +970,9 @@
                 activeTracks.sort((a, b) => new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31'));
             } catch (e) { activeTracks = []; }
 
-            if(activeTracks.length === 0) list.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">NO TRACKS CONFIGURED</div>`;
+            if(activeTracks.length === 0) list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;">NO TRACKS CONFIGURED</div>`;
             else {
-                list.innerHTML = activeTracks.map(t => `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><div style="display:flex; align-items:center; gap:15px;"><input type="checkbox" class="track-checkbox" value="${t.id}" style="transform:scale(1.2);"><span style="font-weight:bold; color:#fff;">${t.name}</span></div><div style="display:flex; gap:10px; align-items:center;"><input type="date" value="${t.date || ''}" onchange="updateTrackDate('${t.id}', this.value)" style="background:#222; border:1px solid #444; color:#fff; padding:4px;"><button class="icon-btn delete" onclick="removeTrackConfig('${t.id}')"><i class="fas fa-times"></i></button></div></div>`).join('');
+                list.innerHTML = activeTracks.map(t => `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-radius:8px; box-shadow:var(--shadow-sm);"><div style="display:flex; align-items:center; gap:15px;"><input type="checkbox" class="track-checkbox" value="${t.id}" style="transform:scale(1.2);"><span style="font-weight:700; color:var(--text-primary); font-size:0.95rem;">${t.name}</span></div><div style="display:flex; gap:10px; align-items:center;"><input type="date" value="${t.date || ''}" onchange="updateTrackDate('${t.id}', this.value)" style="background:#fff; border:1px solid var(--border-dim); color:var(--text-primary); padding:6px; border-radius:4px;"><button class="icon-btn delete" onclick="removeTrackConfig('${t.id}')"><i class="fas fa-times"></i></button></div></div>`).join('');
             }
             
             const rs = document.getElementById("raceDirectorTrackSelect");
@@ -1088,13 +1050,13 @@
                 const statSel = document.getElementById("statsDriverSelect");
                 const grid = document.getElementById("editorSelectionGrid");
                 list.innerHTML = ""; statSel.innerHTML = '<option value="">-- SELECT DRIVER --</option>'; grid.innerHTML = ""; allDrivers = [];
-                if(snap.empty) { list.innerHTML = `<div style="padding:20px; color:#666;">GRID EMPTY</div>`; grid.innerHTML = `<div style="padding:20px; color:#666;">NO DRIVERS FOUND</div>`; }
+                if(snap.empty) { list.innerHTML = `<div style="padding:20px; color:var(--text-muted);">GRID EMPTY</div>`; grid.innerHTML = `<div style="padding:20px; color:var(--text-muted);">NO DRIVERS FOUND</div>`; }
                 snap.forEach(d => {
                     const data = d.data(); data.id = d.id; driversCache[d.id] = data; allDrivers.push(data);
-                    const teamColor = TEAM_COLORS[data.team] || '#444';
+                    const teamColor = TEAM_COLORS[data.team] || '#94a3b8';
                     statSel.innerHTML += `<option value="${d.id}">${data.name.toUpperCase()}</option>`;
-                    list.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}"><div style="display:flex; align-items:center; gap:10px;"><input type="checkbox" class="driver-checkbox" value="${d.id}" style="transform:scale(1.2);"><div class="driver-info"><h4>${data.name}</h4><p style="color:var(--text-secondary);">${data.team}</p></div></div><button class="icon-btn delete" onclick="deleteDriver('${d.id}')"><i class="fas fa-trash"></i></button></div>`;
-                    grid.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}; cursor:pointer;" onclick="loadDriverData('${d.id}')"><div class="driver-info"><h4>${data.name}</h4><p>${data.team}</p></div><div style="font-family:var(--font-display); font-size:1.2rem; color:var(--accent-cyan);">${data.totalPoints} PTS</div></div>`;
+                    list.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}"><div style="display:flex; align-items:center; gap:12px;"><input type="checkbox" class="driver-checkbox" value="${d.id}" style="transform:scale(1.2);"><div class="driver-info"><h4>${data.name}</h4><p style="color:var(--text-secondary);">${data.team}</p></div></div><button class="icon-btn delete" onclick="deleteDriver('${d.id}')"><i class="fas fa-trash"></i></button></div>`;
+                    grid.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}; cursor:pointer;" onclick="loadDriverData('${d.id}')"><div class="driver-info"><h4>${data.name}</h4><p>${data.team}</p></div><div style="font-family:var(--font-display); font-size:1.2rem; color:var(--accent-cyan); font-weight:800;">${data.totalPoints} PTS</div></div>`;
                 });
                 updateLiveTables(); updateDashboard();
                 if(document.getElementById("raceDirectorGrid").style.display === "block") loadRaceGrid();
@@ -1181,11 +1143,11 @@
                         pos = res[t.id].position || "";
                     } else { pts = res[t.id]; } 
                 }
-                grid.innerHTML += `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:15px; border-radius:6px;">
+                grid.innerHTML += `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:16px; border-radius:8px; box-shadow:var(--shadow-sm);">
                     <label class="input-label">${t.name}</label>
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" class="pos-in form-control" style="width:60px; text-align:center;" placeholder="POS" value="${pos}">
-                        <input type="number" class="pts-in form-control" style="width:80px; text-align:center; font-weight:bold; color:var(--accent-cyan);" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
+                    <div style="display:flex; gap:12px;">
+                        <input type="text" class="pos-in form-control" style="width:70px; text-align:center;" placeholder="POS" value="${pos}">
+                        <input type="number" class="pts-in form-control" style="width:90px; text-align:center; font-weight:bold; color:var(--accent-cyan);" data-track="${t.id}" value="${pts}" oninput="calcTotal()">
                         <select class="tm-in form-control" id="tm-${t.id}">${teamOpts}</select>
                     </div>
                 </div>`;
@@ -1249,10 +1211,10 @@
         function updateLiveTables() {
             const tD = document.getElementById("liveDriversBody"); tD.innerHTML = "";
             const sorted = [...allDrivers].sort((a,b) => { if(a.team==='reserve' && b.team!=='reserve') return 1; if(a.team!=='reserve' && b.team==='reserve') return -1; return b.totalPoints - a.totalPoints; });
-            sorted.forEach((d,i) => { tD.innerHTML += `<tr><td style="color:#666;">${i+1}</td><td><div style="font-weight:bold; color:#fff;">${d.name}</div><div style="font-size:0.7rem; color:var(--accent-cyan);">${d.team.toUpperCase()}</div></td><td style="text-align:right; font-weight:bold; font-size:1.1rem; color:var(--accent-cyan);">${d.totalPoints}</td></tr>`; });
+            sorted.forEach((d,i) => { tD.innerHTML += `<tr><td style="color:var(--text-secondary); font-weight:600;">${String(i+1).padStart(2,'0')}</td><td><div style="font-weight:700; color:var(--text-primary); font-size:0.95rem;">${d.name}</div><div style="font-size:0.75rem; color:var(--accent-cyan); font-weight:600;">${d.team.toUpperCase()}</div></td><td style="text-align:right; font-weight:800; font-size:1.1rem; color:var(--accent-cyan);">${d.totalPoints}</td></tr>`; });
             const teamPts = {}; allDrivers.forEach(d => { const res = d.results || {}; Object.values(res).forEach(r => { const p = (typeof r === 'object') ? r.points : r; const t = (typeof r === 'object') ? r.team : d.team; if(t !== 'reserve') { teamPts[t] = (teamPts[t]||0) + p; } }); });
             const tC = document.getElementById("liveConstructorsBody"); tC.innerHTML = "";
-            Object.keys(teamPts).map(k => ({id:k, p:teamPts[k]})).sort((a,b) => b.p - a.p).forEach((x,i) => { const tn = TEAMS.find(t=>t.id===x.id)?.name || x.id; tC.innerHTML += `<tr><td style="color:#666;">${i+1}</td><td style="font-weight:bold; color:#fff; text-transform:uppercase;">${tn}</td><td style="text-align:right; font-weight:bold; color:var(--accent-red);">${x.p}</td></tr>`; });
+            Object.keys(teamPts).map(k => ({id:k, p:teamPts[k]})).sort((a,b) => b.p - a.p).forEach((x,i) => { const tn = TEAMS.find(t=>t.id===x.id)?.name || x.id; tC.innerHTML += `<tr><td style="color:var(--text-secondary); font-weight:600;">${String(i+1).padStart(2,'0')}</td><td style="font-weight:700; color:var(--text-primary); text-transform:uppercase; font-size:0.95rem;">${tn}</td><td style="text-align:right; font-weight:800; color:var(--accent-red); font-size:1.1rem;">${x.p}</td></tr>`; });
         }
 
         window.loadRaceGrid = () => {
@@ -1262,13 +1224,13 @@
                 const pts = (r[tid] && typeof r[tid]==='object') ? r[tid].points : (r[tid] || 0); 
                 const pos = (r[tid] && typeof r[tid]==='object') ? r[tid].position : "";
                 const team = (r[tid] && typeof r[tid]==='object') ? r[tid].team : d.team; 
-                const teamColor = TEAM_COLORS[team] || '#555'; 
-                const hasPoints = pts > 0 ? 'border-color:var(--accent-cyan); box-shadow:0 0 10px rgba(0,240,255,0.2);' : '';
+                const teamColor = TEAM_COLORS[team] || '#94a3b8'; 
+                const hasPoints = pts > 0 ? 'border-color:var(--accent-cyan); box-shadow:0 0 0 3px rgba(37, 99, 235, 0.1);' : '';
                 con.innerHTML += `
                     <div class="driver-card" style="--team-color:${teamColor}; ${hasPoints}">
                         <div style="display:flex; flex-direction:column;">
-                            <span style="font-weight:bold;">${d.name}</span>
-                            <span style="font-size:0.75rem; color:#888;">${team.toUpperCase()}</span>
+                            <span style="font-weight:700; color:var(--text-primary);">${d.name}</span>
+                            <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">${team.toUpperCase()}</span>
                         </div>
                         <div style="display:flex; gap:5px;">
                             <input type="text" class="rc-pos-input form-control" style="width:50px; text-align:center; padding:5px; font-size:0.8rem;" placeholder="POS" value="${pos || ''}">
@@ -1312,7 +1274,7 @@
 
         window.viewDriverStats = () => {
             const id = document.getElementById("statsDriverSelect").value; const disp = document.getElementById("statsDisplay"); if(!id) { disp.style.display="none"; return; } disp.style.display="block";
-            const d = driversCache[id]; document.getElementById("statsDriverName").innerText = d.name.toUpperCase(); document.getElementById("statsTeamName").innerText = TEAMS.find(t=>t.id===d.team)?.name.toUpperCase() || d.team; document.getElementById("statPoints").innerHTML = `${d.totalPoints} <span style="font-size:1rem; color:#888;">PTS</span>`;
+            const d = driversCache[id]; document.getElementById("statsDriverName").innerText = d.name.toUpperCase(); document.getElementById("statsTeamName").innerText = TEAMS.find(t=>t.id===d.team)?.name.toUpperCase() || d.team; document.getElementById("statPoints").innerHTML = `${d.totalPoints} <span style="font-size:1rem; color:var(--text-secondary);">PTS</span>`;
             
             let w=0, p=0, r=0, entries=0, best=0, dnf=0, hHTML=""; 
             const labels = [], dataPoints = [], barData = []; let cumulative = 0;
@@ -1325,25 +1287,20 @@
                 
                 if(res) { 
                     entries++; 
-                    // Calculate stats
                     if(pt > 0) { 
                         r++; cumulative += pt; 
                         if(pt > best) best = pt; 
                         if(pt>=25) w++; 
                         if(pt>=15) p++; 
                     }
-                    
-                    // Track finishes for Avg
                     const numPos = parseInt(pos);
                     if(!isNaN(numPos)) {
                         totalPos += numPos;
                         finishedRaces++;
                     }
-
                     const tm = (typeof res === 'object') ? res.team : d.team; 
                     const tName = TEAMS.find(x=>x.id===tm)?.name || tm; 
-                    hHTML += `<tr><td>${t.name.toUpperCase()}</td><td style="color:var(--accent-yellow); font-weight:bold;">${pos}</td><td style="color:#888;">${tName}</td><td style="text-align:right; font-weight:bold; color:var(--accent-cyan);">${pt}</td></tr>`; 
-                    
+                    hHTML += `<tr><td>${t.name.toUpperCase()}</td><td style="color:var(--accent-yellow); font-weight:700;">${pos}</td><td style="color:var(--text-secondary); font-weight:500;">${tName}</td><td style="text-align:right; font-weight:700; color:var(--accent-cyan);">${pt}</td></tr>`; 
                     labels.push(t.id.substring(0,3).toUpperCase()); 
                     dataPoints.push(cumulative); 
                     barData.push(pt); 
@@ -1351,7 +1308,7 @@
             });
             
             let avg = finishedRaces > 0 ? totalPos / finishedRaces : 0; 
-            let variance = 0; // Consistency based on points variance for now
+            let variance = 0; 
             if(r > 0) { barData.forEach(pt => { if(pt>0) variance += Math.pow(pt - (d.totalPoints/r), 2); }); variance = Math.sqrt(variance / r).toFixed(1); }
             
             document.getElementById("statWins").innerText = w; 
@@ -1364,112 +1321,12 @@
         };
 
         function renderChart(labels, lineData, barData) {
-            const ctx1 = document.getElementById('pointsChart'); if(statsChart) statsChart.destroy(); statsChart = new Chart(ctx1, { type: 'line', data: { labels: labels, datasets: [{ label: 'Points', data: lineData, borderColor: '#00f0ff', backgroundColor: 'rgba(0, 240, 255, 0.1)', tension: 0.3, fill: true, pointBackgroundColor: '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } });
-            const ctx2 = document.getElementById('barChart'); if(barChart) barChart.destroy(); barChart = new Chart(ctx2, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Points', data: barData, backgroundColor: 'rgba(255, 59, 59, 0.6)', borderColor: '#ff3b3b', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } });
-        }
+            // Updated Colors for Light Mode Chart
+            const gridColor = 'rgba(0,0,0,0.05)';
+            const textColor = '#64748b';
 
-        // --- THREE.JS GLOBE INIT ---
-        function initGlobe() {
-            if(!globeContainer) return;
-            const w = globeContainer.offsetWidth;
-            const h = globeContainer.offsetHeight;
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
-            camera.position.z = 250;
-            camera.position.y = 100;
-
-            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(w, h);
-            globeContainer.innerHTML = '';
-            globeContainer.appendChild(renderer.domElement);
-
-            const loader = new THREE.TextureLoader();
-            loader.load('https://ksenia-k.com/img/earth-map-colored.png', (texture) => {
-                const material = new THREE.ShaderMaterial({
-                    uniforms: { u_map_tex: { type: 't', value: texture }, u_dot_size: { type: 'f', value: 4.5 }, u_time_since_click: { value: 0 }, u_pointer: { value: new THREE.Vector3() } },
-                    vertexShader: document.getElementById("vertex-shader-map").textContent,
-                    fragmentShader: document.getElementById("fragment-shader-map").textContent,
-                    transparent: true
-                });
-                const sphereGeo = new THREE.SphereGeometry(80, 64, 64);
-                globe = new THREE.Points(sphereGeo, material);
-                globe.rotation.y = -Math.PI / 2;
-                scene.add(globe);
-
-                const innerGeo = new THREE.SphereGeometry(79.5, 32, 32);
-                const innerMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-                const innerMesh = new THREE.Mesh(innerGeo, innerMat);
-                scene.add(innerMesh);
-                updateGlobeMarkers();
-            });
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableZoom = true; controls.enablePan = false; controls.minDistance = 120; controls.maxDistance = 400; controls.autoRotate = true; controls.autoRotateSpeed = 0.5;
-
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2();
-            const tooltip = document.getElementById('globe-tooltip');
-            const ttTitle = document.getElementById('gt-title');
-            const ttStatus = document.getElementById('gt-status');
-            const ttCoords = document.getElementById('gt-coords');
-
-            window.addEventListener('resize', () => { if(!globeContainer) return; const nw = globeContainer.offsetWidth; const nh = globeContainer.offsetHeight; renderer.setSize(nw, nh); camera.aspect = nw / nh; camera.updateProjectionMatrix(); });
-
-            renderer.domElement.addEventListener('mousemove', (e) => {
-                const rect = renderer.domElement.getBoundingClientRect();
-                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(globeMarkers);
-                
-                if (intersects.length > 0) {
-                    controls.autoRotate = false;
-                    document.body.style.cursor = 'pointer';
-                    const marker = intersects[0].object;
-                    const data = marker.userData;
-                    
-                    tooltip.style.display = 'block';
-                    // Calculate position relative to container
-                    tooltip.style.left = (e.clientX - rect.left + 20) + 'px';
-                    tooltip.style.top = (e.clientY - rect.top + 20) + 'px';
-                    
-                    ttTitle.innerText = data.name;
-                    ttStatus.innerText = data.date ? `SCHEDULED: ${data.date}` : "DATE TBD";
-                    ttCoords.innerText = `LAT: ${data.coords?.lat.toFixed(2) || '0.00'} | LON: ${data.coords?.lon.toFixed(2) || '0.00'}`;
-
-                    marker.scale.set(2, 2, 2);
-                    marker.material.opacity = 1;
-                    marker.material.color.setHex(0x00ff9d); // Green on hover
-                } else {
-                    controls.autoRotate = true;
-                    document.body.style.cursor = 'default';
-                    tooltip.style.display = 'none';
-                    globeMarkers.forEach(m => { m.scale.set(1, 1, 1); m.material.opacity = 0.8; m.material.color.setHex(0xff3b3b); });
-                }
-            });
-            animateGlobe();
-        }
-
-        function animateGlobe() { requestAnimationFrame(animateGlobe); controls.update(); renderer.render(scene, camera); }
-        function latLonToVector3(lat, lon, radius) { const phi = (90 - lat) * (Math.PI / 180); const theta = (lon + 180) * (Math.PI / 180); const x = -(radius * Math.sin(phi) * Math.cos(theta)); const z = (radius * Math.sin(phi) * Math.sin(theta)); const y = (radius * Math.cos(phi)); return new THREE.Vector3(x, y, z); }
-        
-        function updateGlobeMarkers() {
-            if(!globe) return;
-            globeMarkers.forEach(m => scene.remove(m)); globeMarkers = [];
-            activeTracks.forEach(t => {
-                const coords = TRACK_COORDS[t.id];
-                if(coords) {
-                    const pos = latLonToVector3(coords.lat, coords.lon, 80);
-                    const geom = new THREE.SphereGeometry(1.5, 8, 8);
-                    const mat = new THREE.MeshBasicMaterial({ color: 0xff3b3b, transparent: true, opacity: 0.8 });
-                    const mesh = new THREE.Mesh(geom, mat);
-                    pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2);
-                    mesh.position.copy(pos);
-                    mesh.userData = { name: t.name, date: t.date, coords: coords };
-                    scene.add(mesh); globeMarkers.push(mesh);
-                }
-            });
+            const ctx1 = document.getElementById('pointsChart'); if(statsChart) statsChart.destroy(); statsChart = new Chart(ctx1, { type: 'line', data: { labels: labels, datasets: [{ label: 'Points', data: lineData, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', tension: 0.3, fill: true, pointBackgroundColor: '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } }, plugins: { legend: { display: false } } } });
+            const ctx2 = document.getElementById('barChart'); if(barChart) barChart.destroy(); barChart = new Chart(ctx2, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Points', data: barData, backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: '#ef4444', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } }, plugins: { legend: { display: false } } } });
         }
     </script>
 </body>
