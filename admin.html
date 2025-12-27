@@ -161,14 +161,20 @@
         .form-control:focus { border-color: var(--accent-cyan); background: #fff; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
 
         .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .driver-card { background: #fff; border: 1px solid var(--border-dim); border: 2px solid var(--team-color, #94a3b8); border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+        
+        /* Updated Driver Card: Outer Border Color */
+        .driver-card { background: #fff; border: 2px solid var(--team-color, #94a3b8); border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
         .driver-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
         .driver-info { position: relative; z-index: 2; }
         .driver-info h4 { font-family: var(--font-display); font-size: 1.1rem; margin: 0; font-weight: 700; color: var(--text-primary); }
         .driver-info p { font-family: var(--font-ui); font-size: 0.8rem; color: var(--team-color); filter: brightness(0.8); margin: 4px 0 0; text-transform: uppercase; font-weight: 800; }
-        .icon-btn { position: relative; z-index: 2; background: none; border: 1px solid var(--border-dim); color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
-        .icon-btn:hover { background: #f1f5f9; color: var(--text-primary); }
+        
+        /* High Z-Index for Delete button so it floats above any potential overlaps */
+        .icon-btn { position: relative; z-index: 10; background: #fff; border: 1px solid var(--border-dim); color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
+        .icon-btn:hover { background: #f1f5f9; color: var(--text-primary); border-color: var(--accent-cyan); }
         .icon-btn.delete:hover { background: #fef2f2; border-color: #fecaca; color: var(--accent-red); }
+        
+        /* Team Strip for Editor Rows */
         .team-strip { width: 8px; height: 100%; position: absolute; left: 0; top: 0; background: var(--team-color, #ccc); }
 
         .tech-table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: var(--font-ui); font-size: 0.9rem; }
@@ -177,11 +183,13 @@
         .tech-table tr:hover td { background: #f8fafc; }
         .tech-table tr:last-child td { border-bottom: none; }
 
+        /* --- MODALS & TOAST --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; }
         .modal-box { background: #fff; border: 1px solid var(--border-dim); width: 90%; max-width: 480px; padding: 32px; border-radius: 16px; box-shadow: var(--shadow-lg); text-align: center; }
         .modal-title { font-family: var(--font-display); font-size: 1.5rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 800; }
-        .toast { position: fixed; bottom: 30px; right: 30px; background: #fff; border: 1px solid var(--border-dim); border-left: 4px solid var(--accent-cyan); padding: 16px 24px; color: var(--text-primary); transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 200; font-family: var(--font-ui); font-weight: 600; box-shadow: var(--shadow-lg); border-radius: 8px; }
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #0f172a; border: 1px solid #1e293b; border-left: 5px solid var(--accent-green); padding: 16px 24px; color: #ffffff; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; font-family: var(--font-ui); font-weight: 600; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); border-radius: 8px; display: flex; align-items: center; gap: 10px; }
         .toast.show { transform: translateY(0); opacity: 1; }
+        .toast i { color: var(--accent-green); font-size: 1.1rem; }
 
         /* --- LOGIN SCREEN --- */
         #login-screen { position: fixed; inset: 0; z-index: 999; background: #f1f5f9; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
@@ -421,7 +429,8 @@
         }
 
         // --- HELPER FUNCTIONS ---
-        function getTeamColor(teamId) {
+        // Internal helper, not needed in global scope
+        const getTeamColor = (teamId) => {
             if(!teamId) return '#94a3b8';
             if(TEAM_COLORS[teamId]) return TEAM_COLORS[teamId];
             const lower = teamId.toLowerCase();
@@ -429,7 +438,34 @@
             const teamObj = TEAMS.find(t => t.name.toLowerCase() === lower || t.id === lower);
             if(teamObj && TEAM_COLORS[teamObj.id]) return TEAM_COLORS[teamObj.id];
             return '#94a3b8';
-        }
+        };
+
+        // Internal helper for charts
+        const renderChart = (labels, lineData, barData) => {
+            const gridColor = 'rgba(0,0,0,0.05)';
+            const textColor = '#64748b';
+            const ctx1 = document.getElementById('pointsChart'); if(statsChart) statsChart.destroy(); statsChart = new Chart(ctx1, { type: 'line', data: { labels: labels, datasets: [{ label: 'Points', data: lineData, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', tension: 0.3, fill: true, pointBackgroundColor: '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } }, plugins: { legend: { display: false } } } });
+            const ctx2 = document.getElementById('barChart'); if(barChart) barChart.destroy(); barChart = new Chart(ctx2, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Points', data: barData, backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: '#ef4444', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } }, plugins: { legend: { display: false } } } });
+        };
+        
+        // Global Utils
+        const showToast = (msg) => {
+            const t = document.getElementById('toast');
+            // Add checkmark icon if not present in message
+            const iconHTML = '<i class="fas fa-check-circle"></i> ';
+            t.innerHTML = iconHTML + msg;
+            t.classList.add('show');
+            setTimeout(() => { t.classList.remove('show'); }, 3000);
+        };
+        window.showToast = showToast; // Explicitly attach to window
+
+        const customConfirm = (msg, onYes) => {
+            const m = document.getElementById('confirmModal');
+            document.getElementById('modalMessage').innerText = msg;
+            m.style.display = 'flex';
+            document.getElementById('btnConfirmYes').onclick = () => { m.style.display = 'none'; onYes(); };
+        };
+        window.customConfirm = customConfirm; // Explicitly attach to window
 
         // --- CORE FUNCTIONS (Attached to Window for HTML Access) ---
         window.switchTab = (id) => {
@@ -485,7 +521,7 @@
 
             if(activeTracks.length === 0) list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;">NO TRACKS CONFIGURED</div>`;
             else {
-                list.innerHTML = activeTracks.map(t => `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-radius:8px; box-shadow:var(--shadow-sm);"><div style="display:flex; align-items:center; gap:15px;"><input type="checkbox" class="track-checkbox" value="${t.id}" style="transform:scale(1.2);"><span style="font-weight:700; color:var(--text-primary); font-size:0.95rem;">${t.name}</span></div><div style="display:flex; gap:10px; align-items:center;"><input type="date" value="${t.date || ''}" onchange="updateTrackDate('${t.id}', this.value)" style="background:#fff; border:1px solid var(--border-dim); color:var(--text-primary); padding:6px; border-radius:4px;"><button class="icon-btn delete" onclick="removeTrackConfig('${t.id}')"><i class="fas fa-times"></i></button></div></div>`).join('');
+                list.innerHTML = activeTracks.map(t => `<div style="background:var(--bg-panel); border:1px solid var(--border-dim); padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-radius:8px; box-shadow:var(--shadow-sm);"><div style="display:flex; align-items:center; gap:15px;"><input type="checkbox" class="track-checkbox" value="${t.id}" style="transform:scale(1.2);"><span style="font-weight:700; color:var(--text-primary); font-size:0.95rem;">${t.name}</span></div><div style="display:flex; gap:10px; align-items:center;"><input type="date" value="${t.date || ''}" onchange="updateTrackDate('${t.id}', this.value)" style="background:#fff; border:1px solid var(--border-dim); color:var(--text-primary); padding:6px; border-radius:4px;"><button class="icon-btn delete" onclick="window.removeTrackConfig('${t.id}')"><i class="fas fa-times"></i></button></div></div>`).join('');
             }
             
             const rs = document.getElementById("raceDirectorTrackSelect");
@@ -765,7 +801,7 @@
             calcTotal();
         };
         
-        // --- ADDED: RENAME FUNCTION ---
+        // --- ADDED: RENAME FUNCTION (With Ack) ---
         window.updateDriverName = async () => {
             const id = document.getElementById("editorDriverIdHidden").value;
             const newName = document.getElementById("editorDriverNameInput").value.trim();
@@ -773,11 +809,13 @@
             
             try {
                 await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { name: newName });
+                // Update the input immediately for responsiveness
                 document.getElementById("editorDriverNameInput").value = newName; 
-                showToast("Driver Renamed");
+                // Show High-Vis Toast
+                showToast("DRIVER RENAMED SUCCESSFULLY");
             } catch(e) {
                 console.error(e);
-                showToast("Error Renaming Driver");
+                showToast("ERROR: COULD NOT RENAME");
             }
         };
 
@@ -810,7 +848,8 @@
                     total += val; 
                 } 
             });
-            await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { results: newResults, totalPoints: total }); showToast("Driver Updated");
+            await updateDoc(doc(db, "seasons", currentSeason, "drivers", id), { results: newResults, totalPoints: total }); 
+            showToast("CHANGES SAVED"); // Ack for Driver Editor Save
         };
 
         window.triggerImport = () => document.getElementById('csvFile').click();
@@ -859,7 +898,21 @@
                 let team = d.team; if (r[tid] && typeof r[tid] === 'object' && r[tid].team) { team = r[tid].team; }
                 const teamColor = getTeamColor(team);
                 const teamName = TEAMS.find(t => t.id === team)?.name || team;
-                gridHTML += `<div class="driver-card" style="--team-color:${teamColor};"><div class="driver-info"><span style="display:block; font-weight:700; color:var(--text-primary); font-size:1.05rem;">${d.name}</span><span style="display:block; font-size:0.75rem; color:${teamColor}; font-weight:700; text-transform:uppercase; margin-top:2px;">${teamName}</span></div><div style="display:flex; gap:5px; position:relative; z-index:2;"><input type="text" class="rc-pos-input form-control" style="width:60px; text-align:center; padding:5px; font-size:0.9rem; font-weight:700; text-transform:uppercase;" placeholder="POS" value="${pos || ''}"><input type="number" class="rc-points-input form-control" style="width:70px; text-align:center; padding:5px; font-weight:800; color:var(--accent-cyan);" placeholder="PTS" data-did="${d.id}" value="${pts}"></div></div>`;
+                
+                // FIXED: Removed the blue tint background for cards with points
+                const hasPoints = '';
+                
+                gridHTML += `
+                    <div class="driver-card" style="--team-color:${teamColor}; ${hasPoints}">
+                        <div class="driver-info">
+                            <span style="display:block; font-weight:700; color:var(--text-primary); font-size:1.05rem;">${d.name}</span>
+                            <span style="display:block; font-size:0.75rem; color:${teamColor}; font-weight:700; text-transform:uppercase; margin-top:2px;">${teamName}</span>
+                        </div>
+                        <div style="display:flex; gap:5px; position:relative; z-index:2;">
+                            <input type="text" class="rc-pos-input form-control" style="width:60px; text-align:center; padding:5px; font-size:0.9rem; font-weight:700; text-transform:uppercase;" placeholder="POS" value="${pos || ''}">
+                            <input type="number" class="rc-points-input form-control" style="width:70px; text-align:center; padding:5px; font-weight:800; color:var(--accent-cyan);" placeholder="PTS" data-did="${d.id}" value="${pts}">
+                        </div>
+                    </div>`;
             });
             con.innerHTML = gridHTML;
         };
@@ -877,7 +930,12 @@
                     batch.update(doc(db, "seasons", currentSeason, "drivers", did), { results: resUpd, totalPoints: newTot }); changes++; 
                 }
             });
-            if(changes > 0) { await batch.commit(); showToast("Results Saved"); } else showToast("No Changes");
+            if(changes > 0) { 
+                await batch.commit(); 
+                showToast("RACE RESULTS COMMITTED"); // Ack for Race Director
+            } else { 
+                showToast("NO CHANGES DETECTED"); 
+            }
         };
 
         window.viewDriverStats = () => {
@@ -902,13 +960,6 @@
             document.getElementById("statWins").innerText = w; document.getElementById("statPodiums").innerText = p; document.getElementById("statAvg").innerText = avg > 0 ? "P" + avg.toFixed(1) : "-"; document.getElementById("statConsistency").innerText = variance; document.getElementById("statsHistoryBody").innerHTML = hHTML || `<tr><td colspan="4" style="text-align:center;">NO DATA</td></tr>`;
             renderChart(labels, dataPoints, barData);
         };
-
-        function renderChart(labels, lineData, barData) {
-            const gridColor = 'rgba(0,0,0,0.05)';
-            const textColor = '#64748b';
-            const ctx1 = document.getElementById('pointsChart'); if(statsChart) statsChart.destroy(); statsChart = new Chart(ctx1, { type: 'line', data: { labels: labels, datasets: [{ label: 'Points', data: lineData, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', tension: 0.3, fill: true, pointBackgroundColor: '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } }, plugins: { legend: { display: false } } } });
-            const ctx2 = document.getElementById('barChart'); if(barChart) barChart.destroy(); barChart = new Chart(ctx2, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Points', data: barData, backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: '#ef4444', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } }, x: { grid: { display: false }, ticks: { color: textColor } } }, plugins: { legend: { display: false } } } });
-        }
 
         // --- VISUALIZATION HELPERS ---
         function updateLiveTables() {
@@ -950,7 +1001,7 @@
                     const teamColor = TEAM_COLORS[data.team] || '#94a3b8';
                     const teamName = TEAMS.find(t => t.id === data.team)?.name || data.team;
                     if(statSel) statSel.innerHTML += `<option value="${data.id}">${data.name.toUpperCase()}</option>`;
-                    if(list) list.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}"><div style="display:flex; align-items:center; gap:12px; position:relative; z-index:2;"><input type="checkbox" class="driver-checkbox" value="${data.id}" style="transform:scale(1.2);"><div class="driver-info"><h4>${data.name}</h4><p>${teamName}</p></div></div><button class="icon-btn delete" onclick="deleteDriver('${data.id}')"><i class="fas fa-trash"></i></button></div>`;
+                    if(list) list.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}"><div style="display:flex; align-items:center; gap:12px; position:relative; z-index:2;"><input type="checkbox" class="driver-checkbox" value="${data.id}" style="transform:scale(1.2);"><div class="driver-info"><h4>${data.name}</h4><p>${teamName}</p></div></div><button class="icon-btn delete" onclick="window.deleteDriver('${data.id}')"><i class="fas fa-trash"></i></button></div>`;
                     if(grid) grid.innerHTML += `<div class="driver-card" style="--team-color:${teamColor}; cursor:pointer;" onclick="loadDriverData('${data.id}')"><div class="driver-info"><h4>${data.name}</h4><p>${teamName}</p></div><div style="position:relative; z-index:2; font-family:var(--font-display); font-size:1.2rem; color:var(--accent-cyan); font-weight:800;">${data.totalPoints} PTS</div></div>`;
                 });
                 if(document.getElementById("raceDirectorGrid") && document.getElementById("raceDirectorGrid").style.display === "block") loadRaceGrid();
